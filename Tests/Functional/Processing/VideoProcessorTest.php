@@ -61,5 +61,6 @@ class VideoProcessorTest extends FunctionalTestCase
         $processedFile = $resourceStorage->processFile($file, 'Video.CropScale', []);
 
         $this->assertTrue($processedFile->isProcessed());
+        $this->assertEquals('mp4', $processedFile->getExtension());
     }
 }

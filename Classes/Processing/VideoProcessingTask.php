@@ -19,11 +19,6 @@ class VideoProcessingTask extends AbstractTask
     protected $name = 'CropScale';
 
     /**
-     * @var string
-     */
-    protected $targetFileExtension = 'mp4';
-
-    /**
      * Checks if the given configuration is sensible for this task, i.e. if all required parameters
      * are given, within the boundaries and don't conflict with each other.
      *
@@ -47,6 +42,11 @@ class VideoProcessingTask extends AbstractTask
     public function fileNeedsProcessing()
     {
         return true;
+    }
+
+    public function getTargetFileExtension()
+    {
+        return preg_split('#\W#', $this->getRequestedFormat(), 2)[0];
     }
 
     public function getRequestedFormat(): string
