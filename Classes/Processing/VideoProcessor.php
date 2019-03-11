@@ -82,6 +82,7 @@ class VideoProcessor implements ProcessorInterface
 
     protected function getConverter(): VideoConverterInterface
     {
-        return GeneralUtility::makeInstance(ObjectManager::class)->get(LocalVideoConverter::class);
+        $videoConverter = $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['hauptsache_video']['video_converter'] ?? [LocalVideoConverter::class];
+        return GeneralUtility::makeInstance(ObjectManager::class)->get(...$videoConverter);
     }
 }

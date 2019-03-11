@@ -4,7 +4,6 @@ namespace Hn\HauptsacheVideo\Tests\Functional\Processing;
 
 
 use Hn\HauptsacheVideo\Converter\LocalVideoConverter;
-use Hn\HauptsacheVideo\Converter\VideoConverterInterface;
 use Nimut\TestingFramework\TestCase\FunctionalTestCase;
 use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
 use TYPO3\CMS\Core\Resource\DuplicationBehavior;
@@ -58,7 +57,7 @@ class VideoProcessorTest extends FunctionalTestCase
 
         $videoConverter = $this->createMock(LocalVideoConverter::class);
         $videoConverter->expects($this->once())->method('start');
-        GeneralUtility::setSingletonInstance(LocalVideoConverter::class, $videoConverter);
+        GeneralUtility::addInstance(LocalVideoConverter::class, $videoConverter);
         $processedFile = $resourceStorage->processFile($file, 'Video.CropScale', []);
 
         $this->assertTrue($processedFile->isProcessed());

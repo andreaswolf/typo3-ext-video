@@ -4,9 +4,8 @@ namespace Hn\HauptsacheVideo\Converter;
 
 use Hn\HauptsacheVideo\Exception\ConversionException;
 use Hn\HauptsacheVideo\Processing\VideoProcessingTask;
-use TYPO3\CMS\Core\SingletonInterface;
 
-interface VideoConverterInterface extends SingletonInterface
+interface VideoConverterInterface
 {
     /**
      * This method will start the conversion process using the provided options.
