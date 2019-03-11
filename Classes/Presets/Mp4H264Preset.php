@@ -3,7 +3,7 @@
 namespace Hn\HauptsacheVideo\Presets;
 
 
-class Mp4Preset implements FFmpegPresetInterface
+class Mp4H264Preset implements FFmpegPresetInterface
 {
     /**
      * Defines the limits of the different h264 levels.

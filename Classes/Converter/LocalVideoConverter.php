@@ -4,7 +4,7 @@ namespace Hn\HauptsacheVideo\Converter;
 
 
 use Hn\HauptsacheVideo\Exception\ConversionException;
-use Hn\HauptsacheVideo\Presets\Mp4Preset;
+use Hn\HauptsacheVideo\Presets\Mp4H264Preset;
 use Hn\HauptsacheVideo\Processing\VideoProcessingTask;
 use TYPO3\CMS\Core\Log\LogManager;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -48,7 +48,7 @@ class LocalVideoConverter implements VideoConverterInterface
         $command = [$executable];
         array_push($command, '-i', $task->getSourceFile()->getForLocalProcessing(false));
 
-        $preset = $this->presetRepository->getPresetForFormat($task->getRequestedFormat()) ?? new Mp4Preset();
+        $preset = $this->presetRepository->getPresetForFormat($task->getRequestedFormat()) ?? new Mp4H264Preset();
         array_push($command, ...$preset->getParameters(
             $task->getWidth(),
             $task->getHeight(),

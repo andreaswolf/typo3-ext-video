@@ -5,7 +5,7 @@ if (!defined('TYPO3_MODE')) {
 }
 
 $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['hauptsache_video']['presets'] = [
-    'mp4' => [\Hn\HauptsacheVideo\Presets\Mp4Preset::class, 'main', '3.1', 4.0, 30, 'fast'],
+    'mp4' => [\Hn\HauptsacheVideo\Presets\Mp4H264Preset::class, 'main', '3.1', 4.0, 30, 'fast'],
 ];
 
 $GLOBALS['TYPO3_CONF_VARS']['SYS']['fal']['processingTaskTypes']['Video.CropScale']
