@@ -130,8 +130,8 @@ class Mp4H264Preset extends AbstractFFmpegPreset
         $maxResolutionPerFrame = self::LEVEL_DEFINITION[$this->level][0];
         if (($width * $height) > $maxResolutionPerFrame) {
             $msg = "The desired resolution ({$width}x{$height}) exceeds the h264 level $this->level capabilities.";
-            trigger_error($msg, E_USER_NOTICE);
-            $scalingFactor = $maxResolutionPerFrame / ($width * $height);
+            @trigger_error($msg, E_USER_NOTICE);
+            $scalingFactor = sqrt($maxResolutionPerFrame / ($width * $height));
             $width = floor($width * $scalingFactor / $divisor) * $divisor;
             $height = floor($height * $scalingFactor / $divisor) * $divisor;
         }
