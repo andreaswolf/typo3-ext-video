@@ -3,7 +3,7 @@
 namespace Hn\HauptsacheVideo\Presets;
 
 
-class Mp4H264Preset implements FFmpegPresetInterface
+class Mp4H264Preset extends AbstractFFmpegPreset
 {
     /**
      * Defines the limits of the different h264 levels.
@@ -123,14 +123,6 @@ class Mp4H264Preset implements FFmpegPresetInterface
 
     protected function getVideoParameters(int $width, int $height, float $quality): array
     {
-        if ($width < 16 || $height < 16) {
-            throw new \RuntimeException("The minimum resolution is 16x16, got {$width}x{$height}");
-        }
-
-        if ($quality <= 0.0 || $quality > 1.0) {
-            throw new \RuntimeException("Quality must be higher than 0.0 and lower or equal to 1.0, got $quality.");
-        }
-
         $divisor = 2; // chroma sub-sampling requires the resolution to be divisible by 2
         $width = round($width / $divisor) * $divisor;
         $height = round($height / $divisor) * $divisor;
@@ -144,7 +136,7 @@ class Mp4H264Preset implements FFmpegPresetInterface
             $height = floor($height * $scalingFactor / $divisor) * $divisor;
         }
 
-        $parameters = [];
+        $parameters = ['-c:v', 'libx264'];
 
         // limit resolution to the specified values
         array_push($parameters, '-vf', implode(',', [
@@ -152,7 +144,6 @@ class Mp4H264Preset implements FFmpegPresetInterface
             "crop=$width:$height",
         ]));
 
-        array_push($parameters, '-c:v', 'libx264');
         array_push($parameters, '-preset', $this->preset);
 
         $maxResolutionPerSecond = self::LEVEL_DEFINITION[$this->level][1];
@@ -207,8 +198,7 @@ class Mp4H264Preset implements FFmpegPresetInterface
 
     protected function getAudioParameters(float $quality): array
     {
-        $parameters = [];
-        array_push($parameters, '-c:a', 'aac'); // native aac encoder ~ libfdk_aac probably is better but might not be present
+        $parameters = ['-c:a', 'aac']; // native aac encoder ~ libfdk_aac probably is better but might not be present
 
         // http://wiki.hydrogenaud.io/index.php?title=Fraunhofer_FDK_AAC#Recommended_Sampling_Rate_and_Bitrate_Combinations
         // there is also an astonishing amount of incompatibility with some android devices so stick to that table.
@@ -234,16 +224,9 @@ class Mp4H264Preset implements FFmpegPresetInterface
         return $parameters;
     }
 
-    public function getParameters(int $width, int $height, bool $audio, float $quality): array
+    protected function getContainerParameters(): array
     {
-        $parameters = $this->getVideoParameters($width, $height, $quality);
-
-        if ($audio) {
-            array_push($parameters, ...$this->getAudioParameters($quality));
-        } else {
-            array_push($parameters, '-an');
-        }
-
+        $parameters = [];
         array_push($parameters, '-movflags', '+faststart');
         array_push($parameters, '-f', 'mp4');
         return $parameters;
