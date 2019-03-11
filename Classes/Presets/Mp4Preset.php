@@ -174,12 +174,12 @@ class Mp4Preset implements FFmpegPresetInterface
         // for h264 the range should is 51-0 according to ffmpeg https://trac.ffmpeg.org/wiki/Encode/H.264#crf
         // The recommended range however is 18 to 28
         // quality 1.0 = crf 18
-        // quality 0.9 = crf 20
-        // quality 0.8 = crf 22
-        // quality 0.7 = crf 24
-        // quality 0.6 = crf 26
-        // quality 0.5 = crf 28
-        array_push($parameters, '-crf', round(38 - $quality * 20));
+        // quality 0.9 = crf 21
+        // quality 0.8 = crf 24
+        // quality 0.7 = crf 27
+        // quality 0.6 = crf 30
+        // quality 0.5 = crf 33
+        array_push($parameters, '-crf', round(48 - $quality * 30));
 
         // limit the bitrate to a value calculated by the resolution
         // this ensures that a video with a lot of movement does not explode in file size
