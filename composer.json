@@ -1,0 +1,80 @@
+{
+    "name": "hn/hauptsache_video",
+    "description": "Video transcoding in typo3",
+    "type": "typo3-cms-extension",
+    "license": "GPL-2.0-or-later",
+    "authors": [
+        {
+            "name": "Marco Pfeiffer",
+            "email": "marco@hauptsache.net",
+            "homepage": "https://www.marco.zone",
+            "role": "Developer"
+        },
+        {
+            "name": "Alexander Bernhardt",
+            "email": "bernhardt@hauptsache.net",
+            "homepage": "https://www.hauptsache.net",
+            "role": "Project manager"
+        }
+    ],
+    "require": {
+        "php": "7.1.* || 7.2.*",
+        "typo3/cms-core": "~8.7.7 || ~9.5.0"
+    },
+    "require-dev": {
+        "nimut/testing-framework": "^4.1",
+        "phpunit/phpunit": "^6.5"
+    },
+    "conflict": {
+        "typo3/cms-composer-installers": "<1.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "Hn\\HauptsacheVideo\\": "Classes"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Hn\\HauptsacheVideo\\Tests\\": "Tests"
+        }
+    },
+    "config": {
+        "sort-packages": true,
+        "vendor-dir": ".Build/vendor",
+        "bin-dir": ".Build/bin"
+    },
+    "extra": {
+        "typo3/cms": {
+            "web-dir": ".Build",
+            "app-dir": ".Build"
+        }
+    },
+    "scripts": {
+        "post-autoload-dump": [
+            "mkdir -p .Build/typo3conf/ext",
+            "ln -s ../../../ .Build/typo3conf/ext/hauptsache_video || true"
+        ],
+        "db:start": [
+            "docker run --name `basename $PWD`_db -d -p3306:3306 -eMYSQL_ALLOW_EMPTY_PASSWORD=yes mysql:5.7 mysqld --character-set-server=utf8 --collation-server=utf8_general_ci",
+            "while ! docker exec `basename $PWD`_db mysql -e 'SELECT 1' &> /dev/null; do printf . && sleep 1; done && echo "
+        ],
+        "db:stop": [
+            "docker rm --force --volumes `basename $PWD`_db",
+            "rm -r .Build/typo3temp/var/tests/"
+        ],
+        "db:restart": [
+            "@db:stop",
+            "@db:start"
+        ],
+        "test:functional": [
+            "phpunit -c Tests/FunctionalTests.xml"
+        ],
+        "test:unit": [
+            "phpunit -c Tests/UnitTests.xml"
+        ],
+        "test": [
+            "@test:unit",
+            "@test:functional"
+        ]
+    }
+}
