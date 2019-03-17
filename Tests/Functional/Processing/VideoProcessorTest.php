@@ -23,6 +23,10 @@ class VideoProcessorTest extends FunctionalTestCase
     protected $objectManager;
     /** @var StorageRepository */
     protected $storageRepository;
+    /** @var ResourceStorage */
+    protected $resourceStorage;
+    /** @var File */
+    protected $file;
 
     protected function setUp()
     {
@@ -32,6 +36,15 @@ class VideoProcessorTest extends FunctionalTestCase
         $GLOBALS['BE_USER'] = $this->createConfiguredMock(BackendUserAuthentication::class, [
             'isAdmin' => true,
         ]);
+
+        $this->resourceStorage = $this->storageRepository->findByUid(1);
+        $this->file = $this->resourceStorage->addFile(
+            __DIR__ . '/../../Resources/File.mp4',
+            $this->resourceStorage->getRootLevelFolder(),
+            'File.mp4',
+            DuplicationBehavior::REPLACE,
+            false
+        );
     }
 
     protected function tearDown()
@@ -41,26 +54,46 @@ class VideoProcessorTest extends FunctionalTestCase
         GeneralUtility::purgeInstances();
     }
 
+    public function __sleep()
+    {
+        return [];
+    }
+
     public function testProcessing()
     {
-        $resourceStorage = $this->storageRepository->findByUid(1);
-        $this->assertInstanceOf(ResourceStorage::class, $resourceStorage);
-
-        $file = $resourceStorage->addFile(
-            __DIR__ . '/../../Resources/File.mp4',
-            $resourceStorage->getRootLevelFolder(),
-            'File.mp4',
-            DuplicationBehavior::REPLACE,
-            false
-        );
-        $this->assertInstanceOf(File::class, $file);
-
         $videoConverter = $this->createMock(LocalVideoConverter::class);
         $videoConverter->expects($this->once())->method('start');
         GeneralUtility::addInstance(LocalVideoConverter::class, $videoConverter);
-        $processedFile = $resourceStorage->processFile($file, 'Video.CropScale', []);
+        $processedFile = $this->resourceStorage->processFile($this->file, 'Video.CropScale', []);
 
         $this->assertTrue($processedFile->isProcessed());
         $this->assertEquals('mp4', $processedFile->getExtension());
+        //$this->assertFileExists($processedFile->getForLocalProcessing(false));
+    }
+
+    public function testReprocessAsLongAsNotFinished()
+    {
+        $videoConverter = $this->createMock(LocalVideoConverter::class);
+        $videoConverter->expects($this->exactly(2))->method('start');
+
+        GeneralUtility::addInstance(LocalVideoConverter::class, $videoConverter);
+        GeneralUtility::addInstance(LocalVideoConverter::class, $videoConverter);
+
+        $path = $this->file->getForLocalProcessing(false);
+        $contentBefore = $this->file->getContents();
+        $processedFile1 = $this->resourceStorage->processFile($this->file, 'Video.CropScale', []);
+        $processedFile2 = $this->resourceStorage->processFile($this->file, 'Video.CropScale', []);
+        $this->assertEquals($path, $this->file->getForLocalProcessing(false));
+        $this->assertEquals($contentBefore, $this->file->getContents());
+
+        //$this->assertEquals($processedFile1->getIdentifier(), $processedFile2->getIdentifier());
+        $this->assertTrue($processedFile1->isProcessed());
+        $this->assertTrue($processedFile2->isProcessed());
+        $this->assertEquals('mp4', $processedFile1->getExtension());
+        $this->assertEquals('mp4', $processedFile2->getExtension());
+        $this->assertSame($processedFile1->getOriginalFile(), $processedFile2->getOriginalFile());
+        //$this->assertFileExists($processedFile2->getForLocalProcessing(false));
+
+        $this->markTestIncomplete("it must be prevented that every call creates a new processed file.");
     }
 }
