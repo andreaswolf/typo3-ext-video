@@ -146,9 +146,11 @@ class Mp4H264Preset extends AbstractFFmpegPreset
 
         array_push($parameters, '-preset', $this->preset);
 
+        // TODO changing the framerate is a actually a dump idea and should only be done if required
+        // also this might increase the framerate of 24 fps video wich is also a very bad idea
         $maxResolutionPerSecond = self::LEVEL_DEFINITION[$this->level][1];
         $framerate = min($this->maxFramerate, $maxResolutionPerSecond / ($width * $height));
-        array_push($parameters, '-r', round($framerate, 2, PHP_ROUND_HALF_DOWN), '-vsync', 'vfr');
+        array_push($parameters, '-r', round($framerate, 2, PHP_ROUND_HALF_DOWN), '-vsync', 'cfr');
 
         // limit the capabilities to ensure max compatibility
         array_push($parameters, '-profile:v', $this->profile);
