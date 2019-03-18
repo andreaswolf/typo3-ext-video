@@ -1,0 +1,47 @@
+options:
+  max-time: 5 # minutes per step
+clone:
+  depth: 1 # only the last history step ~ why would i need anything else?
+definitions:
+  services:
+    mysql:
+      image: mysql:5.7
+      environment:
+        MYSQL_ROOT_PASSWORD: password
+
+pipelines:
+  default:
+    - parallel:
+        - step:
+            name: TYPO3 8 with PHP 7.1
+            image: chialab/php:7.1
+            caches:
+              - composer
+            services:
+              - mysql
+            script:
+              - composer require typo3/cms-core:8.7.*
+              - export typo3DatabaseName=test typo3DatabaseHost=127.0.0.1 typo3DatabaseUsername=root typo3DatabasePassword=password
+              - composer test
+        - step:
+            name: TYPO3 8 with PHP 7.2
+            image: chialab/php:7.2
+            caches:
+              - composer
+            services:
+              - mysql
+            script:
+              - composer require typo3/cms-core:8.7.*
+              - export typo3DatabaseName=test typo3DatabaseHost=127.0.0.1 typo3DatabaseUsername=root typo3DatabasePassword=password
+              - composer test
+        - step:
+            name: TYPO3 9 with PHP 7.2
+            image: chialab/php:7.2
+            caches:
+              - composer
+            services:
+              - mysql
+            script:
+              - composer require typo3/cms-core:9.5.*
+              - export typo3DatabaseName=test typo3DatabaseHost=127.0.0.1 typo3DatabaseUsername=root typo3DatabasePassword=password
+              - composer test
