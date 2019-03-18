@@ -3,97 +3,91 @@
 namespace Hn\HauptsacheVideo\Tests\Functional\Processing;
 
 
-use Hn\HauptsacheVideo\Converter\LocalVideoConverter;
-use Nimut\TestingFramework\TestCase\FunctionalTestCase;
-use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
-use TYPO3\CMS\Core\Resource\DuplicationBehavior;
-use TYPO3\CMS\Core\Resource\File;
-use TYPO3\CMS\Core\Resource\ResourceStorage;
-use TYPO3\CMS\Core\Resource\StorageRepository;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Object\ObjectManager;
+use Hn\HauptsacheVideo\Converter\VideoConverterInterface;
+use Hn\HauptsacheVideo\Domain\Model\StoredTask;
+use Hn\HauptsacheVideo\Domain\Repository\StoredTaskRepository;
+use Hn\HauptsacheVideo\Processing\VideoProcessingTask;
+use Hn\HauptsacheVideo\Processing\VideoProcessor;
+use Hn\HauptsacheVideo\Tests\Functional\FunctionalTestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class VideoProcessorTest extends FunctionalTestCase
 {
-    protected $testExtensionsToLoad = [
-        'typo3conf/ext/hauptsache_video',
-    ];
-
-    /** @var ObjectManager */
-    protected $objectManager;
-    /** @var StorageRepository */
-    protected $storageRepository;
-    /** @var ResourceStorage */
-    protected $resourceStorage;
-    /** @var File */
-    protected $file;
+    /** @var VideoConverterInterface|MockObject */
+    protected $converter;
 
     protected function setUp()
     {
         parent::setUp();
-        $this->objectManager = GeneralUtility::makeInstance(ObjectManager::class);
-        $this->storageRepository = $this->objectManager->get(StorageRepository::class);
-        $GLOBALS['BE_USER'] = $this->createConfiguredMock(BackendUserAuthentication::class, [
-            'isAdmin' => true,
-        ]);
 
-        $this->resourceStorage = $this->storageRepository->findByUid(1);
-        $this->file = $this->resourceStorage->addFile(
-            __DIR__ . '/../../Resources/File.mp4',
-            $this->resourceStorage->getRootLevelFolder(),
-            'File.mp4',
-            DuplicationBehavior::REPLACE,
-            false
-        );
+        $this->converter = $this->createMock(VideoConverterInterface::class);
+        $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['hauptsache_video']['video_converter'] = $this->converter;
     }
 
     protected function tearDown()
     {
+        unset($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['hauptsache_video']['video_converter']); // TODO reset
         parent::tearDown();
-        unset($GLOBALS['BE_USER']);
-        GeneralUtility::purgeInstances();
     }
 
-    public function __sleep()
+    public function testProcessFile()
     {
-        return [];
+        $this->converter->expects($this->once())->method('start');
+        $this->converter->expects($this->never())->method('process');
+
+        $this->assertEquals(0, $this->getDatabaseConnection()->selectCount('uid', 'tx_hauptsachevideo_domain_model_storedtask'));
+        $this->assertEquals(0, $this->getDatabaseConnection()->selectCount('uid', 'sys_file_processedfile'));
+
+        $this->resourceStorage->processFile($this->file, 'Video.CropScale', []);
+
+        $this->assertEquals(1, $this->getDatabaseConnection()->selectCount('uid', 'tx_hauptsachevideo_domain_model_storedtask'));
+        $this->assertEquals(0, $this->getDatabaseConnection()->selectCount('uid', 'sys_file_processedfile'));
     }
 
-    public function testProcessing()
+    public function testDoProcessFile()
     {
-        $videoConverter = $this->createMock(LocalVideoConverter::class);
-        $videoConverter->expects($this->once())->method('start');
-        GeneralUtility::addInstance(LocalVideoConverter::class, $videoConverter);
-        $processedFile = $this->resourceStorage->processFile($this->file, 'Video.CropScale', []);
+        $this->converter->expects($this->once())->method('start');
+        $this->converter->expects($this->once())->method('process');
 
-        $this->assertTrue($processedFile->isProcessed());
-        $this->assertEquals('mp4', $processedFile->getExtension());
-        //$this->assertFileExists($processedFile->getForLocalProcessing(false));
+        $this->resourceStorage->processFile($this->file, 'Video.CropScale', []);
+
+        /** @var StoredTask $storedTask */
+        $storedTask = $this->objectManager->get(StoredTaskRepository::class)->findAll()->getFirst();
+        $this->assertInstanceOf(StoredTask::class, $storedTask);
+
+        $videoProcessor = $this->objectManager->get(VideoProcessor::class);
+        $task = $storedTask->getOriginalTask();
+        $videoProcessor->doProcessTask($task);
+        $this->assertFalse($task->isExecuted());
     }
 
-    public function testReprocessAsLongAsNotFinished()
+    public function testActuallyDoProcessFile()
     {
-        $videoConverter = $this->createMock(LocalVideoConverter::class);
-        $videoConverter->expects($this->exactly(2))->method('start');
+        $this->converter->expects($this->once())->method('start');
+        $this->converter->expects($this->once())->method('process')->willReturnCallback(function (VideoProcessingTask $task) {
+            $processedFile = $task->getTargetFile();
+            $processedFile->setName($task->getTargetFilename());
+            $processedFile->updateProperties([
+                'checksum' => $task->getConfigurationChecksum(),
+                'width' => 1280,
+                'height' => 720,
+            ]);
+            $task->setExecuted(true);
+        });
 
-        GeneralUtility::addInstance(LocalVideoConverter::class, $videoConverter);
-        GeneralUtility::addInstance(LocalVideoConverter::class, $videoConverter);
+        $this->resourceStorage->processFile($this->file, 'Video.CropScale', []);
 
-        $path = $this->file->getForLocalProcessing(false);
-        $contentBefore = $this->file->getContents();
-        $processedFile1 = $this->resourceStorage->processFile($this->file, 'Video.CropScale', []);
-        $processedFile2 = $this->resourceStorage->processFile($this->file, 'Video.CropScale', []);
-        $this->assertEquals($path, $this->file->getForLocalProcessing(false));
-        $this->assertEquals($contentBefore, $this->file->getContents());
+        /** @var StoredTask $storedTask */
+        $storedTask = $this->objectManager->get(StoredTaskRepository::class)->findAll()->getFirst();
+        $this->assertInstanceOf(StoredTask::class, $storedTask);
 
-        //$this->assertEquals($processedFile1->getIdentifier(), $processedFile2->getIdentifier());
-        $this->assertTrue($processedFile1->isProcessed());
-        $this->assertTrue($processedFile2->isProcessed());
-        $this->assertEquals('mp4', $processedFile1->getExtension());
-        $this->assertEquals('mp4', $processedFile2->getExtension());
-        $this->assertSame($processedFile1->getOriginalFile(), $processedFile2->getOriginalFile());
-        //$this->assertFileExists($processedFile2->getForLocalProcessing(false));
+        $videoProcessor = $this->objectManager->get(VideoProcessor::class);
+        $task = $storedTask->getOriginalTask();
+        $videoProcessor->doProcessTask($task);
 
-        $this->markTestIncomplete("it must be prevented that every call creates a new processed file.");
+        $this->assertTrue($task->isExecuted());
+        $this->assertTrue($task->isSuccessful());
+        $this->assertTrue($task->getTargetFile()->isProcessed());
+        $this->assertTrue($task->getTargetFile()->isPersisted());
     }
 }

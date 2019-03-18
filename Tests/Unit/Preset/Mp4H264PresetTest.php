@@ -21,7 +21,7 @@ class Mp4H264PresetTest extends UnitTestCase
             '-r',
             '30',
             '-vsync',
-            'vfr',
+            'cfr',
             '-profile:v',
             'main',
             '-level',

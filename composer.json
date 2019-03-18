@@ -19,6 +19,7 @@
     ],
     "require": {
         "php": "7.1.* || 7.2.*",
+        "ext-json": "*",
         "typo3/cms-core": "~8.7.7 || ~9.5.0"
     },
     "require-dev": {
@@ -54,17 +55,17 @@
             "mkdir -p .Build/typo3conf/ext",
             "ln -s ../../../ .Build/typo3conf/ext/hauptsache_video || true"
         ],
-        "db:start": [
-            "docker run --name `basename $PWD`_db -d -p3306:3306 -eMYSQL_ALLOW_EMPTY_PASSWORD=yes mysql:5.7 mysqld --character-set-server=utf8 --collation-server=utf8_general_ci",
-            "while ! docker exec `basename $PWD`_db mysql -e 'SELECT 1' &> /dev/null; do printf . && sleep 1; done && echo "
+        "cc": [
+            "rm -rf .Build/typo3temp/var/tests/"
         ],
         "db:stop": [
-            "docker rm --force --volumes `basename $PWD`_db",
-            "rm -r .Build/typo3temp/var/tests/"
+            "docker rm --force --volumes `basename $PWD`_db || true"
         ],
-        "db:restart": [
+        "db:start": [
             "@db:stop",
-            "@db:start"
+            "@cc",
+            "docker run --rm --name `basename $PWD`_db -d -p3306:3306 -eMYSQL_ALLOW_EMPTY_PASSWORD=yes mysql:5.7 mysqld --character-set-server=utf8 --collation-server=utf8_general_ci",
+            "while ! docker exec `basename $PWD`_db mysql -e 'SELECT 1' &> /dev/null; do printf . && sleep 1; done && echo database is running"
         ],
         "test:functional": [
             "phpunit -c Tests/FunctionalTests.xml"

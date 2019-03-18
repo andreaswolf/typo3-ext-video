@@ -27,16 +27,19 @@ class LocalVideoConverter implements VideoConverterInterface
     protected $presetRepository;
 
     /**
-     * This method will start the conversion process using the provided options.
-     *
-     * It must not block the process. If the process can't run async, than it must not run here.
-     * However this method must check if the conversion is possible and throw a ConversionException if it can't.
-     *
+     * @param VideoProcessingTask $task
+     */
+    public function start(VideoProcessingTask $task): void
+    {
+        // nothing to do here.
+    }
+
+    /**
      * @param VideoProcessingTask $task
      *
      * @throws ConversionException
      */
-    public function start(VideoProcessingTask $task): void
+    public function process(VideoProcessingTask $task): void
     {
         $logger = GeneralUtility::makeInstance(LogManager::class)->getLogger(__CLASS__);
 
@@ -63,11 +66,22 @@ class LocalVideoConverter implements VideoConverterInterface
 
         $string = $this->commandUtility->exec($commandStr, $output, $returnValue);
 
-        if ($returnValue === 0) {
+        if ($returnValue === 0 || $returnValue === null) {
             $logger->notice($commandStr . $string . implode("\n", $output), ['returnValue' => $returnValue]);
-            $task->getTargetFile()->updateWithLocalFile($tempFilename);
+
+            $processedFile = $task->getTargetFile();
+            $processedFile->setName($task->getTargetFilename());
+            $processedFile->updateProperties([
+                'checksum' => $task->getConfigurationChecksum(),
+                'width' => $task->getWidth(),
+                'height' => $task->getHeight(),
+            ]);
+            $processedFile->updateWithLocalFile($tempFilename);
+            $task->setExecuted(true);
+
         } else {
             throw new ConversionException($commandStr . $string . implode("\n", $output), $returnValue);
         }
     }
+
 }

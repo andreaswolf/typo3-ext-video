@@ -5,6 +5,8 @@ namespace Hn\HauptsacheVideo\Processing;
 
 use Hn\HauptsacheVideo\Converter\VideoConverterInterface;
 use Hn\HauptsacheVideo\Converter\LocalVideoConverter;
+use Hn\HauptsacheVideo\Domain\Model\StoredTask;
+use Hn\HauptsacheVideo\Domain\Repository\StoredTaskRepository;
 use Hn\HauptsacheVideo\Exception\ConversionException;
 use TYPO3\CMS\Core\Log\LogManager;
 use TYPO3\CMS\Core\Resource\ProcessedFileRepository;
@@ -13,6 +15,8 @@ use TYPO3\CMS\Core\Resource\Processing\TaskInterface;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Object\ObjectManager;
+use TYPO3\CMS\Extbase\Persistence\Exception\IllegalObjectTypeException;
+use TYPO3\CMS\Extbase\Persistence\Generic\PersistenceManager;
 
 class VideoProcessor implements ProcessorInterface
 {
@@ -36,6 +40,9 @@ class VideoProcessor implements ProcessorInterface
      * @see \Hn\HauptsacheVideo\Slot\FileProcessingServiceSlot::preFileProcess
      *
      * @param TaskInterface $task
+     *
+     * @throws IllegalObjectTypeException If extbase is being drunk again.
+     * @todo manipulate cache times
      */
     public function processTask(TaskInterface $task)
     {
@@ -48,41 +55,57 @@ class VideoProcessor implements ProcessorInterface
             return;
         }
 
+        $objectManager = GeneralUtility::makeInstance(ObjectManager::class);
+        $storedTaskRepository = $objectManager->get(StoredTaskRepository::class);
+        $storedTask = $storedTaskRepository->findByTask($task);
+        if ($storedTask !== null) {
+            return;
+        }
+
+        $storedTask = GeneralUtility::makeInstance(StoredTask::class, $task);
         try {
-            $task->getTargetFile()->setName($task->getTargetFileName());
-            $task->getTargetFile()->updateProperties([
-                'width' => $task->getWidth(),
-                'height' => $task->getHeight(),
-                'checksum' => $task->getConfigurationChecksum()
-            ]);
-
             $this->getConverter()->start($task);
-
-            if ($task->getTargetFile()->isProcessed() !== true) {
-                // video conversion runs async. To prevent other tasks from taking over, a placeholder video is used.
-                // this should mark the target file as #isProcessed and therefor prevent typo3 from trying to scale
-                // a video using it's \TYPO3\CMS\Core\Resource\Processing\LocalImageProcessor
-                // @see \TYPO3\CMS\Core\Resource\Service\FileProcessingService::processFile
-                $placeholder = ExtensionManagementUtility::extPath('hauptsache_video', 'Resources/Private/Placeholder.mp4');
-                $tmpfile = tempnam(sys_get_temp_dir(), 'placeholder_video');
-                copy($placeholder, $tmpfile);
-                $task->getTargetFile()->updateWithLocalFile($tmpfile);
-                if ($task->getTargetFile()->isProcessed() !== true) {
-                    throw new \LogicException("The file was replaced but somehow isn't marked as processed.", 1551953787);
-                }
-            }
-
-            $task->setExecuted(true);
+            $storedTask->synchronize($task);
         } catch (ConversionException $e) {
-            $task->setExecuted(false);
-            $logger = GeneralUtility::makeInstance(LogManager::class)->getLogger(__CLASS__);
-            $logger->error("video could not be converted", ['exception' => $e]);
+            $storedTask->setStatus(StoredTask::STATUS_FAILED);
+            $storedTask->appendException($e);
+        }
+        $storedTaskRepository->add($storedTask);
+        $objectManager->get(PersistenceManager::class)->persistAll();
+    }
+
+    /**
+     * This method actually does process the task.
+     *
+     * It may take long and should therefor not be called in a frontend process.
+     *
+     * @param TaskInterface $task
+     *
+     * @throws ConversionException
+     */
+    public function doProcessTask(TaskInterface $task)
+    {
+        if (!$task instanceof VideoProcessingTask) {
+            $type = is_object($task) ? get_class($task) : gettype($task);
+            throw new \InvalidArgumentException("Expected " . VideoProcessingTask::class . ", got $type");
+        }
+
+        $converter = $this->getConverter();
+        $converter->process($task);
+
+        if ($task->isExecuted() && $task->isSuccessful() && $task->getTargetFile()->isProcessed()) {
+            $processedFileRepository = GeneralUtility::makeInstance(ProcessedFileRepository::class);
+            $processedFileRepository->add($task->getTargetFile());
         }
     }
 
     protected function getConverter(): VideoConverterInterface
     {
-        $videoConverter = $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['hauptsache_video']['video_converter'] ?? [LocalVideoConverter::class];
+        $videoConverter = $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['hauptsache_video']['video_converter'];
+        if ($videoConverter instanceof VideoConverterInterface) {
+            return $videoConverter;
+        }
+
         return GeneralUtility::makeInstance(ObjectManager::class)->get(...$videoConverter);
     }
 }

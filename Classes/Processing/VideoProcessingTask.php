@@ -8,15 +8,18 @@ use TYPO3\CMS\Core\Utility\MathUtility;
 
 class VideoProcessingTask extends AbstractTask
 {
-    /**
-     * @var string
-     */
-    protected $type = 'Video';
+    const TYPE = 'Video';
+    const NAME = 'CropScale';
 
     /**
      * @var string
      */
-    protected $name = 'CropScale';
+    protected $type = self::TYPE;
+
+    /**
+     * @var string
+     */
+    protected $name = self::NAME;
 
     /**
      * Checks if the given configuration is sensible for this task, i.e. if all required parameters

@@ -24,3 +24,8 @@ call_user_func(function () {
 });
 
 \TYPO3\CMS\Core\Resource\Rendering\RendererRegistry::getInstance()->registerRendererClass(\Hn\HauptsacheVideo\Rendering\VideoTagRenderer::class);
+
+if (TYPO3_MODE === 'BE') {
+    $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['extbase']['commandControllers'][] =
+        \Hn\HauptsacheVideo\Command\VideoCommandController::class;
+}
