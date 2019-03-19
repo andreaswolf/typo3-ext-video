@@ -13,7 +13,7 @@ pipelines:
   default:
     - parallel:
         - step:
-            name: TYPO3 8.7 (lowest) PHP 7.1
+            name: TYPO3 8.7 (low) PHP 7.1
             image: chialab/php:7.1
             caches:
               - composer
@@ -25,7 +25,7 @@ pipelines:
               - composer test:unit -- --log-junit test-reports/unit.xml
               - composer test:functional -- --log-junit test-reports/functional.xml
         - step:
-            name: TYPO3 8.7 (highest) PHP 7.1
+            name: TYPO3 8.7 (high) PHP 7.1
             image: chialab/php:7.1
             caches:
               - composer
@@ -37,7 +37,7 @@ pipelines:
               - composer test:unit -- --log-junit test-reports/unit.xml
               - composer test:functional -- --log-junit test-reports/functional.xml
         - step:
-            name: TYPO3 8.7 (highest) PHP 7.2
+            name: TYPO3 8.7 (high) PHP 7.2
             image: chialab/php:7.2
             caches:
               - composer
@@ -49,7 +49,7 @@ pipelines:
               - composer test:unit -- --log-junit test-reports/unit.xml
               - composer test:functional -- --log-junit test-reports/functional.xml
         - step:
-            name: TYPO3 9.5 (lowest) with PHP 7.2
+            name: TYPO3 9.5 (low) PHP 7.2
             image: chialab/php:7.2
             caches:
               - composer
@@ -61,7 +61,7 @@ pipelines:
               - composer test:unit -- --log-junit test-reports/unit.xml
               - composer test:functional -- --log-junit test-reports/functional.xml
         - step:
-            name: TYPO3 9.5 (highest) with PHP 7.2
+            name: TYPO3 9.5 (high) PHP 7.2
             image: chialab/php:7.2
             caches:
               - composer
