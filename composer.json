@@ -24,10 +24,8 @@
     },
     "require-dev": {
         "nimut/testing-framework": "^4.1",
-        "phpunit/phpunit": "^6.5"
-    },
-    "conflict": {
-        "typo3/cms-composer-installers": "<1.4"
+        "phpunit/phpunit": "^6.5",
+        "typo3/cms-composer-installers": ">=1.4.1"
     },
     "autoload": {
         "psr-4": {
