@@ -17,21 +17,30 @@ class StoredTaskRepository extends Repository
      *
      * @return StoredTask|null
      */
-    public function findByTask(TaskInterface $task): ?StoredTask
+    public function findLastByTask(TaskInterface $task): ?StoredTask
+    {
+        return $this->findByTask($task)->getFirst() ?: null;
+    }
+
+    /**
+     * @param TaskInterface $task
+     *
+     * @return StoredTask[]|QueryResultInterface
+     */
+    public function findByTask(TaskInterface $task): QueryResultInterface
     {
         if ($task->getType() !== VideoProcessingTask::TYPE || $task->getName() !== VideoProcessingTask::NAME) {
             return null;
         }
 
         $query = $this->createQuery();
+        $query->setOrderings(['tstamp' => QueryInterface::ORDER_DESCENDING]);
         $query->matching($query->logicalAnd([
             $query->equals('file', $task->getSourceFile()->getUid()),
             $query->equals('configuration', serialize($task->getConfiguration())),
-            $query->equals('status', StoredTask::taskToStatus($task)),
         ]));
 
-        $result = $query->execute()->getFirst();
-        return $result instanceof StoredTask ? $result : null;
+        return $query->execute();
     }
 
     /**

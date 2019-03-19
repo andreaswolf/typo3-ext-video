@@ -47,11 +47,11 @@ class StoredTaskRepositoryTest extends FunctionalTestCase
         $storedTask = new StoredTask($task);
         $this->persistAndFlush($storedTask);
 
-        $foundTask = $this->repository->findByTask($task);
+        $foundTasks = $this->repository->findByTask($task);
+        $this->assertCount(1, $foundTasks);
+        $foundTask = $foundTasks[0];
+
         $this->assertInstanceOf(StoredTask::class, $foundTask);
         $this->assertEquals($task->getConfiguration(), $foundTask->getOriginalTask()->getConfiguration());
-
-        $task->setExecuted(true);
-        $this->assertNull($this->repository->findByTask($task));
     }
 }

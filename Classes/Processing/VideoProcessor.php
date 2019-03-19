@@ -4,15 +4,12 @@ namespace Hn\HauptsacheVideo\Processing;
 
 
 use Hn\HauptsacheVideo\Converter\VideoConverterInterface;
-use Hn\HauptsacheVideo\Converter\LocalVideoConverter;
 use Hn\HauptsacheVideo\Domain\Model\StoredTask;
 use Hn\HauptsacheVideo\Domain\Repository\StoredTaskRepository;
 use Hn\HauptsacheVideo\Exception\ConversionException;
-use TYPO3\CMS\Core\Log\LogManager;
 use TYPO3\CMS\Core\Resource\ProcessedFileRepository;
 use TYPO3\CMS\Core\Resource\Processing\ProcessorInterface;
 use TYPO3\CMS\Core\Resource\Processing\TaskInterface;
-use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Object\ObjectManager;
 use TYPO3\CMS\Extbase\Persistence\Exception\IllegalObjectTypeException;
@@ -57,21 +54,22 @@ class VideoProcessor implements ProcessorInterface
 
         $objectManager = GeneralUtility::makeInstance(ObjectManager::class);
         $storedTaskRepository = $objectManager->get(StoredTaskRepository::class);
-        $storedTask = $storedTaskRepository->findByTask($task);
-        if ($storedTask !== null) {
-            return;
-        }
+        $storedTask = $storedTaskRepository->findLastByTask($task);
 
-        $storedTask = GeneralUtility::makeInstance(StoredTask::class, $task);
-        try {
-            $this->getConverter()->start($task);
-            $storedTask->synchronize($task);
-        } catch (ConversionException $e) {
-            $storedTask->setStatus(StoredTask::STATUS_FAILED);
-            $storedTask->appendException($e);
+        // if there wasn't a task before ~ this is the first time someone wants that video with that configuration
+        // or if there was one successfully executed ~ the processed file was deleted and we have to do it again
+        if ($storedTask === null || $storedTask->getStatus() === StoredTask::STATUS_FINISHED) {
+            $storedTask = GeneralUtility::makeInstance(StoredTask::class, $task);
+            try {
+                $this->getConverter()->start($task);
+                $storedTask->synchronize($task);
+            } catch (ConversionException $e) {
+                $storedTask->setStatus(StoredTask::STATUS_FAILED);
+                $storedTask->appendException($e);
+            }
+            $storedTaskRepository->add($storedTask);
+            $objectManager->get(PersistenceManager::class)->persistAll();
         }
-        $storedTaskRepository->add($storedTask);
-        $objectManager->get(PersistenceManager::class)->persistAll();
     }
 
     /**
