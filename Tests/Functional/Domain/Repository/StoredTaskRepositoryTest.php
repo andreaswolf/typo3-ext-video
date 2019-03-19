@@ -54,4 +54,24 @@ class StoredTaskRepositoryTest extends FunctionalTestCase
         $this->assertInstanceOf(StoredTask::class, $foundTask);
         $this->assertEquals($task->getConfiguration(), $foundTask->getOriginalTask()->getConfiguration());
     }
+
+    public function testFindByTaskOrder()
+    {
+        $task = (new ProcessedFile($this->file, 'Video.CropScale', ['foo' => 'bar']))->getTask();
+
+        $storedTask1 = new StoredTask($task);
+        $storedTask2 = new StoredTask($task);
+        $this->persistAndFlush($storedTask1, $storedTask2);
+
+        $this->assertEquals(
+            [
+                $storedTask2->getUid(),
+                $storedTask1->getUid(),
+            ],
+            array_map(
+                [$this->persistenceManager, 'getIdentifierByObject'],
+                $this->repository->findByTask($task)->toArray()
+            )
+        );
+    }
 }

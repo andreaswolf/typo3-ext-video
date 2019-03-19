@@ -34,7 +34,7 @@ class StoredTaskRepository extends Repository
         }
 
         $query = $this->createQuery();
-        $query->setOrderings(['tstamp' => QueryInterface::ORDER_DESCENDING]);
+        $query->setOrderings(['uid' => QueryInterface::ORDER_DESCENDING]);
         $query->matching($query->logicalAnd([
             $query->equals('file', $task->getSourceFile()->getUid()),
             $query->equals('configuration', serialize($task->getConfiguration())),

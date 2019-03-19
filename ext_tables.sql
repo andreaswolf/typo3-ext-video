@@ -10,5 +10,4 @@ CREATE TABLE `tx_hauptsachevideo_domain_model_storedtask`
   `log`           mediumtext           DEFAULT NULL,
   PRIMARY KEY (`uid`),
   KEY `file` (`file`),
-  KEY `status` (`status`, `crdate`)
 );
