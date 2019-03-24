@@ -68,7 +68,7 @@ abstract class AbstractVideoPreset extends AbstractPreset
      */
     public abstract function getEncoderParameters(array $sourceStream): array;
 
-    public function getFramerate(array $sourceStream): float
+    public function getFramerate(array $sourceStream): string
     {
         $maxFramerate = $this->getMaxFramerate();
         if (!isset($sourceStream['avg_frame_rate'])) {
@@ -76,7 +76,10 @@ abstract class AbstractVideoPreset extends AbstractPreset
         }
 
         $avgFrameRate = MathUtility::calculateWithParentheses($sourceStream['avg_frame_rate']);
-        $targetFrameRate = $avgFrameRate;
+        if ($avgFrameRate <= $maxFramerate) {
+            // return the source string so that the ffmpeg fraction is preserved
+            return $sourceStream['avg_frame_rate'];
+        }
 
         // if the framerate is more than 50% over our target than start dividing it evenly
         // this should result in less stutter, here a few examples with a 30 fps limit:
@@ -84,6 +87,7 @@ abstract class AbstractVideoPreset extends AbstractPreset
         // 48 fps will result in 24 fps
         // 50 fps will result in 25 fps
         // 144 fps will result in 28,8 fps
+        $targetFrameRate = $avgFrameRate;
         for ($divisor = 1; $targetFrameRate > $maxFramerate * (1.0 + 0.5 / $divisor);) {
             $targetFrameRate = $avgFrameRate / ++$divisor;
         }
@@ -147,7 +151,7 @@ abstract class AbstractVideoPreset extends AbstractPreset
             return true;
         }
 
-        $hasTargetedFramerate = $this->getFramerate($sourceStream) === self::parseFramerate($sourceStream['avg_frame_rate']);
+        $hasTargetedFramerate = $this->getFramerate($sourceStream) === $sourceStream['avg_frame_rate'];
         if (!$hasTargetedFramerate) {
             return true;
         }

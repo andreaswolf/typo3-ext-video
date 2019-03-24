@@ -42,41 +42,83 @@ class LocalVideoConverter implements VideoConverterInterface
      */
     public function process(VideoProcessingTask $task): void
     {
+        $localFile = $task->getSourceFile()->getForLocalProcessing(false);
+        $streams = $this->ffprobe($localFile)['streams'] ?? [];
+
+        $tempFilename = tempnam(sys_get_temp_dir(), 'video');
+        $parameters = $this->formatRepository->buildParameters($task->getRequestedFormat(), [], $streams);
+        $this->ffmpeg('-i', $localFile, ...$parameters, ...[$tempFilename]);
+
+        $processedFile = $task->getTargetFile();
+        $processedFile->setName($task->getTargetFilename());
+        $processedFile->updateProperties([
+            'checksum' => $task->getConfigurationChecksum(),
+            'width' => $task->getWidth(),
+            'height' => $task->getHeight(),
+        ]);
+        $processedFile->updateWithLocalFile($tempFilename);
+        $task->setExecuted(true);
+    }
+
+    /**
+     * @param string $file
+     *
+     * @return array
+     * @throws ConversionException
+     */
+    protected function ffprobe(string $file): array
+    {
         $logger = GeneralUtility::makeInstance(LogManager::class)->getLogger(__CLASS__);
 
-        $executable = $this->commandUtility->getCommand('ffmpeg');
-        if (!is_string($executable)) {
+        $ffprobe = $this->commandUtility->getCommand('ffprobe');
+        if (!is_string($ffprobe)) {
+            throw new \RuntimeException("ffprobe not found.");
+        }
+
+        $parameters = ['-v', 'quiet', '-print_format', 'json', '-show_streams', $file];
+        $commandStr = $ffprobe . ' ' . implode(' ', array_map('escapeshellarg', $parameters));
+        $logger->info('run ffprobe command', ['command' => $commandStr]);
+        $this->commandUtility->exec($commandStr, $output, $returnValue);
+        $response = implode("\n", $output);
+
+        if ($returnValue !== 0 && $returnValue !== null) {
+            throw new ConversionException("Probing failed: $commandStr", $returnValue);
+        }
+
+        if (empty($response)) {
+            throw new ConversionException("Probing result empty: $commandStr");
+        }
+
+        $json = json_decode($response, true);
+        if (json_last_error()) {
+            $jsonMsg = json_last_error_msg();
+            $msg = strlen($response) > 32 ? substr($response, 0, 16) . '...' . substr($response, -8) : $response;
+            throw new ConversionException("Probing result ($msg) could not be parsed: $jsonMsg : $commandStr");
+        }
+
+        return $json;
+    }
+
+    /**
+     * @param string ...$parameters
+     *
+     * @throws ConversionException
+     */
+    protected function ffmpeg(string ...$parameters): void
+    {
+        $logger = GeneralUtility::makeInstance(LogManager::class)->getLogger(__CLASS__);
+
+        $ffmpeg = $this->commandUtility->getCommand('ffmpeg');
+        if (!is_string($ffmpeg)) {
             throw new \RuntimeException("ffmpeg not found.");
         }
 
-        $command = [$executable];
-        array_push($command, '-i', $task->getSourceFile()->getForLocalProcessing(false));
+        $commandStr = $ffmpeg . ' ' . implode(' ', array_map('escapeshellarg', $parameters));
+        $logger->notice('run ffmpeg command', ['command' => $commandStr]);
+        $this->commandUtility->exec($commandStr, $output, $returnValue);
 
-        $parameters = $this->formatRepository->buildParameters($task->getRequestedFormat());
-        array_push($command, ...$parameters);
-
-        $tempFilename = tempnam(sys_get_temp_dir(), 'video');
-        array_push($command, '-y');
-        array_push($command, $tempFilename);
-        $commandStr = implode(' ', array_map('escapeshellarg', $command));
-
-        $string = $this->commandUtility->exec($commandStr, $output, $returnValue);
-
-        if ($returnValue === 0 || $returnValue === null) {
-            $logger->notice($commandStr . $string . implode("\n", $output), ['returnValue' => $returnValue]);
-
-            $processedFile = $task->getTargetFile();
-            $processedFile->setName($task->getTargetFilename());
-            $processedFile->updateProperties([
-                'checksum' => $task->getConfigurationChecksum(),
-                'width' => $task->getWidth(),
-                'height' => $task->getHeight(),
-            ]);
-            $processedFile->updateWithLocalFile($tempFilename);
-            $task->setExecuted(true);
-
-        } else {
-            throw new ConversionException($commandStr . $string . implode("\n", $output), $returnValue);
+        if ($returnValue !== 0 && $returnValue !== null) {
+            throw new ConversionException("Conversion failed: $commandStr", $returnValue);
         }
     }
 

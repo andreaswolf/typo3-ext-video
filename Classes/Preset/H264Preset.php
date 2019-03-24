@@ -3,6 +3,8 @@
 namespace Hn\HauptsacheVideo\Preset;
 
 
+use TYPO3\CMS\Core\Utility\MathUtility;
+
 class H264Preset extends AbstractVideoPreset
 {
     /**
@@ -138,7 +140,7 @@ class H264Preset extends AbstractVideoPreset
     public function getBitrateLimit(array $sourceStream): int
     {
         list($width, $height) = $this->getDimensions($sourceStream);
-        $framerate = $this->getFramerate($sourceStream);
+        $framerate = MathUtility::calculateWithParentheses($this->getFramerate($sourceStream));
         $quality = $this->getQuality();
 
         // here is the effect that quality has on a 720p and 1080p video with 30fps

@@ -22,24 +22,24 @@ class AbstractVideoPresetTest extends AbstractPresetTest
             [30, []],
 
             // equal or lower framerates
-            [30, ['avg_frame_rate' => '30/1']],
-            [24, ['avg_frame_rate' => '24/1']],
-            [15, ['avg_frame_rate' => '15/1']],
+            [30, ['avg_frame_rate' => '30']],
+            [24, ['avg_frame_rate' => '24']],
+            [15, ['avg_frame_rate' => '15']],
 
             // slightly too high framerates
-            [30, ['avg_frame_rate' => '32/1']],
-            [30, ['avg_frame_rate' => '35/1']],
+            [30, ['avg_frame_rate' => '32']],
+            [30, ['avg_frame_rate' => '35']],
 
             // massively too high framerates
-            [24, ['avg_frame_rate' => '48/1']],
-            [25, ['avg_frame_rate' => '50/1']],
-            [30, ['avg_frame_rate' => '60/1']],
-            [28.8, ['avg_frame_rate' => '144/1']],
+            [24, ['avg_frame_rate' => '48']],
+            [25, ['avg_frame_rate' => '50']],
+            [30, ['avg_frame_rate' => '60']],
+            [28.8, ['avg_frame_rate' => '144']],
 
             // stupid tv framerates
-            [23.976, ['avg_frame_rate' => '24000/1001']],
+            ['24000/1001', ['avg_frame_rate' => '24000/1001']],
             [23.976, ['avg_frame_rate' => '48000/1001']],
-            [29.97, ['avg_frame_rate' => '30000/1001']],
+            ['30000/1001', ['avg_frame_rate' => '30000/1001']],
             [29.97, ['avg_frame_rate' => '60000/1001']],
         ];
     }
