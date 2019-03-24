@@ -51,4 +51,9 @@ class AbstractPresetTest extends UnitTestCase
     {
         $this->preset->setQuality(0.0);
     }
+
+    public function testRequiresTranscoding()
+    {
+        $this->assertTrue($this->preset->requiresTranscoding([]));
+    }
 }

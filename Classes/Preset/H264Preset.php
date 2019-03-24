@@ -82,13 +82,13 @@ class H264Preset extends AbstractVideoPreset
      */
     private $performance = 'fast';
 
-    protected function requiresTranscoding(array $sourceStream): bool
+    public function requiresTranscoding(array $sourceStream): bool
     {
         if (parent::requiresTranscoding($sourceStream)) {
             return true;
         }
 
-        if (!isset($sourceStream['profile']) || $sourceStream['profile'] !== $this->getProfile()) {
+        if (!isset($sourceStream['profile']) || strcasecmp($sourceStream['profile'], $this->getProfile()) === 0) {
             return true;
         }
 

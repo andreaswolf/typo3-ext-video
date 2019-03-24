@@ -20,7 +20,7 @@ class AacPreset extends AbstractAudioPreset
         return 'aac';
     }
 
-    protected function requiresTranscoding(array $sourceStream): bool
+    public function requiresTranscoding(array $sourceStream): bool
     {
         if (parent::requiresTranscoding($sourceStream)) {
             return true;

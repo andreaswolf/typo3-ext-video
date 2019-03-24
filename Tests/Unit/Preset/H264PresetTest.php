@@ -4,17 +4,15 @@ namespace Hn\HauptsacheVideo\Tests\Unit\Preset;
 
 
 use Hn\HauptsacheVideo\Preset\H264Preset;
-use Nimut\TestingFramework\TestCase\UnitTestCase;
 
-class H264PresetTest extends UnitTestCase
+class H264PresetTest extends AbstractVideoPresetTest
 {
     /** @var H264Preset */
-    private $preset;
+    protected $preset;
 
-    protected function setUp()
+    protected function createPreset()
     {
-        parent::setUp();
-        $this->preset = new H264Preset();
+        return new H264Preset();
     }
 
     public function testParameters()

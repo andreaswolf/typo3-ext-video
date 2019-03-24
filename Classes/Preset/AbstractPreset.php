@@ -118,7 +118,7 @@ abstract class AbstractPreset implements PresetInterface
      *
      * @return bool
      */
-    protected function requiresTranscoding(array $sourceStream): bool
+    public function requiresTranscoding(array $sourceStream): bool
     {
         if (!isset($sourceStream['codec_type'])) {
             return true;

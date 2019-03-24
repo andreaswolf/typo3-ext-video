@@ -104,7 +104,7 @@ abstract class AbstractAudioPreset extends AbstractPreset
         return ['-c:a', 'copy'];
     }
 
-    protected function requiresTranscoding(array $sourceStream): bool
+    public function requiresTranscoding(array $sourceStream): bool
     {
         if (parent::requiresTranscoding($sourceStream)) {
             return true;

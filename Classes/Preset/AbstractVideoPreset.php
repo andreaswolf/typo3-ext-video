@@ -130,7 +130,7 @@ abstract class AbstractVideoPreset extends AbstractPreset
         ];
     }
 
-    protected function requiresTranscoding(array $sourceStream): bool
+    public function requiresTranscoding(array $sourceStream): bool
     {
         if (parent::requiresTranscoding($sourceStream)) {
             return true;
