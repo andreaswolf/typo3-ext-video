@@ -32,8 +32,10 @@ class LocalVideoConverterTest extends FunctionalTestCase
             '/usr/local/bin/ffmpeg'
         );
         $this->commandUtility->expects($this->exactly(2))->method('exec')->willReturnCallback(function ($command) use (&$calls) {
+            $parameters = str_getcsv($command, " ", "'");
             switch ($calls++) {
                 case 0:
+                    $this->assertEquals('/usr/local/bin/ffprobe', reset($parameters));
                     return json_encode([
                         'streams' => [
                             ['codec_type' => 'audio'],
@@ -42,8 +44,8 @@ class LocalVideoConverterTest extends FunctionalTestCase
                     ]);
                     break;
                 case 1:
-                    $parameters = str_getcsv($command, " ", "'");
                     $tmpFile = end($parameters); // technically escaped but probably fine
+                    $this->assertEquals('/usr/local/bin/ffmpeg', reset($parameters));
                     $this->assertStringStartsWith(realpath(sys_get_temp_dir()), $tmpFile, $command);
                     file_put_contents($tmpFile, "hi");
                     return 0;
