@@ -43,7 +43,7 @@ class VideoCommandController extends CommandController
             return;
         }
 
-        $this->outputLine("found <info>%s</info> tasks:");
+        $this->outputLine("found <info>%s</info> tasks:", [$count]);
         $this->output->progressStart($count);
         $startTime = time();
         foreach ($storedTasks as $storedTask) {
