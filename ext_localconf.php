@@ -50,3 +50,25 @@ if (TYPO3_MODE === 'BE') {
     $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['extbase']['commandControllers'][] =
         \Hn\HauptsacheVideo\Command\VideoCommandController::class;
 }
+
+if (true/*todo enable condition*/) {
+    \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addPageTSConfig(<<<PageTSConfig
+mod.wizards.newContentElement.wizardItems.special.elements.hauptsache_video {
+    iconIdentifier = content-media
+    title = hauptsache_video testing utility
+    description = This elements helps you find the right options for video compression.
+    tt_content_defValues {
+        CType = hauptsache_video
+    }
+}
+mod.wizards.newContentElement.wizardItems.special.show := addToList(hauptsache_video)
+PageTSConfig
+    );
+
+    \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addTypoScriptSetup(<<<TypoScript
+tt_content.hauptsache_video = USER
+tt_content.hauptsache_video.userFunc = Hn\HauptsacheVideo\DebugContentElement->render
+tt_content.hauptsache_video.configurations.field = bodytext
+TypoScript
+    );
+}
