@@ -4,8 +4,6 @@ namespace Hn\HauptsacheVideo\Converter;
 
 
 use Hn\HauptsacheVideo\Exception\ConversionException;
-use Hn\HauptsacheVideo\FormatRepository;
-use Hn\HauptsacheVideo\PresetsOld\Mp4H264Preset;
 use Hn\HauptsacheVideo\Processing\VideoProcessingTask;
 use TYPO3\CMS\Core\Log\LogManager;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -79,11 +77,16 @@ class LocalVideoConverter implements VideoConverterInterface
         $parameters = ['-v', 'quiet', '-print_format', 'json', '-show_streams', $file];
         $commandStr = $ffprobe . ' ' . implode(' ', array_map('escapeshellarg', $parameters));
         $logger->info('run ffprobe command', ['command' => $commandStr]);
-        $this->commandUtility->exec($commandStr, $output, $returnValue);
+        $returnResponse = $this->commandUtility->exec($commandStr, $output, $returnValue);
         $response = implode("\n", $output);
 
         if ($returnValue !== 0 && $returnValue !== null) {
             throw new ConversionException("Probing failed: $commandStr", $returnValue);
+        }
+
+        // this case is for unit testing as it is hard to pass references in a mock
+        if (empty($response)) {
+            $response = $returnResponse;
         }
 
         if (empty($response)) {
@@ -118,6 +121,7 @@ class LocalVideoConverter implements VideoConverterInterface
         $logger->notice('run ffmpeg command', ['command' => $commandStr]);
         $this->commandUtility->exec($commandStr, $output, $returnValue);
 
+        // because updating referenced values in unit tests is hard, null is also checked here
         if ($returnValue !== 0 && $returnValue !== null) {
             throw new ConversionException("Conversion failed: $commandStr", $returnValue);
         }

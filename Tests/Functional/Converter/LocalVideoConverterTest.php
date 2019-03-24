@@ -26,13 +26,28 @@ class LocalVideoConverterTest extends FunctionalTestCase
 
     public function testProcess()
     {
-        $this->commandUtility->expects($this->once())->method('getCommand')->willReturn('/usr/local/bin/ffmpeg');
-        $this->commandUtility->expects($this->once())->method('exec')->willReturnCallback(function ($command) {
-            $parameters = str_getcsv($command, " ");
-            $tmpFile = end($parameters); // technically escaped but probably fine
-            $this->assertStringStartsWith(realpath(sys_get_temp_dir()), $tmpFile);
-            file_put_contents($tmpFile, "hi");
-            return 0;
+        $calls = 0;
+        $this->commandUtility->expects($this->exactly(2))->method('getCommand')->willReturnOnConsecutiveCalls(
+            '/usr/local/bin/ffprobe',
+            '/usr/local/bin/ffmpeg'
+        );
+        $this->commandUtility->expects($this->exactly(2))->method('exec')->willReturnCallback(function ($command) use (&$calls) {
+            switch ($calls++) {
+                case 0:
+                    return json_encode([
+                        'streams' => [
+                            ['codec_type' => 'audio'],
+                            ['codec_type' => 'video'],
+                        ],
+                    ]);
+                    break;
+                case 1:
+                    $parameters = str_getcsv($command, " ", "'");
+                    $tmpFile = end($parameters); // technically escaped but probably fine
+                    $this->assertStringStartsWith(realpath(sys_get_temp_dir()), $tmpFile, $command);
+                    file_put_contents($tmpFile, "hi");
+                    return 0;
+            }
         });
 
         $file = new ProcessedFile($this->file, 'Video.CropScale', []);
