@@ -88,7 +88,7 @@ class H264Preset extends AbstractVideoPreset
             return true;
         }
 
-        if (!isset($sourceStream['profile']) || strcasecmp($sourceStream['profile'], $this->getProfile()) === 0) {
+        if (strcasecmp($sourceStream['profile'] ?? '', $this->getProfile()) !== 0) {
             return true;
         }
 

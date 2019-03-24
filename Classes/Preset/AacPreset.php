@@ -41,11 +41,11 @@ class AacPreset extends AbstractAudioPreset
             return true;
         }
 
-        if (!isset($sourceStream['profile']) || $sourceStream['profile'] !== 'LC') {
+        if (strcasecmp($sourceStream['profile'], 'LC') !== 0) {
             return true;
         }
 
-        if (!isset($sourceStream['bit_rate']) || $sourceStream['bit_rate'] > $this->getBitrate($sourceStream) * self::BITRATE_TOLERANCE) {
+        if ($sourceStream['bit_rate'] ?? INF > $this->getBitrate($sourceStream) * self::BITRATE_TOLERANCE) {
             return true;
         }
 

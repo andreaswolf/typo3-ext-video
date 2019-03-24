@@ -126,9 +126,9 @@ abstract class AbstractPreset implements PresetInterface
 
         // if the codec type is off we are probably looking an a software error
         // transcoding between audio and video is probably not possible
-        if ($sourceStream['codec_type'] !== $this->getCodecType()) {
+        if (strcasecmp($sourceStream['codec_type'], $this->getCodecType()) !== 0) {
             $className = get_class($this);
-            $expectedType = $this->getCodecName();
+            $expectedType = $this->getCodecType();
             $gotType = $sourceStream['codec_type'];
             $msg = "Wrong information passed to $className. Expected codec type $expectedType, got $gotType";
             throw new \RuntimeException($msg);
@@ -138,7 +138,7 @@ abstract class AbstractPreset implements PresetInterface
             return true;
         }
 
-        $isCorrectCodec = isset($sourceStream['codec_name']) && $sourceStream['codec_name'] === $this->getCodecName();
+        $isCorrectCodec = strcasecmp($sourceStream['codec_name'] ?? '', $this->getCodecName()) === 0;
         if (!$isCorrectCodec) {
             return true;
         }

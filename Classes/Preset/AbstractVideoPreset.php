@@ -136,7 +136,7 @@ abstract class AbstractVideoPreset extends AbstractPreset
             return true;
         }
 
-        $hasCorrectPixelFormat = isset($sourceStream['pix_fmt']) && $sourceStream['pix_fmt'] === $this->getPixelFormat();
+        $hasCorrectPixelFormat = strcasecmp($sourceStream['pix_fmt'], $this->getPixelFormat()) === 0;
         if (!$hasCorrectPixelFormat) {
             return true;
         }
