@@ -1,12 +1,33 @@
 <?php
 
+use Hn\HauptsacheVideo\Preset;
+
 if (!defined('TYPO3_MODE')) {
     die('Access denied.');
 }
 
-$GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['hauptsache_video']['presets'] = [
-    'mp4' => [\Hn\HauptsacheVideo\Presets\Mp4H264Preset::class, 'main', '3.1', 4.0, 30, 'fast'],
+$GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['hauptsache_video']['default_quality'] = 0.8;
+
+$GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['hauptsache_video']['formats'] = [
+    'mp4:default' => [
+        'fileExtension' => 'mp4',
+        'video' => [Preset\H264Preset::class, ['profile' => 'main', 'level' => 31, 'performance' => 'fast']],
+        'audio' => [Preset\AacPreset::class],
+        'additionalParameters' => ['-movflags', '+faststart', '-f', 'mp4'],
+    ],
+    'mp4:high' => [
+        'fileExtension' => 'mp4',
+        'video' => [Preset\H264Preset::class, ['profile' => 'high', 'level' => 41, 'performance' => 'fast']],
+        'audio' => [Preset\AacPreset::class],
+        'additionalParameters' => ['-movflags', '+faststart', '-f', 'mp4'],
+    ],
+    'm4a:default' => [
+        'fileExtension' => 'm4a',
+        'audio' => [Preset\AacPreset::class],
+        'additionalParameters' => ['-movflags', '+faststart', '-f', 'm4a'],
+    ],
 ];
+
 $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['hauptsache_video']['video_converter'] =
     [\Hn\HauptsacheVideo\Converter\LocalVideoConverter::class];
 

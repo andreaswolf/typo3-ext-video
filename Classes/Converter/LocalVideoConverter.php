@@ -4,7 +4,8 @@ namespace Hn\HauptsacheVideo\Converter;
 
 
 use Hn\HauptsacheVideo\Exception\ConversionException;
-use Hn\HauptsacheVideo\Presets\Mp4H264Preset;
+use Hn\HauptsacheVideo\FormatRepository;
+use Hn\HauptsacheVideo\PresetsOld\Mp4H264Preset;
 use Hn\HauptsacheVideo\Processing\VideoProcessingTask;
 use TYPO3\CMS\Core\Log\LogManager;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -21,10 +22,10 @@ class LocalVideoConverter implements VideoConverterInterface
     protected $commandUtility;
 
     /**
-     * @var \Hn\HauptsacheVideo\Presets\PresetRepository
+     * @var \Hn\HauptsacheVideo\FormatRepository
      * @inject
      */
-    protected $presetRepository;
+    protected $formatRepository;
 
     /**
      * @param VideoProcessingTask $task
@@ -51,18 +52,13 @@ class LocalVideoConverter implements VideoConverterInterface
         $command = [$executable];
         array_push($command, '-i', $task->getSourceFile()->getForLocalProcessing(false));
 
-        $preset = $this->presetRepository->getPresetForFormat($task->getRequestedFormat()) ?? new Mp4H264Preset();
-        array_push($command, ...$preset->getParameters(
-            $task->getWidth(),
-            $task->getHeight(),
-            !$task->isMuted(),
-            $task->getQuality()
-        ));
+        $parameters = $this->formatRepository->buildParameters($task->getRequestedFormat());
+        array_push($command, ...$parameters);
 
         $tempFilename = tempnam(sys_get_temp_dir(), 'video');
         array_push($command, '-y');
         array_push($command, $tempFilename);
-        $commandStr = implode(' ', array_map('escapeshellcmd', $command));
+        $commandStr = implode(' ', array_map('escapeshellarg', $command));
 
         $string = $this->commandUtility->exec($commandStr, $output, $returnValue);
 
