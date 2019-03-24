@@ -6,6 +6,21 @@ namespace Hn\HauptsacheVideo\Preset;
 class AacPreset extends AbstractAudioPreset
 {
     /**
+     * This is a tolerance for a higher bitrate.
+     * If the source bitrate is below the target bitrate*1.5 than no transcode will happen.
+     * If a transcode is necessary than the bitrate will be *1.5 higher than the source if that is lower than the target.
+     *
+     * Examples with a 128 kbit/s target (2 channels with 64 kbit/s each):
+     * - If the source is a 192 kbit/s aac than no transcode will happen.
+     * - If the source is a 128 kbit/s aac than no transcode will happen.
+     * - If the source is a 96 kbit/s aac than no transcode will happen.
+     * - If the source is a 192 kbit/s mp3 than the aac stream will have 128 kbit/s.
+     * - If the source is a 128 kbit/s mp3 than the aac stream will have 128 kbit/s.
+     * - If the source is a 64 kbit/s mp3 than the aac stream will have 92 kbit/s.
+     */
+    const BITRATE_TOLERANCE = 1.5;
+
+    /**
      * This is the base for the bitrate calculation.
      * this * (0.25 + quality ** 5 * 0.75) * channel
      *
@@ -13,7 +28,7 @@ class AacPreset extends AbstractAudioPreset
      * @see AacPreset::getBitrate()
      * @var int
      */
-    private $maxBitratePerChannel = 128 * 1024;
+    private $bitratePerChannel = 128 * 1024;
 
     public function getCodecName(): string
     {
@@ -30,7 +45,7 @@ class AacPreset extends AbstractAudioPreset
             return true;
         }
 
-        if (!isset($sourceStream['bit_rate']) || $sourceStream['bit_rate'] > $this->getBitrate($sourceStream)) {
+        if (!isset($sourceStream['bit_rate']) || $sourceStream['bit_rate'] > $this->getBitrate($sourceStream) * self::BITRATE_TOLERANCE) {
             return true;
         }
 
@@ -40,7 +55,7 @@ class AacPreset extends AbstractAudioPreset
     public function getBitrate(array $sourceStream): int
     {
         $channels = $this->getChannels($sourceStream);
-        $maxBitratePerChannel = $this->getMaxBitratePerChannel();
+        $maxBitratePerChannel = $this->getBitratePerChannel();
         $quality = $this->getQuality();
         $maxBitrate = $maxBitratePerChannel * (0.25 + $quality ** 5 * 0.75) * $channels;
 
@@ -48,7 +63,7 @@ class AacPreset extends AbstractAudioPreset
             return $maxBitrate;
         }
 
-        return min($sourceStream['bit_rate'], $maxBitrate);
+        return min($sourceStream['bit_rate'] * self::BITRATE_TOLERANCE, $maxBitrate);
     }
 
     /**
@@ -70,17 +85,17 @@ class AacPreset extends AbstractAudioPreset
         return $parameters;
     }
 
-    public function getMaxBitratePerChannel(): int
+    public function getBitratePerChannel(): int
     {
-        return $this->maxBitratePerChannel;
+        return $this->bitratePerChannel;
     }
 
-    public function setMaxBitratePerChannel(int $maxBitratePerChannel): void
+    public function setBitratePerChannel(int $bitratePerChannel): void
     {
-        if ($maxBitratePerChannel < 16000) {
+        if ($bitratePerChannel < 16000) {
             throw new \RuntimeException("Bitrate must be at least 16000.");
         }
 
-        $this->maxBitratePerChannel = $maxBitratePerChannel;
+        $this->bitratePerChannel = $bitratePerChannel;
     }
 }
