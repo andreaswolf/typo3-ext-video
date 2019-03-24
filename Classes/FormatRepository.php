@@ -7,6 +7,7 @@ use Hn\HauptsacheVideo\Exception\FormatException;
 use Hn\HauptsacheVideo\Preset\PresetInterface;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Core\Utility\MathUtility;
 
 class FormatRepository implements SingletonInterface
 {
@@ -27,15 +28,16 @@ class FormatRepository implements SingletonInterface
 
     public function buildParameters(string $format, array $options = [], array $sourceStreams = null)
     {
-        $parameters = [];
         $definition = $this->findFormatDefinition($format);
-
         if ($definition === null) {
             throw new FormatException("Format '$format' not found.");
         }
 
+        $parameters = [];
+        $options = $this->normalizeOptions($options);
+
         foreach (['video' => '-vn', 'audio' => '-an', 'subtitle' => '-sn'] as $steamType => $disableParameter) {
-            if (!isset($definition[$steamType])) {
+            if (!isset($definition[$steamType]) || $options[$steamType]['disabled'] ?? false) {
                 array_push($parameters, $disableParameter);
                 continue;
             }
@@ -71,5 +73,36 @@ class FormatRepository implements SingletonInterface
         }
 
         return $parameters;
+    }
+
+    /**
+     * @param array $options
+     *
+     * @return array
+     */
+    public static function normalizeOptions(array $options): array
+    {
+        if (isset($options['width']) && is_numeric($options['width'])) {
+            $options['video']['maxWidth'] = intval($options['width']);
+        }
+
+        if (isset($options['height']) && is_numeric($options['height'])) {
+            $options['video']['maxHeight'] = intval($options['height']);
+        }
+
+        if (isset($options['quality']) && is_numeric($options['quality'])) {
+            $quality = MathUtility::forceIntegerInRange($options['quality'], 1, 100);
+            $options['video']['quality'] = (float)($quality * 0.01);
+            $options['audio']['quality'] = (float)($quality * 0.01);
+        }
+
+        if (isset($options['muted']) && $options['muted']) {
+            $options['audio']['disabled'] = true;
+        }
+
+        return [
+            'audio' => $options['audio'] ?? [],
+            'video' => $options['video'] ?? [],
+        ];
     }
 }

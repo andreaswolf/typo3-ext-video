@@ -3,6 +3,7 @@
 namespace Hn\HauptsacheVideo\Rendering;
 
 
+use Hn\HauptsacheVideo\FormatRepository;
 use TYPO3\CMS\Core\Resource\File;
 use TYPO3\CMS\Core\Resource\FileInterface;
 use TYPO3\CMS\Core\Resource\FileReference;
@@ -36,12 +37,11 @@ class VideoTagRenderer extends \TYPO3\CMS\Core\Resource\Rendering\VideoTagRender
         }
 
         if ($file instanceof File) {
-            $file = $file->process('Video.CropScale', [
-                'width' => $width,
-                'height' => $height,
-                'muted' => $options['muted'] ?? false,
-                'quality' => $options['quality'] ?? null,
-            ]);
+            $file = $file->process('Video.CropScale', FormatRepository::normalizeOptions($options));
+        }
+
+        if (!$file->exists()) {
+            return "file is processing";
         }
 
         return parent::render($file, $width, $height, $options, $usedPathsRelativeToCurrentScript);
