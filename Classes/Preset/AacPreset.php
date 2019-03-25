@@ -11,14 +11,15 @@ class AacPreset extends AbstractAudioPreset
      * If a transcode is necessary than the bitrate will be *1.5 higher than the source if that is lower than the target.
      *
      * Examples with a 128 kbit/s target (2 channels with 64 kbit/s each):
-     * - If the source is a 192 kbit/s aac than no transcode will happen.
+     * - If the source is a 192 kbit/s aac than it will be transcoded to 128 kbit/s.
+     * - If the source is a 160 kbit/s aac than no transcode will happen.
      * - If the source is a 128 kbit/s aac than no transcode will happen.
      * - If the source is a 96 kbit/s aac than no transcode will happen.
      * - If the source is a 192 kbit/s mp3 than the aac stream will have 128 kbit/s.
      * - If the source is a 128 kbit/s mp3 than the aac stream will have 128 kbit/s.
-     * - If the source is a 64 kbit/s mp3 than the aac stream will have 92 kbit/s.
+     * - If the source is a 64 kbit/s mp3 than the aac stream will have 80 kbit/s.
      */
-    const BITRATE_TOLERANCE = 1.5;
+    const BITRATE_TOLERANCE = 1.25;
 
     /**
      * This is the base for the bitrate calculation.
