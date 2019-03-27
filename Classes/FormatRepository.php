@@ -11,9 +11,10 @@ use TYPO3\CMS\Core\Utility\MathUtility;
 
 class FormatRepository implements SingletonInterface
 {
-    public function findFormatDefinition(string $format): ?array
+    public function findFormatDefinition(array $options): ?array
     {
         $formats = $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['hauptsache_video']['formats'] ?? [];
+        $format = $options['format'] ?? 'mp4';
 
         if (isset($formats[$format])) {
             return $formats[$format];
@@ -26,49 +27,57 @@ class FormatRepository implements SingletonInterface
         return null;
     }
 
-    public function buildParameters(string $format, array $options = [], array $sourceStreams = null)
+    public function buildParameters(array $options = [], array $sourceStreams = null): array
     {
-        $definition = $this->findFormatDefinition($format);
-        if ($definition === null) {
-            throw new FormatException("Format '$format' not found.");
-        }
-
         $parameters = [];
         $options = $this->normalizeOptions($options);
 
+        $definition = $this->findFormatDefinition($options);
+        if ($definition === null) {
+            throw new FormatException("No format defintion found for configuration: " . print_r($options, true));
+        }
+
         foreach (['video' => '-vn', 'audio' => '-an', 'subtitle' => '-sn'] as $steamType => $disableParameter) {
-            if (!isset($definition[$steamType]) || $options[$steamType]['disabled'] ?? false) {
+            if (!isset($definition[$steamType])) {
                 array_push($parameters, $disableParameter);
                 continue;
             }
 
-            $sourceStream = [];
+            if ($options[$steamType]['disabled'] ?? false) {
+                array_push($parameters, $disableParameter);
+                continue;
+            }
+
             if ($sourceStreams !== null) {
                 $sourceStreamIndex = array_search($steamType, array_column($sourceStreams, 'codec_type'));
-
-                // disable this stream type if the source does not contain it
                 if ($sourceStreamIndex === false) {
+                    // disable this stream type if the source does not contain it
                     array_push($parameters, $disableParameter);
                     continue;
                 }
 
                 $sourceStream = $sourceStreams[$sourceStreamIndex];
+            } else {
+                $sourceStream = [];
             }
 
-            $videoPreset = GeneralUtility::makeInstance(...$definition[$steamType]);
-            if (!$videoPreset instanceof PresetInterface) {
-                $type = is_object($videoPreset) ? get_class($videoPreset) : gettype($videoPreset);
+            $preset = GeneralUtility::makeInstance(...$definition[$steamType]);
+            if (!$preset instanceof PresetInterface) {
+                $type = is_object($preset) ? get_class($preset) : gettype($preset);
                 throw new \RuntimeException("Expected " . PresetInterface::class . ", got $type");
             }
 
             if (isset($options[$steamType])) {
-                $videoPreset->setOptions($options[$steamType]);
+                $preset->setOptions($options[$steamType]);
             }
 
-            array_push($parameters, ...$videoPreset->getParameters($sourceStream));
+            $streamParameters = $preset->getParameters($sourceStream);
+            if (!empty($streamParameters)) {
+                array_push($parameters, ...$streamParameters);
+            }
         }
 
-        if (isset($definition['additionalParameters'])) {
+        if (!empty($definition['additionalParameters'])) {
             array_push($parameters, ...$definition['additionalParameters']);
         }
 

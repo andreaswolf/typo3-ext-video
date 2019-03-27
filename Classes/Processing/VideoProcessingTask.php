@@ -3,8 +3,9 @@
 namespace Hn\HauptsacheVideo\Processing;
 
 
+use Hn\HauptsacheVideo\FormatRepository;
 use TYPO3\CMS\Core\Resource\Processing\AbstractTask;
-use TYPO3\CMS\Core\Utility\MathUtility;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class VideoProcessingTask extends AbstractTask
 {
@@ -49,62 +50,8 @@ class VideoProcessingTask extends AbstractTask
 
     public function getTargetFileExtension()
     {
-        return preg_split('#\W#', $this->getRequestedFormat(), 2)[0];
-    }
-
-    public function getRequestedFormat(): string
-    {
-        return $this->getConfiguration()['format'] ?? 'mp4';
-    }
-
-    /**
-     * @return float
-     */
-    public function getQuality(): float
-    {
-        $quality = $this->getConfiguration()['quality'] ?? $GLOBALS['TYPO3_CONF_VARS']['jpg_quality']['jpg_quality'] ?? 80;
-        return MathUtility::forceIntegerInRange($quality, 0, 100) * 0.01;
-    }
-
-    /**
-     * @return int|null
-     */
-    public function getWidth(): ?int
-    {
-        $configuration = $this->getConfiguration();
-        if (isset($configuration['width']) && $configuration['width'] > 0) {
-            return $configuration['width'];
-        }
-
-        if (isset($configuration['height']) && $configuration['height'] > 0) {
-            return $configuration['height'] / 9 * 16;
-        }
-
-        return 1280;
-    }
-
-    /**
-     * @return int|null
-     */
-    public function getHeight(): ?int
-    {
-        $configuration = $this->getConfiguration();
-        if (isset($configuration['height']) && $configuration['height'] > 0) {
-            return $configuration['height'];
-        }
-
-        if (isset($configuration['width']) && $configuration['width'] > 0) {
-            return $configuration['width'] / 16 * 9;
-        }
-
-        return 720;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isMuted(): bool
-    {
-        return $this->getConfiguration()['muted'] ?? false;
+        $formatRepository = GeneralUtility::makeInstance(FormatRepository::class);
+        $definition = $formatRepository->findFormatDefinition($this->getConfiguration());
+        return $definition['fileExtension'];
     }
 }

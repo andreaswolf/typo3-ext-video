@@ -44,15 +44,17 @@ class LocalVideoConverter implements VideoConverterInterface
         $streams = $this->ffprobe($localFile)['streams'] ?? [];
 
         $tempFilename = tempnam(sys_get_temp_dir(), 'video');
-        $parameters = $this->formatRepository->buildParameters($task->getRequestedFormat(), $task->getConfiguration(), $streams);
+        $parameters = $this->formatRepository->buildParameters($task->getConfiguration(), $streams);
         $this->ffmpeg('-i', $localFile, ...$parameters, ...['-y', $tempFilename]);
 
         $processedFile = $task->getTargetFile();
         $processedFile->setName($task->getTargetFilename());
         $processedFile->updateProperties([
             'checksum' => $task->getConfigurationChecksum(),
-            'width' => $task->getWidth(),
-            'height' => $task->getHeight(),
+
+            // TODO figure out the real resolution
+            'width' => intval($task->getConfiguration()['width']),
+            'height' => intval($task->getConfiguration()['height']),
         ]);
 
         $processedFile->updateWithLocalFile($tempFilename);
