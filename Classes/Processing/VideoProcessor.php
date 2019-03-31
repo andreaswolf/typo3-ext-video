@@ -7,6 +7,7 @@ use Hn\HauptsacheVideo\Converter\VideoConverterInterface;
 use Hn\HauptsacheVideo\Domain\Model\StoredTask;
 use Hn\HauptsacheVideo\Domain\Repository\StoredTaskRepository;
 use Hn\HauptsacheVideo\Exception\ConversionException;
+use TYPO3\CMS\Core\Log\LogManager;
 use TYPO3\CMS\Core\Resource\ProcessedFileRepository;
 use TYPO3\CMS\Core\Resource\Processing\ProcessorInterface;
 use TYPO3\CMS\Core\Resource\Processing\TaskInterface;
@@ -88,12 +89,18 @@ class VideoProcessor implements ProcessorInterface
             throw new \InvalidArgumentException("Expected " . VideoProcessingTask::class . ", got $type");
         }
 
-        $converter = $this->getConverter();
-        $converter->process($task);
+        try {
+            $converter = $this->getConverter();
+            $converter->process($task);
 
-        if ($task->isExecuted() && $task->isSuccessful() && $task->getTargetFile()->isProcessed()) {
-            $processedFileRepository = GeneralUtility::makeInstance(ProcessedFileRepository::class);
-            $processedFileRepository->add($task->getTargetFile());
+            if ($task->isExecuted() && $task->isSuccessful() && $task->getTargetFile()->isProcessed()) {
+                $processedFileRepository = GeneralUtility::makeInstance(ProcessedFileRepository::class);
+                $processedFileRepository->add($task->getTargetFile());
+            }
+        } catch (\Exception $e) {
+            $logger = GeneralUtility::makeInstance(LogManager::class)->getLogger(__CLASS__);
+            $logger->critical($e->getMessage());
+            $task->setExecuted(false);
         }
     }
 

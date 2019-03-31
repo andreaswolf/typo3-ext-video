@@ -48,7 +48,7 @@ class VideoProcessingTask extends AbstractTask
         return true;
     }
 
-    public function getTargetFileExtension()
+    public function getTargetFileExtension(): string
     {
         $formatRepository = GeneralUtility::makeInstance(FormatRepository::class);
         $definition = $formatRepository->findFormatDefinition($this->getConfiguration());
