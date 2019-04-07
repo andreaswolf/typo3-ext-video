@@ -99,12 +99,6 @@ class FormatRepository implements SingletonInterface
             $options['video']['maxHeight'] = intval($options['height']);
         }
 
-        if (isset($options['quality']) && is_numeric($options['quality'])) {
-            $quality = MathUtility::forceIntegerInRange($options['quality'], 1, 100);
-            $options['video']['quality'] = (float)($quality * 0.01);
-            $options['audio']['quality'] = (float)($quality * 0.01);
-        }
-
         if (isset($options['muted']) && $options['muted']) {
             $options['audio']['disabled'] = true;
         }

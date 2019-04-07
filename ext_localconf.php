@@ -6,8 +6,6 @@ if (!defined('TYPO3_MODE')) {
     die('Access denied.');
 }
 
-$GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['hauptsache_video']['default_quality'] = 0.8;
-
 $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['hauptsache_video']['formats'] = [
     'mp4:default' => [
         'fileExtension' => 'mp4',
@@ -28,8 +26,10 @@ $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['hauptsache_video']['formats'] = [
     ],
 ];
 
-$GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['hauptsache_video']['video_converter'] =
-    [\Hn\HauptsacheVideo\Converter\LocalVideoConverter::class];
+if (!isset($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['hauptsache_video']['video_converter'])) {
+    $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['hauptsache_video']['video_converter'] =
+        [\Hn\HauptsacheVideo\Converter\LocalVideoConverter::class];
+}
 
 $GLOBALS['TYPO3_CONF_VARS']['SYS']['fal']['processingTaskTypes']['Video.CropScale']
     = \Hn\HauptsacheVideo\Processing\VideoProcessingTask::class;
