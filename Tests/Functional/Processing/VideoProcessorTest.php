@@ -10,7 +10,10 @@ use Hn\HauptsacheVideo\Processing\VideoProcessingTask;
 use Hn\HauptsacheVideo\Processing\VideoProcessor;
 use Hn\HauptsacheVideo\Tests\Functional\FunctionalTestCase;
 use PHPUnit\Framework\MockObject\MockObject;
+use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Core\Resource\ProcessedFile;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 
 class VideoProcessorTest extends FunctionalTestCase
 {
@@ -46,6 +49,8 @@ class VideoProcessorTest extends FunctionalTestCase
         $this->converter->expects($this->once())->method('start');
         $this->converter->expects($this->never())->method('process');
 
+        $GLOBALS['TSFE'] = $this->createMock(TypoScriptFrontendController::class);
+        $GLOBALS['TSFE']->expects($this->once())->method('addCacheTags')->withAnyParameters();
         $this->resourceStorage->processFile($this->file, 'Video.CropScale', []);
         $this->assertTasksAndProcessedFiles(1, 0);
     }
@@ -61,6 +66,10 @@ class VideoProcessorTest extends FunctionalTestCase
         /** @var StoredTask $storedTask */
         $storedTask = $this->objectManager->get(StoredTaskRepository::class)->findAll()->getFirst();
         $this->assertInstanceOf(StoredTask::class, $storedTask);
+
+        $cacheManager = $this->createMock(CacheManager::class);
+        GeneralUtility::setSingletonInstance(CacheManager::class, $cacheManager);
+        $cacheManager->expects($this->never())->method('flushCachesInGroupByTag')->withAnyParameters();
 
         $videoProcessor = $this->objectManager->get(VideoProcessor::class);
         $task = $storedTask->getOriginalTask();
@@ -89,6 +98,10 @@ class VideoProcessorTest extends FunctionalTestCase
         /** @var StoredTask $storedTask */
         $storedTask = $this->objectManager->get(StoredTaskRepository::class)->findAll()->getFirst();
         $this->assertInstanceOf(StoredTask::class, $storedTask);
+
+        $cacheManager = $this->createMock(CacheManager::class);
+        GeneralUtility::setSingletonInstance(CacheManager::class, $cacheManager);
+        $cacheManager->expects($this->once())->method('flushCachesInGroupByTag')->withAnyParameters();
 
         $videoProcessor = $this->objectManager->get(VideoProcessor::class);
         $task = $storedTask->getOriginalTask();

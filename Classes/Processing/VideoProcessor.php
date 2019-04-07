@@ -7,6 +7,7 @@ use Hn\HauptsacheVideo\Converter\VideoConverterInterface;
 use Hn\HauptsacheVideo\Domain\Model\StoredTask;
 use Hn\HauptsacheVideo\Domain\Repository\StoredTaskRepository;
 use Hn\HauptsacheVideo\Exception\ConversionException;
+use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Core\Log\LogManager;
 use TYPO3\CMS\Core\Resource\ProcessedFileRepository;
 use TYPO3\CMS\Core\Resource\Processing\ProcessorInterface;
@@ -15,6 +16,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Object\ObjectManager;
 use TYPO3\CMS\Extbase\Persistence\Exception\IllegalObjectTypeException;
 use TYPO3\CMS\Extbase\Persistence\Generic\PersistenceManager;
+use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 
 class VideoProcessor implements ProcessorInterface
 {
@@ -71,6 +73,14 @@ class VideoProcessor implements ProcessorInterface
             $storedTaskRepository->add($storedTask);
             $objectManager->get(PersistenceManager::class)->persistAll();
         }
+
+        // the video should never be done processing here ...
+
+        // add a cache tag to the current page that the video can be displayed as soon as it's done
+        if ($GLOBALS['TSFE'] instanceof TypoScriptFrontendController) {
+            $GLOBALS['TSFE']->addCacheTags([$task->getConfigurationChecksum()]);
+            $GLOBALS['TSFE']->config['config']['sendCacheHeaders'] = false;
+        }
     }
 
     /**
@@ -96,6 +106,9 @@ class VideoProcessor implements ProcessorInterface
             if ($task->isExecuted() && $task->isSuccessful() && $task->getTargetFile()->isProcessed()) {
                 $processedFileRepository = GeneralUtility::makeInstance(ProcessedFileRepository::class);
                 $processedFileRepository->add($task->getTargetFile());
+
+                $cacheManager = GeneralUtility::makeInstance(CacheManager::class);
+                $cacheManager->flushCachesInGroupByTag('pages', $task->getConfigurationChecksum());
             }
         } catch (\Exception $e) {
             $logger = GeneralUtility::makeInstance(LogManager::class)->getLogger(__CLASS__);
