@@ -13,7 +13,9 @@ class AbstractVideoPresetTest extends AbstractPresetTest
 
     protected function createPreset()
     {
-        return $this->getMockForAbstractClass(AbstractVideoPreset::class);
+        $preset = $this->getMockForAbstractClass(AbstractVideoPreset::class);
+        $preset->method('getMaxResolution')->willReturn(1920*1080);
+        return $preset;
     }
 
     public static function framerates()

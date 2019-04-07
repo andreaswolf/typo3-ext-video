@@ -31,11 +31,11 @@ class H264PresetTest extends AbstractVideoPresetTest
             '-level:v',
             '31',
             '-crf:v',
-            '24',
+            '23',
             '-maxrate:v',
-            '2488k',
+            '2104k',
             '-bufsize:v',
-            '3110k',
+            '2630k',
         ], $this->preset->getParameters([]));
     }
 }

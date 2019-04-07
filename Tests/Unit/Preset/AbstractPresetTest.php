@@ -3,13 +3,13 @@
 namespace Hn\HauptsacheVideo\Tests\Unit\Preset;
 
 
-use Hn\HauptsacheVideo\Preset\AbstractPreset;
+use Hn\HauptsacheVideo\Preset\AbstractCompressiblePreset;
 use Nimut\TestingFramework\TestCase\UnitTestCase;
 use PHPUnit\Framework\MockObject\MockObject;
 
 class AbstractPresetTest extends UnitTestCase
 {
-    /** @var AbstractPreset|MockObject */
+    /** @var AbstractCompressiblePreset|MockObject */
     protected $preset;
 
     public function __sleep()
@@ -19,7 +19,7 @@ class AbstractPresetTest extends UnitTestCase
 
     protected function createPreset()
     {
-        return $this->getMockForAbstractClass(AbstractPreset::class);
+        return $this->getMockForAbstractClass(AbstractCompressiblePreset::class);
     }
 
     protected function setUp()

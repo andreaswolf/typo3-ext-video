@@ -23,27 +23,32 @@ class AacPresetTest extends AbstractAudioPresetTest
             '-ac',
             '2',
             '-c:a',
-            'aac',
+            'libfdk_aac',
             '-b:a',
             '128k',
+            '-profile:a',
+            'aac_low'
         ], $this->preset->getParameters([]));
     }
 
     public function testBitrate()
     {
         $this->preset->setQuality(1.0);
-        $this->assertEquals(256, round($this->preset->getBitrate([]) / 1024 / 16) * 16);
+        $this->assertEquals(192, $this->preset->getBitrate([]));
 
         $this->preset->setQuality(0.9);
-        $this->assertEquals(176, round($this->preset->getBitrate([]) / 1024 / 16) * 16);
+        $this->assertEquals(158, $this->preset->getBitrate([]));
 
         $this->preset->setQuality(0.8);
-        $this->assertEquals(128, round($this->preset->getBitrate([]) / 1024 / 16) * 16);
+        $this->assertEquals(128, $this->preset->getBitrate([]));
 
         $this->preset->setQuality(0.7);
-        $this->assertEquals(96, round($this->preset->getBitrate([]) / 1024 / 16) * 16);
+        $this->assertEquals(104, $this->preset->getBitrate([]));
 
         $this->preset->setQuality(0.6);
-        $this->assertEquals(80, round($this->preset->getBitrate([]) / 1024 / 16) * 16);
+        $this->assertEquals(86, $this->preset->getBitrate([]));
+
+        $this->preset->setQuality(0.5);
+        $this->assertEquals(72, $this->preset->getBitrate([]));
     }
 }

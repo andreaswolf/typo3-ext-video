@@ -3,8 +3,6 @@
 namespace Hn\HauptsacheVideo\Preset;
 
 
-use TYPO3\CMS\Core\Utility\MathUtility;
-
 class H264Preset extends AbstractVideoPreset
 {
     /**
@@ -55,6 +53,18 @@ class H264Preset extends AbstractVideoPreset
         'high' => 1.25,
     ];
 
+    /**
+     * Some profiles are subsets of others.
+     * main is a subset of high.
+     *
+     * If high was requested and i get a low bitrate main than no transcoding is required.
+     */
+    const PROFILES_ALLOWED_MAP = [
+        'baseline' => ['baseline'],
+        'main' => ['main'],
+        'high' => ['high', 'main'],
+    ];
+
     const PERFORMANCE_PRESETS = [
         'ultrafast',
         'veryfast',
@@ -82,13 +92,67 @@ class H264Preset extends AbstractVideoPreset
      */
     private $performance = 'fast';
 
+    public function getCodecName(): string
+    {
+        return 'h264';
+    }
+
+    protected function getMaxResolution(): int
+    {
+        $levelDefinition = self::LEVEL_DEFINITION[$this->getLevel()];
+        return min($levelDefinition[0], $levelDefinition[1] / $this->getMaxFramerate());
+    }
+
+    protected function getBitsPerPixel(): float
+    {
+        // http://fooplot.com/#W3sidHlwZSI6MCwiZXEiOiIoKHgqKjIqMC44KzAuMikqMC42KSoxMjgwKjcyMCooMzAqKjAuNSkvMTAyNCIsImNvbG9yIjoiIzAwMDAwMCJ9LHsidHlwZSI6MTAwMCwid2luZG93IjpbIjAiLCIxIiwiMCIsIjUwMDAiXX1d
+        $qualityFactor = $this->getQuality() ** 2 * 0.8 + 0.2;
+        return 0.6 * $qualityFactor;
+    }
+
+    protected function getBitrateLimit(): int
+    {
+        $profileModifier = self::PROFILE_BITRATE_MULTIPLIER[$this->getProfile()];
+        $levelLimit = self::LEVEL_DEFINITION[$this->getLevel()][2] * $profileModifier;
+        return $levelLimit / 2; // stay well below the absolute limit since there will be spikes over this rate
+    }
+
+    /**
+     * Constant Rate factor.
+     *
+     * The idea is that a bitrate target might produce unnecessarily big files if there is little movement
+     * crf will always reduce the quality to the target.
+     *
+     * The quality reduction compared to the quality parameter is chosen to be modest on purpose.
+     * If you reduce the quality you probably want to reduce the size more than you want to reduce the actual quality.
+     * Moving scenes are way worse for the bitrate than still scenes and a high crf would make both look bad.
+     * A low crf combined with a low limit will vary in quality more but will overall look better.
+     *
+     * for h264 the range should is 51-0 according to ffmpeg https://trac.ffmpeg.org/wiki/Encode/H.264#crf
+     * The recommended range however is 18 to 28
+     * quality 1.0 = crf 18
+     * quality 0.9 = crf 21
+     * quality 0.8 = crf 23
+     * quality 0.7 = crf 25
+     * quality 0.6 = crf 27
+     * quality 0.5 = crf 28
+     *
+     * @see http://fooplot.com/#W3sidHlwZSI6MCwiZXEiOiJNYXRoLnJvdW5kKDI4LXgqKjMqMTApIiwiY29sb3IiOiIjMDAwMDAwIn0seyJ0eXBlIjoxMDAwLCJ3aW5kb3ciOlsiMCIsIjEiLCIwIiwiNTAiXX1d
+     * @return int
+     */
+    protected function getCrf(): int
+    {
+        return round(30 - $this->getQuality() ** 2.5 * 12);
+    }
+
     public function requiresTranscoding(array $sourceStream): bool
     {
         if (parent::requiresTranscoding($sourceStream)) {
             return true;
         }
 
-        if (strcasecmp($sourceStream['profile'] ?? '', $this->getProfile()) !== 0) {
+        $allowedProfiles = self::PROFILES_ALLOWED_MAP[$this->getProfile()];
+        if (!isset($sourceStream['profile']) || !in_array(strtolower($sourceStream['profile']), $allowedProfiles)) {
             return true;
         }
 
@@ -96,14 +160,10 @@ class H264Preset extends AbstractVideoPreset
             return true;
         }
 
-        if (!isset($sourceStream['bit_rate']) || $sourceStream['bit_rate'] > $this->getBitrateLimit($sourceStream)) {
-            return true;
-        }
-
         return false;
     }
 
-    public function getEncoderParameters(array $sourceStream): array
+    protected function getEncoderParameters(array $sourceStream): array
     {
         $parameters = [];
 
@@ -113,80 +173,11 @@ class H264Preset extends AbstractVideoPreset
         array_push($parameters, '-level:v', $this->getLevel());
         array_push($parameters, '-crf:v', (string)$this->getCrf());
 
-        $bitrate = round($this->getBitrateLimit($sourceStream) / 1024 / 8);
+        $bitrate = round($this->getMaxBitrate($sourceStream) / 8);
         array_push($parameters, '-maxrate:v', $bitrate * 8 . 'k');
         array_push($parameters, '-bufsize:v', $bitrate * 10 . 'k');
 
         return $parameters;
-    }
-
-    public function getCodecName(): string
-    {
-        return 'h264';
-    }
-
-    public function getEncoderName(): string
-    {
-        return 'libx264';
-    }
-
-    /**
-     * Calculates a bitrate limit based on the video dimensions, the framerate and the target quality.
-     *
-     * @param array $sourceStream
-     *
-     * @return int
-     */
-    public function getBitrateLimit(array $sourceStream): int
-    {
-        list($width, $height) = $this->getDimensions($sourceStream);
-        $framerate = MathUtility::calculateWithParentheses($this->getFramerate($sourceStream));
-        $quality = $this->getQuality();
-
-        // here is the effect that quality has on a 720p and 1080p video with 30fps
-        // http://fooplot.com/?lang=de#W3sidHlwZSI6MCwiZXEiOiIxMjgwKjcyMCooMzAqKjAuNSkqKDAuMit4KioyKSowLjYvMTAyNCIsImNvbG9yIjoiIzAwMDAwMCJ9LHsidHlwZSI6MCwiZXEiOiIxOTIwKjEwODAqKDMwKiowLjUpKigwLjIreCoqMikqMC42LzEwMjQiLCJjb2xvciI6IiMwMDAwMDAifSx7InR5cGUiOjEwMDAsIndpbmRvdyI6WyIwIiwiMSIsIjAiLCI4MDAwIl19XQ--
-        // here is the effect on framerate while at 720p and 1080p at 80% quality
-        // http://fooplot.com/?lang=de#W3sidHlwZSI6MCwiZXEiOiIxMjgwKjcyMCooeCoqMC41KSooMC4yKzAuOCoqMikqMC42LzEwMjQiLCJjb2xvciI6IiMwMDAwMDAifSx7InR5cGUiOjAsImVxIjoiMTkyMCoxMDgwKih4KiowLjUpKigwLjIrMC44KioyKSowLjYvMTAyNCIsImNvbG9yIjoiIzAwMDAwMCJ9LHsidHlwZSI6MTAwMCwid2luZG93IjpbIjEwIiwiNjAiLCIwIiwiODAwMCJdfV0-
-        $bitrateMultiplier = 0.6;
-        return floor(min(
-            $width * $height * ($framerate ** 0.5) * (0.2 + $quality ** 2.0) * $bitrateMultiplier,
-            self::LEVEL_DEFINITION[$this->getLevel()][2] * self::PROFILE_BITRATE_MULTIPLIER[$this->getProfile()] * 1000
-        ));
-    }
-
-    /**
-     * Calculate the maximum resolution allowed by the current level within the maximum framerate.
-     *
-     * @return int
-     */
-    public function getMaxResolution(): int
-    {
-        $levelDefinition = self::LEVEL_DEFINITION[$this->getLevel()];
-        return min($levelDefinition[0], $levelDefinition[1] / $this->getMaxFramerate());
-    }
-
-    /**
-     * target a constant quality.
-     * The idea is that a bitrate target might produce unnecessarily big files if there is little movement
-     * crf will always reduce the quality to the target. There is an additional bitrate limit below.
-     * for h264 the range should is 51-0 according to ffmpeg https://trac.ffmpeg.org/wiki/Encode/H.264#crf
-     * The recommended range however is 18 to 28
-     * quality 1.0 = crf 18
-     * quality 0.9 = crf 21
-     * quality 0.8 = crf 24
-     * quality 0.7 = crf 27
-     * quality 0.6 = crf 30
-     * quality 0.5 = crf 33
-     * quality 0.4 = crf 36
-     * quality 0.3 = crf 39
-     * quality 0.2 = crf 42
-     * quality 0.1 = crf 45
-     *
-     * @return int
-     */
-    protected function getCrf(): int
-    {
-        return round(48 - $this->getQuality() * 30);
     }
 
     public function getProfile(): string

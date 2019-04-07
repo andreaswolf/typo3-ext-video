@@ -6,34 +6,50 @@ namespace Hn\HauptsacheVideo\Preset;
 class AacPreset extends AbstractAudioPreset
 {
     /**
-     * This is a tolerance for a higher bitrate.
-     * If the source bitrate is below the target bitrate*1.5 than no transcode will happen.
-     * If a transcode is necessary than the bitrate will be *1.5 higher than the source if that is lower than the target.
+     * This is the base for the bitrate calculation in kbit/s.
+     * It will by multiplied by channel count and quality.
      *
-     * Examples with a 128 kbit/s target (2 channels with 64 kbit/s each):
-     * - If the source is a 192 kbit/s aac than it will be transcoded to 128 kbit/s.
-     * - If the source is a 160 kbit/s aac than no transcode will happen.
-     * - If the source is a 128 kbit/s aac than no transcode will happen.
-     * - If the source is a 96 kbit/s aac than no transcode will happen.
-     * - If the source is a 192 kbit/s mp3 than the aac stream will have 128 kbit/s.
-     * - If the source is a 128 kbit/s mp3 than the aac stream will have 128 kbit/s.
-     * - If the source is a 64 kbit/s mp3 than the aac stream will have 80 kbit/s.
-     */
-    const BITRATE_TOLERANCE = 1.25;
-
-    /**
-     * This is the base for the bitrate calculation.
-     * this * (0.25 + quality ** 5 * 0.75) * channel
+     * Here are some considerations:
+     * - Apple claims to only support 160 kbit/s aac-lc audio within video (although this spec seems to have never changed ~ and are probably outdated)
+     * - Youtube used to use 152 kbit/s back when they combined video and audio streams which is what this preset is for
+     * - Youtube now (since ~ 2013) uses 128 kbit/s audio next to the video stream
+     * - Spotify uses 96/160 and 320 kbit/s vorbis depending on your quality setting and platform
+     * - Android recommends between between 128 kbit/s and 192 kbit/s and in my experience can completely fail to decode audio otherwise
      *
-     * @see http://fooplot.com/#W3sidHlwZSI6MCwiZXEiOiIxMjgqKDAuMjUreCoqNSowLjc1KSIsImNvbG9yIjoiIzAwMDAwMCJ9LHsidHlwZSI6MTAwMCwid2luZG93IjpbIjAiLCIxIiwiMCIsIjEyOCJdLCJncmlkIjpbIiIsIjE2Il19XQ--
-     * @see AacPreset::getBitrate()
-     * @var int
+     * Here some examples of the bitrate using different quality settings
+     * - 100% = 192 kbit/s (the highest android recommends)
+     * - 80% = 128 kbit/s (default ~ usually a safe bet and the quality youtube uses)
+     * - 50% = 72 kbit/s (this is the bitrate DAB+ uses with HE-AAC)
+     *
+     * @see http://fooplot.com/#W3sidHlwZSI6MCwiZXEiOiIyKk1hdGgucm91bmQoOTYqKHgqKjIuNiowLjc1KzAuMjUpKSIsImNvbG9yIjoiIzAwMDAwMCJ9LHsidHlwZSI6MCwiZXEiOiIxKk1hdGgucm91bmQoOTYqKHgqKjIuNiowLjc1KzAuMjUpKSIsImNvbG9yIjoiIzAwMDAwMCJ9LHsidHlwZSI6MTAwMCwid2luZG93IjpbIjAiLCIxIiwiMCIsIjE5MiJdLCJncmlkIjpbIiIsIjE2Il19XQ--
      */
-    private $bitratePerChannel = 128 * 1024;
+    private const BITRATE_PER_CHANNEL = 96;
 
     public function getCodecName(): string
     {
         return 'aac';
+    }
+
+    protected function getMaxChannels(): int
+    {
+        return 2;
+    }
+
+    protected function getSampleRates(): array
+    {
+        return [48000, 44100, 32000];
+    }
+
+    protected function getBitratePerChannel(): int
+    {
+        $qualityFactor = $this->getQuality() ** 2.6 * 0.75 + 0.25;
+        return round(self::BITRATE_PER_CHANNEL * $qualityFactor);
+    }
+
+    protected function getProfile(array $sourceStream): string
+    {
+        // with 40 kbit/s per channel (80 kbit/s stereo) use he-aac since it'll sound better
+        return $this->getBitratePerChannel() <= 40 ? 'aac_he' : 'aac_low';
     }
 
     public function requiresTranscoding(array $sourceStream): bool
@@ -42,61 +58,22 @@ class AacPreset extends AbstractAudioPreset
             return true;
         }
 
-        if (strcasecmp($sourceStream['profile'], 'LC') !== 0) {
-            return true;
-        }
-
-        if ($sourceStream['bit_rate'] ?? INF > $this->getBitrate($sourceStream) * self::BITRATE_TOLERANCE) {
+        // I allow LC and HE-1
+        if (!in_array(strtoupper($sourceStream['profile']), ['HE-AAC', 'LC'], true)) {
             return true;
         }
 
         return false;
     }
 
-    public function getBitrate(array $sourceStream): int
-    {
-        $channels = $this->getChannels($sourceStream);
-        $maxBitratePerChannel = $this->getBitratePerChannel();
-        $quality = $this->getQuality();
-        $maxBitrate = $maxBitratePerChannel * (0.25 + $quality ** 5 * 0.75) * $channels;
-
-        if (!isset($sourceStream['bit_rate'])) {
-            return $maxBitrate;
-        }
-
-        return min($sourceStream['bit_rate'] * self::BITRATE_TOLERANCE, $maxBitrate);
-    }
-
-    /**
-     * The parameters specific to this encoder like bitrate.
-     *
-     * @param array $sourceStream
-     *
-     * @return array
-     */
-    public function getEncoderParameters(array $sourceStream): array
+    protected function getEncoderParameters(array $sourceStream): array
     {
         $parameters = [];
 
-        array_push($parameters, '-c:a', 'aac');
-
-        $bitrate = round($this->getBitrate($sourceStream) / 1024 / 16);
-        array_push($parameters, '-b:a', $bitrate * 16 . 'k');
+        array_push($parameters, '-c:a', 'libfdk_aac');
+        array_push($parameters, '-b:a', $this->getBitrate($sourceStream) . 'k');
+        array_push($parameters, '-profile:a', $this->getProfile($sourceStream));
 
         return $parameters;
-    }
-
-    public function getBitratePerChannel(): int
-    {
-        return $this->bitratePerChannel;
-    }
-
-    public function setBitratePerChannel(int $bitratePerChannel): void
-    {
-        if ($bitratePerChannel < 16000) {
-            throw new \RuntimeException("Bitrate must be at least 16000.");
-        }
-
-        $this->bitratePerChannel = $bitratePerChannel;
     }
 }

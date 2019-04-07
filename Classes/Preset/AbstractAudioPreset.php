@@ -3,8 +3,43 @@
 namespace Hn\HauptsacheVideo\Preset;
 
 
-abstract class AbstractAudioPreset extends AbstractPreset
+abstract class AbstractAudioPreset extends AbstractCompressiblePreset
 {
+    /**
+     * This is a tolerance for a higher bitrate.
+     * If the source bitrate is below the target bitrate*1.25 than no transcode will happen.
+     * If a transcode is necessary than the bitrate will be *1.25 higher than the source if that is lower than the target.
+     *
+     * Examples with a 128 kbit/s target (2 channels with 64 kbit/s each):
+     * - If the source is a 192 kbit/s aac than it will be transcoded to 128 kbit/s.
+     * - If the source is a 160 kbit/s aac than no transcode will happen.
+     * - If the source is a 128 kbit/s aac than no transcode will happen.
+     * - If the source is a 96 kbit/s aac than no transcode will happen.
+     * - If the source is a 192 kbit/s mp3 than the aac stream will have 128 kbit/s.
+     * - If the source is a 128 kbit/s mp3 than the aac stream will have 128 kbit/s.
+     * - If the source is a 64 kbit/s mp3 than the aac stream will have 80 kbit/s.
+     */
+    const BITRATE_TOLERANCE = 1.25;
+
+    /**
+     * Returns the maximum number of channels supported by this preset.
+     *
+     * This is usually 2.
+     *
+     * @return int
+     */
+    protected abstract function getMaxChannels(): int;
+
+    public function getChannels(array $sourceStream): int
+    {
+        $maxChannels = $this->getMaxChannels();
+        if (!isset($sourceStream['channels'])) {
+            return $maxChannels;
+        }
+
+        return min($sourceStream['channels'], $maxChannels);
+    }
+
     /**
      * The sample rates allowed.
      *
@@ -15,28 +50,9 @@ abstract class AbstractAudioPreset extends AbstractPreset
      *
      * Make sure the first item is your preferred sample rate since it will be used if the source is unknown.
      *
-     * @var int[]
-     */
-    private $sampleRates = [48000, 44100, 32000];
-
-    /**
-     * @var int
-     */
-    private $maxChannels = 2;
-
-    public function getCodecType(): string
-    {
-        return 'audio';
-    }
-
-    /**
-     * The parameters specific to this encoder like bitrate.
-     *
-     * @param array $sourceStream
-     *
      * @return array
      */
-    public abstract function getEncoderParameters(array $sourceStream): array;
+    protected abstract function getSampleRates(): array;
 
     public function getSampleRate(array $sourceStream): int
     {
@@ -48,7 +64,7 @@ abstract class AbstractAudioPreset extends AbstractPreset
         $sourceSampleRate = (int)$sourceStream['sample_rate'];
 
         // try to find an exactly matching sample rate
-        // use a sample rate that is a multiple of the source
+        // or use a sample rate that is a multiple of the source
         sort($sampleRates); // make sure to check from the lowest to the highest
         foreach ($sampleRates as $sampleRate) {
             if ($sampleRate % $sourceSampleRate === 0) {
@@ -67,27 +83,47 @@ abstract class AbstractAudioPreset extends AbstractPreset
         return end($sampleRates);
     }
 
-    public function getChannels(array $sourceStream): int
+    /**
+     * The expected bitrate per channel in kbit/s.
+     *
+     * @return int
+     */
+    protected abstract function getBitratePerChannel(): int;
+
+    public function getBitrate(array $sourceStream): int
     {
-        $maxChannels = $this->getMaxChannels();
-        if (!isset($sourceStream['channels'])) {
-            return $maxChannels;
+        $maxBitrate = $this->getBitratePerChannel() * $this->getChannels($sourceStream);
+        if (!isset($sourceStream['bit_rate'])) {
+            return $maxBitrate;
         }
 
-        return min($sourceStream['channels'], $maxChannels);
+        return min($sourceStream['bit_rate'] * self::BITRATE_TOLERANCE, $maxBitrate);
     }
 
-    /**
-     * Creates the parameters used to transcode the stream into the desired format.
-     *
-     * If you create a codec specific implementation than this is the method you want to override to add your parameters.
-     * Be sure that ::requiresTranscoding does check your codec and conditions.
-     *
-     * @param array $sourceStream
-     *
-     * @return array
-     * @see AbstractPreset::requiresTranscoding
-     */
+    public function requiresTranscoding(array $sourceStream): bool
+    {
+        if (parent::requiresTranscoding($sourceStream)) {
+            return true;
+        }
+
+        if (!isset($sourceStream['sample_rate']) || $sourceStream['sample_rate'] !== $this->getSampleRate($sourceStream)) {
+            return true;
+        }
+
+        if (!isset($sourceStream['channels']) || $sourceStream['channels'] > $this->getMaxChannels()) {
+            return true;
+        }
+        // TODO maybe check channel layout? it should not matter up until stereo but ~ i don't know
+
+        if (!isset($sourceStream['bit_rate']) || $sourceStream['bit_rate'] > ($this->getBitrate($sourceStream) * self::BITRATE_TOLERANCE)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    protected abstract function getEncoderParameters(array $sourceStream): array;
+
     protected function getTranscodingParameters(array $sourceStream): array
     {
         $parameters = [];
@@ -102,61 +138,5 @@ abstract class AbstractAudioPreset extends AbstractPreset
     protected function getRemuxingParameters(array $sourceStream): array
     {
         return ['-c:a', 'copy'];
-    }
-
-    public function requiresTranscoding(array $sourceStream): bool
-    {
-        if (parent::requiresTranscoding($sourceStream)) {
-            return true;
-        }
-
-        if (!isset($sourceStream['sample_rate']) || $sourceStream['sample_rate'] !== $this->getSampleRate($sourceStream)) {
-            return true;
-        }
-
-        // TODO check sample format
-
-        if (!isset($sourceStream['channels']) || $sourceStream['channels'] > $this->getMaxChannels()) {
-            return true;
-        }
-
-        // TODO maybe check channel layout? it should not matter up until stereo
-
-        return false;
-    }
-
-    public function getSampleRates(): array
-    {
-        return $this->sampleRates;
-    }
-
-    public function setSampleRates(array $sampleRates): void
-    {
-        foreach ($sampleRates as $sampleRate) {
-            if (!is_int($sampleRate)) {
-                $type = is_object($sampleRate) ? get_class($sampleRate) : gettype($sampleRate);
-                throw new \RuntimeException("Sample rates must be an int, got $type");
-            }
-
-            if ($sampleRate < 8000) {
-                throw new \RuntimeException("Sample rate must be equal or above 8000.");
-            }
-        }
-
-        $this->sampleRates = array_values($sampleRates);
-    }
-
-    public function getMaxChannels(): int
-    {
-        return $this->maxChannels;
-    }
-
-    public function setMaxChannels(int $maxChannels): void
-    {
-        if ($maxChannels < 1) {
-            throw new \RuntimeException("Channel count must be at least 1.");
-        }
-
-        $this->maxChannels = $maxChannels;
     }
 }

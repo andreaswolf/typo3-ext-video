@@ -7,7 +7,7 @@ use TYPO3\CMS\Core\Utility\MathUtility;
 
 /**
  */
-abstract class AbstractVideoPreset extends AbstractPreset
+abstract class AbstractVideoPreset extends AbstractCompressiblePreset
 {
     /**
      * The maximum framerate allowed within this video.
@@ -29,29 +29,13 @@ abstract class AbstractVideoPreset extends AbstractPreset
     private $maxHeight = 720;
 
     /**
-     * This final resolution will be divisible by this value.
-     * This is required to get chroma sub-sampling to work.
-     *
-     * You may want to try adjusting it to match the macroblock size.
-     * h264 uses 4x4 and 8x8 macroblocks therefor 4 or 8 would probably be a good idea for experiments.
-     *
-     * @var int
-     */
-    private $dimensionDivisor = 2;
-
-    /**
      * If true than the video will be cropped.
      *
      * @var bool
      */
     private $crop = false;
 
-    public function getCodecType(): string
-    {
-        return 'video';
-    }
-
-    public function getPixelFormat(): string
+    protected function getPixelFormat(): string
     {
         // most players don't support other pixel formats
         // and if they do than hardware support is probably also missing
@@ -59,14 +43,19 @@ abstract class AbstractVideoPreset extends AbstractPreset
         return 'yuv420p';
     }
 
-    /**
-     * The parameters specific to this encoder like bitrate.
-     *
-     * @param array $sourceStream
-     *
-     * @return array
-     */
-    public abstract function getEncoderParameters(array $sourceStream): array;
+    public function getMaxFramerate(): float
+    {
+        return $this->maxFramerate;
+    }
+
+    public function setMaxFramerate(float $maxFramerate): void
+    {
+        if ($maxFramerate <= 0.0) {
+            throw new \RuntimeException("Framerate must be higher than 0.0");
+        }
+
+        $this->maxFramerate = $maxFramerate;
+    }
 
     public function getFramerate(array $sourceStream): string
     {
@@ -101,9 +90,57 @@ abstract class AbstractVideoPreset extends AbstractPreset
      *
      * @return int
      */
-    public function getMaxResolution(): int
+    protected abstract function getMaxResolution(): int;
+
+    public function getMaxWidth(): int
     {
-        return 3840 * 2160;
+        return $this->maxWidth;
+    }
+
+    public function setMaxWidth(int $maxWidth): void
+    {
+        if ($maxWidth < 8) {
+            throw new \RuntimeException("width must be 8 or higher0");
+        }
+
+        $this->maxWidth = $maxWidth;
+    }
+
+    public function getMaxHeight(): int
+    {
+        return $this->maxHeight;
+    }
+
+    public function setMaxHeight(int $maxHeight): void
+    {
+        if ($maxHeight < 8) {
+            throw new \RuntimeException("height must be 8 or higher");
+        }
+
+        $this->maxHeight = $maxHeight;
+    }
+
+    public function isCrop(): bool
+    {
+        return $this->crop;
+    }
+
+    public function setCrop(bool $crop): void
+    {
+        $this->crop = $crop;
+    }
+
+    /**
+     * This final resolution will be divisible by this value.
+     * This is required to get chroma sub-sampling to work.
+     *
+     * It'll probably be 2 or 8.
+     *
+     * @return int
+     */
+    protected function getDimensionDivisor(): int
+    {
+        return 2;
     }
 
     public function getDimensions(array $sourceStream): array
@@ -130,13 +167,47 @@ abstract class AbstractVideoPreset extends AbstractPreset
         ];
     }
 
+    /**
+     * Calculates a rough estimate of how much bitrate is necessary to encode the video at the given quality.
+     * This is based on a per pixel definition.
+     *
+     * Here are a few examples:
+     * 0.6 * 1280*720*(30**0.5)/1024 = 3943.6024140372
+     *
+     * @return float
+     */
+    protected abstract function getBitsPerPixel(): float;
+
+    /**
+     * The maximum bitrate allowed by the codec or the codec configuration.
+     * Most of the time this is configured using a level.
+     *
+     * @return int
+     */
+    protected abstract function getBitrateLimit(): int;
+
+    /**
+     * Calculates the bitrate in kbit/s
+     *
+     * @param array $sourceStream
+     *
+     * @return int
+     */
+    public function getMaxBitrate(array $sourceStream): int
+    {
+        list($width, $height) = $this->getDimensions($sourceStream);
+        $framerate = MathUtility::calculateWithParentheses($this->getFramerate($sourceStream));
+        $bitrate = round($width * $height * ($framerate ** 0.5) * $this->getBitsPerPixel() / 1024);
+        return min($bitrate, $this->getBitrateLimit());
+    }
+
     public function requiresTranscoding(array $sourceStream): bool
     {
         if (parent::requiresTranscoding($sourceStream)) {
             return true;
         }
 
-        $hasCorrectPixelFormat = strcasecmp($sourceStream['pix_fmt'], $this->getPixelFormat()) === 0;
+        $hasCorrectPixelFormat = isset($sourceStream['pix_fmt']) && strcasecmp($sourceStream['pix_fmt'], $this->getPixelFormat()) === 0;
         if (!$hasCorrectPixelFormat) {
             return true;
         }
@@ -167,8 +238,21 @@ abstract class AbstractVideoPreset extends AbstractPreset
             return true;
         }
 
+        if (!isset($sourceStream['bit_rate']) || $sourceStream['bit_rate'] > $this->getMaxBitrate($sourceStream)) {
+            return true;
+        }
+
         return false;
     }
+
+    /**
+     * The parameters specific to this encoder like bitrate.
+     *
+     * @param array $sourceStream
+     *
+     * @return array
+     */
+    protected abstract function getEncoderParameters(array $sourceStream): array;
 
     protected function getTranscodingParameters(array $sourceStream): array
     {
@@ -208,76 +292,5 @@ abstract class AbstractVideoPreset extends AbstractPreset
     protected function getRemuxingParameters(array $sourceStream): array
     {
         return ['-c:v', 'copy'];
-    }
-
-    private static function parseFramerate(string $framerate): float
-    {
-        return MathUtility::calculateWithParentheses($framerate);
-    }
-
-    public function getMaxFramerate(): float
-    {
-        return $this->maxFramerate;
-    }
-
-    public function setMaxFramerate(float $maxFramerate): void
-    {
-        if ($maxFramerate <= 0.0) {
-            throw new \RuntimeException("Framerate must be higher than 0.0");
-        }
-
-        $this->maxFramerate = $maxFramerate;
-    }
-
-    public function getMaxWidth(): int
-    {
-        return $this->maxWidth;
-    }
-
-    public function setMaxWidth(int $maxWidth): void
-    {
-        if ($maxWidth < 8) {
-            throw new \RuntimeException("width must be 8 or higher0");
-        }
-
-        $this->maxWidth = $maxWidth;
-    }
-
-    public function getMaxHeight(): int
-    {
-        return $this->maxHeight;
-    }
-
-    public function setMaxHeight(int $maxHeight): void
-    {
-        if ($maxHeight < 8) {
-            throw new \RuntimeException("height must be 8 or higher");
-        }
-
-        $this->maxHeight = $maxHeight;
-    }
-
-    public function getDimensionDivisor(): int
-    {
-        return $this->dimensionDivisor;
-    }
-
-    public function setDimensionDivisor(int $dimensionDivisor): void
-    {
-        if ($dimensionDivisor < 1) {
-            throw new \RuntimeException("dimension divisor must be 1 or higher");
-        }
-
-        $this->dimensionDivisor = $dimensionDivisor;
-    }
-
-    public function isCrop(): bool
-    {
-        return $this->crop;
-    }
-
-    public function setCrop(bool $crop): void
-    {
-        $this->crop = $crop;
     }
 }

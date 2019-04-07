@@ -13,7 +13,9 @@ class AbstractAudioPresetTest extends AbstractPresetTest
 
     protected function createPreset()
     {
-        return $this->getMockForAbstractClass(AbstractAudioPreset::class);
+        $mockObject = $this->getMockForAbstractClass(AbstractAudioPreset::class);
+        $mockObject->method('getSampleRates')->willReturn([48000, 44100, 32000]);
+        return $mockObject;
     }
 
     public function testSampleRate()
@@ -41,8 +43,5 @@ class AbstractAudioPresetTest extends AbstractPresetTest
 
         $this->assertEquals(48000, $this->preset->getSampleRate(['sample_rate' => '64000']));
         $this->assertEquals(48000, $this->preset->getSampleRate(['sample_rate' => '96000']));
-
-        $this->preset->setSampleRates([48000, 24000]);
-        $this->assertEquals(24000, $this->preset->getSampleRate(['sample_rate' => '12000']));
     }
 }
