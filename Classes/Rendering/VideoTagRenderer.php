@@ -16,6 +16,17 @@ class VideoTagRenderer extends \TYPO3\CMS\Core\Resource\Rendering\VideoTagRender
     }
 
     /**
+     * Check if given File(Reference) can be rendered
+     *
+     * @param FileInterface $file File or FileReference to render
+     * @return bool
+     */
+    public function canRender(FileInterface $file)
+    {
+        return preg_match('#^video/|/ogg$#i', $file->getMimeType());
+    }
+
+    /**
      * Render for given File(Reference) HTML output
      *
      * @param FileInterface $file
