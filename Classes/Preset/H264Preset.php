@@ -137,7 +137,7 @@ class H264Preset extends AbstractVideoPreset
      * quality 0.6 = crf 27
      * quality 0.5 = crf 28
      *
-     * @see http://fooplot.com/#W3sidHlwZSI6MCwiZXEiOiJNYXRoLnJvdW5kKDI4LXgqKjMqMTApIiwiY29sb3IiOiIjMDAwMDAwIn0seyJ0eXBlIjoxMDAwLCJ3aW5kb3ciOlsiMCIsIjEiLCIwIiwiNTAiXX1d
+     * @see http://fooplot.com/#W3sidHlwZSI6MCwiZXEiOiJNYXRoLnJvdW5kKDMwLXgqKjIuNSoxMikiLCJjb2xvciI6IiMwMDAwMDAifSx7InR5cGUiOjEwMDAsIndpbmRvdyI6WyIwIiwiMSIsIjAiLCI1MCJdfV0-
      * @return int
      */
     protected function getCrf(): int
