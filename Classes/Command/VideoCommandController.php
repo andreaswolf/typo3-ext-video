@@ -29,7 +29,7 @@ class VideoCommandController extends CommandController
     protected $videoProcessor;
 
     /**
-     * @param float $timeout A timeout after which no further tasks are started.
+     * @param float $timeout A timeout (in minutes) after which no further tasks are started.
      *
      * @throws UnknownObjectException
      */
