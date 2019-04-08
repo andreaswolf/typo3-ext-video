@@ -5,6 +5,15 @@ namespace Hn\HauptsacheVideo\Preset;
 
 class AacPreset extends AbstractAudioPreset
 {
+    /**
+     * Weather ot not to use libfdk for audio encoding.
+     * libfdk will sound better especially at lower bitrates than the native ffmpeg encoder.
+     * However it is probably not present on your system unless you compiled ffmpeg yourself.
+     *
+     * @var bool
+     */
+    private $fdkAvailable = true;
+
     public function getCodecName(): string
     {
         return 'aac';
@@ -28,7 +37,7 @@ class AacPreset extends AbstractAudioPreset
      * - Spotify uses 96/160 and 320 kbit/s vorbis depending on your quality setting and platform
      * - Android recommends between between 128 kbit/s and 192 kbit/s and in my experience can completely fail to decode audio otherwise
      *
-     * Here some examples of the bitrate using different quality settings
+     * Here some examples of the bitrate using different quality settings (with fdk available)
      * - 100% = 192 kbit/s the highest android recommends
      * - 80% = 128 kbit/s default ~ usually a safe bet and the quality youtube uses
      * - 60% = 80 kbit/s
@@ -38,19 +47,35 @@ class AacPreset extends AbstractAudioPreset
      * - 30% = 32 kbit/s
      * - 0% = 16 kbit/s
      *
-     * @see http://fooplot.com/#W3sidHlwZSI6MCwiZXEiOiIyKk1hdGgucm91bmQoOCsoOTYtOCkqeCoqMikiLCJjb2xvciI6IiMwMDAwMDAifSx7InR5cGUiOjAsImVxIjoiMSpNYXRoLnJvdW5kKDgrKDk2LTgpKngqKjIuNikiLCJjb2xvciI6IiMwMDAwMDAifSx7InR5cGUiOjEwMDAsIndpbmRvdyI6WyIwIiwiMSIsIjAiLCIxOTIiXSwiZ3JpZCI6WyIiLCIxNiJdfV0-
+     * I also give the native ffmpeg encoder a little bitrate boost at the lower end
+     * because it does not support he-aac and even with lc-aac it's noticeably worse at lower bitrates.
+     * At higher bitrates the difference is negligible.
+     * - 100% = 192 kbit/s since I don't want to sacrifice compatibility
+     * - 80% = 140 kbit/s
+     * - 50% = 84 kbit/s
+     * - 30% = 60 kbit/s
+     * - 00% = 48 kbit/s
+     *
+     * @see http://fooplot.com/#W3sidHlwZSI6MCwiZXEiOiIyKk1hdGgucm91bmQoOCsoOTYtOCkqeCoqMikiLCJjb2xvciI6IiMwMDAwMDAifSx7InR5cGUiOjAsImVxIjoiMSpNYXRoLnJvdW5kKDgrKDk2LTgpKngqKjIpIiwiY29sb3IiOiIjMDAwMDAwIn0seyJ0eXBlIjoxMDAwLCJ3aW5kb3ciOlsiMCIsIjEiLCIwIiwiMTkyIl0sImdyaWQiOlsiIiwiMTYiXX1d
      */
     protected function getBitratePerChannel(): int
     {
         $max = 96;
-        $min = 8;
+        $min = $this->isFdkAvailable() ? 8 : 24;
         return round($min + ($max - $min) * $this->getQuality() ** 2);
     }
 
+    /**
+     * Determines the aac profile to use.
+     *
+     * @param array $sourceStream
+     *
+     * @return string
+     */
     protected function getProfile(array $sourceStream): string
     {
-        // with less than 40 kbit/s per channel (80 kbit/s stereo) use he-aac since it'll sound better
-        return $this->getBitratePerChannel() < 40 ? 'aac_he' : 'aac_low';
+        // with 40 kbit/s per channel (80 kbit/s stereo) use he-aac since it'll sound better
+        return $this->getBitratePerChannel() <= 40 ? 'aac_he' : 'aac_low';
     }
 
     public function requiresTranscoding(array $sourceStream): bool
@@ -71,10 +96,26 @@ class AacPreset extends AbstractAudioPreset
     {
         $parameters = [];
 
-        array_push($parameters, '-c:a', 'libfdk_aac');
+        if ($this->isFdkAvailable()) {
+            array_push($parameters, '-c:a', 'libfdk_aac');
+            array_push($parameters, '-profile:a', $this->getProfile($sourceStream));
+        } else {
+            array_push($parameters, '-c:a', 'aac');
+            // TODO experiment with a high-pass filter for lower bitrates ~ just like fdk does natively
+        }
+
         array_push($parameters, '-b:a', $this->getBitrate($sourceStream) . 'k');
-        array_push($parameters, '-profile:a', $this->getProfile($sourceStream));
 
         return $parameters;
+    }
+
+    public function isFdkAvailable(): bool
+    {
+        return $this->fdkAvailable;
+    }
+
+    public function setFdkAvailable(bool $fdkAvailable): void
+    {
+        $this->fdkAvailable = $fdkAvailable;
     }
 }

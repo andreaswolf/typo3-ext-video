@@ -152,8 +152,8 @@ abstract class AbstractCompressiblePreset extends AbstractPreset
      */
     public function setQuality(float $quality): void
     {
-        if ($quality <= 0.0) {
-            throw new \RuntimeException("Quality must be above 0.0");
+        if ($quality < 0.0) {
+            throw new \RuntimeException("Quality must be equal or above 0.0");
         }
 
         if ($quality > 1.0) {

@@ -30,10 +30,10 @@ class AbstractPresetTest extends UnitTestCase
 
     public function testQuality()
     {
-        $this->preset->setQuality(0.1);
-        $this->assertEquals(0.1, $this->preset->getQuality());
-        $this->preset->setQuality(1.0);
-        $this->assertEquals(1.0, $this->preset->getQuality());
+        foreach (range(0.0, 1.0, 0.1) as $quality) {
+            $this->preset->setQuality($quality);
+            $this->assertEquals($quality, $this->preset->getQuality());
+        }
     }
 
     /**
@@ -49,7 +49,7 @@ class AbstractPresetTest extends UnitTestCase
      */
     public function testQualityTooLow()
     {
-        $this->preset->setQuality(0.0);
+        $this->preset->setQuality(-0.1);
     }
 
     public function testRequiresTranscoding()
