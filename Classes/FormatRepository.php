@@ -7,7 +7,6 @@ use Hn\HauptsacheVideo\Exception\FormatException;
 use Hn\HauptsacheVideo\Preset\PresetInterface;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Core\Utility\MathUtility;
 
 class FormatRepository implements SingletonInterface
 {
@@ -37,7 +36,7 @@ class FormatRepository implements SingletonInterface
             throw new FormatException("No format defintion found for configuration: " . print_r($options, true));
         }
 
-        foreach (['video' => '-vn', 'audio' => '-an', 'subtitle' => '-sn'] as $steamType => $disableParameter) {
+        foreach (['video' => '-vn', 'audio' => '-an', 'subtitle' => '-sn', 'data' => '-dn'] as $steamType => $disableParameter) {
             if (!isset($definition[$steamType])) {
                 array_push($parameters, $disableParameter);
                 continue;
