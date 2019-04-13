@@ -1,0 +1,34 @@
+<T3DataStructure>
+    <meta>
+        <langDisable>1</langDisable>
+    </meta>
+    <sheets>
+        <main>
+            <ROOT>
+                <TCEforms>
+                    <sheetTitle>Plugin Settings</sheetTitle>
+                </TCEforms>
+                <type>array</type>
+                <el>
+                    <settings.options>
+                        <TCEforms>
+                            <label>Options</label>
+                            <config>
+                                <type>input</type>
+                                <eval>trim,required</eval>
+                                <valuePicker type="array">
+                                    <items type="array">
+                                        <numIndex index="0" type="array">
+                                            <numIndex index="0">mp4 quality 100%, 80%, 60%, 40%, 20%, 0%</numIndex>
+                                            <numIndex index="1">{"format": "mp4", "video": {"quality": %1.0,0.8,0.6,0.4,0.2,0.0%}, "audio": {"quality": %1.0,0.8,0.6,0.4,0.2,0.0%}}</numIndex>
+                                        </numIndex>
+                                    </items>
+                                </valuePicker>
+                            </config>
+                        </TCEforms>
+                    </settings.options>
+                </el>
+            </ROOT>
+        </main>
+    </sheets>
+</T3DataStructure>

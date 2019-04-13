@@ -67,8 +67,8 @@ PageTSConfig
 
     \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addTypoScriptSetup(<<<TypoScript
 tt_content.hauptsache_video = USER
-tt_content.hauptsache_video.userFunc = Hn\HauptsacheVideo\DebugContentElement->render
-tt_content.hauptsache_video.configurations.field = bodytext
+tt_content.hauptsache_video.userFunc = Hn\HauptsacheVideo\TestContentElement->render
+tt_content.hauptsache_video.configurations.data = flexform:pi_flexform:settings.options
 TypoScript
     );
 }

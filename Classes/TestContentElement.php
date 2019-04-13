@@ -10,7 +10,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
 use TYPO3\CMS\Frontend\Resource\FileCollector;
 
-class DebugContentElement
+class TestContentElement
 {
     /**
      * Reference to the parent (calling) cObject set from TypoScript
@@ -21,9 +21,20 @@ class DebugContentElement
     public function render(string $content, array $config)
     {
         $configStr = $this->cObj->stdWrapValue('configurations', $config);
-        $configurations = json_decode($configStr, true);
-        if (json_last_error()) {
-            return json_last_error_msg() . ':' . $configStr;
+
+        $configurations = [];
+        $limit = 1;
+        for ($i = 0; $i < $limit; ++$i) {
+            $replace = function ($match) use ($i, &$limit) {
+                $variants = GeneralUtility::trimExplode(',', $match[1]);
+                $limit = max($limit, count($variants));
+                return $variants[$i % count($variants)];
+            };
+            $parsedConfig = preg_replace_callback('#%([^%]+)%#', $replace, $configStr);
+            $configurations[] = json_decode($parsedConfig, true);
+            if (json_last_error()) {
+                return json_last_error_msg() . ':' . $parsedConfig;
+            }
         }
 
         $fileCollector = GeneralUtility::makeInstance(FileCollector::class);
