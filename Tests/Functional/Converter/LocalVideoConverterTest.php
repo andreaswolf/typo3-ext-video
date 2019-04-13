@@ -3,14 +3,14 @@
 namespace Hn\HauptsacheVideo\Tests\Functional\Converter;
 
 
-use Hn\HauptsacheVideo\Converter\LocalVideoConverter;
+use Hn\HauptsacheVideo\Converter\LocalFFmpegConverter;
 use Hn\HauptsacheVideo\Tests\Functional\FunctionalTestCase;
 use PHPUnit\Framework\MockObject\MockObject;
 use TYPO3\CMS\Core\Resource\ProcessedFile;
 
 class LocalVideoConverterTest extends FunctionalTestCase
 {
-    /** @var LocalVideoConverter */
+    /** @var LocalFFmpegConverter */
     protected $videoConverter;
     /** @var MockObject */
     protected $commandUtility;
@@ -19,7 +19,7 @@ class LocalVideoConverterTest extends FunctionalTestCase
     {
         parent::setUp();
 
-        $this->videoConverter = $this->objectManager->get(LocalVideoConverter::class);
+        $this->videoConverter = $this->objectManager->get(LocalFFmpegConverter::class);
         $this->commandUtility = $this->getMockBuilder(\stdClass::class)->setMethods(['exec', 'getCommand'])->getMock();
         $this->inject($this->videoConverter, 'commandUtility', $this->commandUtility);
     }

@@ -8,7 +8,7 @@ use Hn\HauptsacheVideo\Processing\VideoProcessingTask;
 use TYPO3\CMS\Core\Log\LogManager;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-class LocalVideoConverter implements VideoConverterInterface
+class LocalFFmpegConverter implements VideoConverterInterface
 {
     /**
      * Yes, i know, the CommandUtility is ment to be used statically.
@@ -80,6 +80,7 @@ class LocalVideoConverter implements VideoConverterInterface
         $commandStr = $ffprobe . ' ' . implode(' ', array_map('escapeshellarg', $parameters));
         $logger->info('run ffprobe command', ['command' => $commandStr]);
         $returnResponse = $this->commandUtility->exec($commandStr, $output, $returnValue);
+        $logger->debug('ffprobe result', ['output' => $output, 'returnValue' => $returnValue]);
         $response = implode("\n", $output);
 
         if ($returnValue !== 0 && $returnValue !== null) {
@@ -122,6 +123,7 @@ class LocalVideoConverter implements VideoConverterInterface
         $commandStr = $ffmpeg . ' ' . implode(' ', array_map('escapeshellarg', $parameters));
         $logger->notice('run ffmpeg command', ['command' => $commandStr]);
         $this->commandUtility->exec($commandStr, $output, $returnValue);
+        $logger->debug('ffprobe result', ['output' => $output, 'returnValue' => $returnValue]);
 
         // because updating referenced values in unit tests is hard, null is also checked here
         if ($returnValue !== 0 && $returnValue !== null) {
