@@ -109,7 +109,7 @@ class CloudConvertConverter implements VideoConverterInterface
         }
 
         // actually download the file
-        // TODO i need to make sure only one person is doing this
+        // TODO i need to make sure only one request is doing this at a time
         // but adding a lock here would leave me with the strange situation
         // in which i can't easily access the file some other process downloaded.
         // i should just make sure process creates a lock and be done with it
@@ -160,6 +160,8 @@ class CloudConvertConverter implements VideoConverterInterface
             'mode' => $mode,
             'options' => $serializedOptions,
         ]);
+
+        // TODO make sure not to spam the api with tons of queries... maybe limit to one every 5 seconds
 
         $info = $statement->fetch() ?: [];
         if (isset($info['status'])) {
