@@ -15,6 +15,7 @@ abstract class AbstractCompressiblePreset extends AbstractPreset
     const QUALITY_WORSE = 0.3;
     const QUALITY_HORRIBLE = 0.2;
     const QUALITY_UNACCEPTABLE = 0.1;
+    const QUALITY_WORST = 0.0;
 
     const QUALITY_DEFAULT = self::QUALITY_GOOD;
 
