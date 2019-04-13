@@ -33,37 +33,49 @@ class AacPresetTest extends AbstractAudioPresetTest
 
     public function testBitrate()
     {
-        $this->preset->setQuality(1.0);
-        $this->assertEquals(192, $this->preset->getBitrate([]));
+        $mapping = [
+            '1.0' => 192,
+            '0.9' => 160,
+            '0.8' => 128,
+            '0.7' => 96,
+            '0.6' => 80,
+            '0.5' => 64,
+            '0.3' => 32,
+            '0.2' => 24,
+            '0.0' => 16,
+        ];
 
-        $this->preset->setQuality(0.9);
-        $this->assertEquals(158, $this->preset->getBitrate([]));
+        $result = [];
+        foreach ($mapping as $quality => $crf) {
+            $this->preset->setQuality($quality);
+            $result[$quality] = $this->preset->getBitrate([]);
+        }
 
-        $this->preset->setQuality(0.8);
-        $this->assertEquals(128, $this->preset->getBitrate([]));
+        $this->assertEquals($mapping, $result, '', 8);
+    }
 
-        $this->preset->setQuality(0.7);
-        $this->assertEquals(102, $this->preset->getBitrate([]));
+    public function testBitrateWithoutFdk()
+    {
+        $this->preset->setFdkAvailable(false);
 
-        $this->preset->setQuality(0.6);
-        $this->assertEquals(80, $this->preset->getBitrate([]));
+        $mapping = [
+            '1.0' => 192,
+            '0.9' => 160,
+            '0.8' => 136,
+            '0.7' => 112,
+            '0.6' => 96,
+            '0.5' => 72,
+            '0.3' => 48,
+            '0.2' => 40,
+            '0.0' => 32,
+        ];
 
-        $this->preset->setQuality(0.5);
-        $this->assertEquals(60, $this->preset->getBitrate([]));
+        $result = [];
+        foreach ($mapping as $quality => $crf) {
+            $this->preset->setQuality($quality);
+            $result[$quality] = $this->preset->getBitrate([]);
+        }
 
-        $this->preset->setQuality(0.4);
-        $this->assertEquals(44, $this->preset->getBitrate([]));
-
-        $this->preset->setQuality(0.3);
-        $this->assertEquals(32, $this->preset->getBitrate([]));
-
-        $this->preset->setQuality(0.2);
-        $this->assertEquals(24, $this->preset->getBitrate([]));
-
-        $this->preset->setQuality(0.1);
-        $this->assertEquals(18, $this->preset->getBitrate([]));
-
-        $this->preset->setQuality(0.0);
-        $this->assertEquals(16, $this->preset->getBitrate([]));
+        $this->assertEquals($mapping, $result, '', 8);
     }
 }

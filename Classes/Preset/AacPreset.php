@@ -50,18 +50,18 @@ class AacPreset extends AbstractAudioPreset
      * I also give the native ffmpeg encoder a little bitrate boost at the lower end
      * because it does not support he-aac and even with lc-aac it's noticeably worse at lower bitrates.
      * At higher bitrates the difference is negligible.
-     * - 100% = 192 kbit/s since I don't want to sacrifice compatibility
-     * - 80% = 140 kbit/s
-     * - 50% = 84 kbit/s
-     * - 30% = 60 kbit/s
-     * - 00% = 48 kbit/s
+     * - 100% = 192 kbit/s
+     * - 80% = 134 kbit/s
+     * - 50% = 72 kbit/s
+     * - 30% = 46 kbit/s
+     * - 00% = 32 kbit/s
      *
      * @see http://fooplot.com/#W3sidHlwZSI6MCwiZXEiOiIyKk1hdGgucm91bmQoOCsoOTYtOCkqeCoqMikiLCJjb2xvciI6IiMwMDAwMDAifSx7InR5cGUiOjAsImVxIjoiMSpNYXRoLnJvdW5kKDgrKDk2LTgpKngqKjIpIiwiY29sb3IiOiIjMDAwMDAwIn0seyJ0eXBlIjoxMDAwLCJ3aW5kb3ciOlsiMCIsIjEiLCIwIiwiMTkyIl0sImdyaWQiOlsiIiwiMTYiXX1d
      */
     protected function getBitratePerChannel(): int
     {
         $max = 96;
-        $min = $this->isFdkAvailable() ? 8 : 24;
+        $min = $this->isFdkAvailable() ? 8 : 16;
         return round($min + ($max - $min) * $this->getQuality() ** 2);
     }
 
