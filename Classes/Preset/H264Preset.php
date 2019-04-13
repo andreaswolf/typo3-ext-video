@@ -10,7 +10,8 @@ class H264Preset extends AbstractVideoPreset
      * 1. luma samples per frame
      * 2. luma samples per second
      * 3. max bitrate per second in kbit/s
-     * https://en.wikipedia.org/wiki/H.264/MPEG-4_AVC#Levels
+     *
+     * @see https://en.wikipedia.org/wiki/H.264/MPEG-4_AVC#Levels
      */
     const LEVEL_DEFINITION = [
         10 => [25344, 380160, 64], // eg. 128×96@30 176×144@15
@@ -46,6 +47,8 @@ class H264Preset extends AbstractVideoPreset
     /**
      * Defines implemented profiles.
      * The value defines how much higher the bitrate is allowed to be compared to to main/baseline.
+     *
+     * @see https://en.wikipedia.org/wiki/H.264/MPEG-4_AVC#Levels
      */
     const PROFILE_BITRATE_MULTIPLIER = [
         'baseline' => 1.0,
@@ -58,6 +61,13 @@ class H264Preset extends AbstractVideoPreset
      * main is a subset of high.
      *
      * If high was requested and i get a low bitrate main than no transcoding is required.
+     *
+     * Baseline contains loss prevention features that are not present in the other profiles.
+     * For that reason I rather reencode baseline to main or high.
+     * Also web video is (mostly) distributed over tcp so there shouldn't be losses.
+     *
+     * @see https://en.wikipedia.org/wiki/H.264/MPEG-4_AVC#Feature_support_in_particular_profiles
+     * @see https://www.vocal.com/video/profiles-and-levels-in-h-264-avc/
      */
     const PROFILES_ALLOWED_MAP = [
         'baseline' => ['baseline'],
@@ -65,6 +75,9 @@ class H264Preset extends AbstractVideoPreset
         'high' => ['high', 'main'],
     ];
 
+    /**
+     * @see H264Preset::$performance
+     */
     const PERFORMANCE_PRESETS = [
         'ultrafast',
         'veryfast',
@@ -84,13 +97,23 @@ class H264Preset extends AbstractVideoPreset
 
     /**
      * @var int
+     * @see https://en.wikipedia.org/wiki/H.264/MPEG-4_AVC#Levels
      */
     private $level = 31;
 
     /**
+     * The performance preset.
+     *
+     * I decided to be boring and go with medium here.
+     * Going in either direction had diminishing returns in speed or quality.
+     * If encode time does not really matter to you go with slower or veryslow.
+     *
      * @var string
+     * @see H264Preset::PERFORMANCE_PRESETS
+     * @see http://dev.beandog.org/x264_preset_reference.html
+     * @see https://encodingwissen.de/codecs/x264/referenz/
      */
-    private $performance = 'fast';
+    private $performance = 'medium';
 
     public function getCodecName(): string
     {
@@ -103,10 +126,13 @@ class H264Preset extends AbstractVideoPreset
         return min($levelDefinition[0], $levelDefinition[1] / $this->getMaxFramerate());
     }
 
+    /**
+     * @see http://fooplot.com/#W3sidHlwZSI6MCwiZXEiOiIoKHgqKjIqMC45KzAuMSkqMC42KSoxMjgwKjcyMCooMzAqKjAuNSkvMTAyNCIsImNvbG9yIjoiIzAwMDAwMCJ9LHsidHlwZSI6MTAwMCwid2luZG93IjpbIjAiLCIxLjAiLCIwIiwiNTAwMCJdfV0-
+     * @return float
+     */
     protected function getBitsPerPixel(): float
     {
-        // http://fooplot.com/#W3sidHlwZSI6MCwiZXEiOiIoKHgqKjIqMC44KzAuMikqMC42KSoxMjgwKjcyMCooMzAqKjAuNSkvMTAyNCIsImNvbG9yIjoiIzAwMDAwMCJ9LHsidHlwZSI6MTAwMCwid2luZG93IjpbIjAiLCIxIiwiMCIsIjUwMDAiXX1d
-        $qualityFactor = $this->getQuality() ** 2 * 0.8 + 0.2;
+        $qualityFactor = $this->getQuality() ** 2 * 0.9 + 0.1;
         return 0.6 * $qualityFactor;
     }
 
@@ -131,18 +157,20 @@ class H264Preset extends AbstractVideoPreset
      * for h264 the range should is 51-0 according to ffmpeg https://trac.ffmpeg.org/wiki/Encode/H.264#crf
      * The recommended range however is 18 to 28
      * quality 1.0 = crf 18
-     * quality 0.9 = crf 21
-     * quality 0.8 = crf 23
-     * quality 0.7 = crf 25
-     * quality 0.6 = crf 27
+     * quality 0.9 = crf 20
+     * quality 0.8 = crf 22
+     * quality 0.7 = crf 24
+     * quality 0.6 = crf 26
      * quality 0.5 = crf 28
      *
-     * @see http://fooplot.com/#W3sidHlwZSI6MCwiZXEiOiJNYXRoLnJvdW5kKDMwLXgqKjIuNSoxMikiLCJjb2xvciI6IiMwMDAwMDAifSx7InR5cGUiOjEwMDAsIndpbmRvdyI6WyIwIiwiMSIsIjAiLCI1MCJdfV0-
-     * @return int
+     * @see http://fooplot.com/#W3sidHlwZSI6MCwiZXEiOiJNYXRoLnJvdW5kKDM4KygxOC0zOCkqeCkiLCJjb2xvciI6IiMwMDAwMDAifSx7InR5cGUiOjEwMDAsIndpbmRvdyI6WyIwIiwiMSIsIjAiLCI1MCJdfV0-
+     * @return float
      */
-    protected function getCrf(): int
+    public function getCrf(): float
     {
-        return round(30 - $this->getQuality() ** 2.5 * 12);
+        $max = 18;
+        $min = 38;
+        return $min + ($max - $min) * $this->getQuality();
     }
 
     public function requiresTranscoding(array $sourceStream): bool
@@ -171,11 +199,11 @@ class H264Preset extends AbstractVideoPreset
         array_push($parameters, '-preset:v', $this->getPerformance());
         array_push($parameters, '-profile:v', $this->getProfile());
         array_push($parameters, '-level:v', $this->getLevel());
-        array_push($parameters, '-crf:v', (string)$this->getCrf());
+        array_push($parameters, '-crf:v', (string)round($this->getCrf(), 2));
 
-        $bitrate = round($this->getMaxBitrate($sourceStream) / 8);
-        array_push($parameters, '-maxrate:v', $bitrate * 8 . 'k');
-        array_push($parameters, '-bufsize:v', $bitrate * 10 . 'k');
+        $bitrate = $this->getMaxBitrate($sourceStream);
+        array_push($parameters, '-maxrate:v', $bitrate . 'k');
+        array_push($parameters, '-bufsize:v', $bitrate * 2 . 'k');
 
         return $parameters;
     }
