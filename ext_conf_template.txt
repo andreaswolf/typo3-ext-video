@@ -1,0 +1,11 @@
+# cat=basic; type=options[LocalFFmpeg,CloudConvert]; label=Converter:Define how videos should be converted. LocalFFmpeg requires you to have ffmpeg installed on your webserver. CloudConvert requires an api key and isn't free if you convert a lot of videos but will keep the load off of your webserver.
+converter = LocalFFmpeg
+
+# cat=basic; type=string; label=CloudConvert Api-Key:If you want to use CloudConvert than you'll need to define this.
+cloudconvertApiKey =
+
+# cat=basic; type=boolean; label=FDK AAC available:Enable this if your local ffmpeg instance can encode using libfdk_aac. This encoder creates noticeably better audio quality especially at lower bitrates. This options is ignored if CloudConvert is used since they have fdk available and not using it would be a waste.
+fdkAvailable = 0
+
+# cat=basic; type=boolean; label=Enable test element:This will add a content element to your instance with which you can easily test different video settings
+testElement = 0
