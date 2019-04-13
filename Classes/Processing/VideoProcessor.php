@@ -69,6 +69,9 @@ class VideoProcessor implements ProcessorInterface
             } catch (ConversionException $e) {
                 $storedTask->setStatus(StoredTask::STATUS_FAILED);
                 $storedTask->appendException($e);
+                if (GeneralUtility::getApplicationContext()->isDevelopment()) {
+                    throw $e; // let them know
+                }
             }
             $storedTaskRepository->add($storedTask);
             $objectManager->get(PersistenceManager::class)->persistAll();
