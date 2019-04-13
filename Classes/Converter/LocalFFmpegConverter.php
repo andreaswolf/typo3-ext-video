@@ -120,8 +120,17 @@ class LocalFFmpegConverter implements VideoConverterInterface
             throw new \RuntimeException("ffmpeg not found.");
         }
 
-        $commandStr = $ffmpeg . ' ' . implode(' ', array_map('escapeshellarg', $parameters));
-        $logger->notice('run ffmpeg command', ['command' => $commandStr]);
+        // if possible run ffmpeg with lower priority
+        // this is because i assume you are using it on the webserver
+        // which should care more about delivering pages than about converting the video
+        // if the utility is not found than just ignore this priority shift
+        $nice = $this->commandUtility->getCommand('nice');
+        if (is_string($nice)) {
+            $ffmpeg = "$nice $ffmpeg";
+        }
+
+        $commandStr = "$ffmpeg " . implode(' ', array_map('escapeshellarg', $parameters));
+        $logger->notice("run ffmpeg command", ['command' => $commandStr]);
         $this->commandUtility->exec($commandStr, $output, $returnValue);
         $logger->debug('ffprobe result', ['output' => $output, 'returnValue' => $returnValue]);
 
