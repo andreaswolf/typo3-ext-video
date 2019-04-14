@@ -5,7 +5,6 @@ namespace Hn\HauptsacheVideo\Tests\Unit;
 
 use Hn\HauptsacheVideo\FormatRepository;
 use Hn\HauptsacheVideo\Preset\PresetInterface;
-use Nimut\TestingFramework\TestCase\UnitTestCase;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class FormatRepositoryTest extends UnitTestCase

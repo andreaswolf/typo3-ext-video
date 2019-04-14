@@ -4,7 +4,7 @@ namespace Hn\HauptsacheVideo\Tests\Unit\Preset;
 
 
 use Hn\HauptsacheVideo\Preset\AbstractCompressiblePreset;
-use Nimut\TestingFramework\TestCase\UnitTestCase;
+use Hn\HauptsacheVideo\Tests\Unit\UnitTestCase;
 use PHPUnit\Framework\MockObject\MockObject;
 
 class AbstractPresetTest extends UnitTestCase

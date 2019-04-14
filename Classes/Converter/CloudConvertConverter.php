@@ -3,6 +3,7 @@
 namespace Hn\HauptsacheVideo\Converter;
 
 
+use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Exception\ServerException;
 use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Promise\RejectedPromise;
@@ -14,8 +15,10 @@ use Hn\HauptsacheVideo\Exception\ConversionException;
 use Hn\HauptsacheVideo\FormatRepository;
 use Hn\HauptsacheVideo\Processing\VideoProcessingTask;
 use Psr\Http\Message\UriInterface;
+use Psr\Log\LoggerInterface;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Locking;
+use TYPO3\CMS\Core\Log\LogManager;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class CloudConvertConverter implements VideoConverterInterface
@@ -35,7 +38,12 @@ class CloudConvertConverter implements VideoConverterInterface
     /**
      * @var \TYPO3\CMS\Core\Database\Connection
      */
-    protected $db;
+    private $db;
+
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
 
     /**
      * This decides if this typo3 instance is publicly available.
@@ -49,13 +57,13 @@ class CloudConvertConverter implements VideoConverterInterface
      *
      * @var UriInterface|null
      */
-    private $baseUrl;
+    private $baseUrl = null;
 
     /**
      * @param string $apiKey
      * @param string|null $baseUrl
      */
-    public function __construct(string $apiKey, string $baseUrl = null)
+    public function __construct(string $apiKey)
     {
         $this->guzzle = GeneralUtility::makeInstance(\GuzzleHttp\Client::class, [
             'base_uri' => 'https://api.cloudconvert.com/',
@@ -65,9 +73,17 @@ class CloudConvertConverter implements VideoConverterInterface
                 'Authorization' => 'Bearer ' . $apiKey,
             ],
         ]);
+
         $this->lockFactory = GeneralUtility::makeInstance(Locking\LockFactory::class);
         $this->db = GeneralUtility::makeInstance(ConnectionPool::class)->getConnectionForTable(self::DB_TABLE);
-        $this->baseUrl = $baseUrl ? uri_for($baseUrl) : null;
+        $this->logger = GeneralUtility::makeInstance(LogManager::class)->getLogger(__CLASS__);
+
+        // if we are in a publicly accessible frontend environment than define the base url
+        // this allows the implementation to use the "download" way of delivering the video file
+        $ip = gethostbyname(GeneralUtility::getIndpEnv('TYPO3_HOST_ONLY'));
+        if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 | FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)) {
+            $this->baseUrl = uri_for(GeneralUtility::getIndpEnv('TYPO3_SITE_URL'));
+        }
     }
 
     public function isPublic(): bool
@@ -75,11 +91,38 @@ class CloudConvertConverter implements VideoConverterInterface
         return $this->baseUrl !== null;
     }
 
+    protected function request(string $method, string $uri, array $options = []): PromiseInterface
+    {
+        $context = ['uri' => $uri, 'method' => $method] + $options;
+        $this->logger->debug('start request', $context);
+        return $this->guzzle->requestAsync($method, $uri, $options)
+            ->then(function (Response $response) use ($context) {
+                $context += ['body' => $response->getBody()->read(1024)];
+                $this->logger->debug('decode response', $context);
+
+                $body = json_decode((string)$response->getBody(), true);
+                if (json_last_error()) {
+                    $this->logger->critical('decode error', $context);
+                    throw new ConversionException(json_last_error_msg());
+                }
+
+                return $body;
+            });
+    }
+
     public function start(VideoProcessingTask $task): void
     {
+        $context = [
+            'file' => $task->getSourceFile()->getUid(),
+            'configuration' => $task->getConfiguration(),
+        ];
+
         // if the instance is public than the process can start immediately.
         if ($this->isPublic()) {
+            $this->logger->notice("got a start signal in public mode.", $context);
             $this->process($task);
+        } else {
+            $this->logger->notice("got a start signal in private mode.", $context);
         }
     }
 
@@ -92,6 +135,7 @@ class CloudConvertConverter implements VideoConverterInterface
         }
 
         $info = $this->getInfo($task);
+        $this->logger->debug('polled for info', ['result' => $info]);
         if ($info === null) {
             return;
         }
@@ -100,6 +144,7 @@ class CloudConvertConverter implements VideoConverterInterface
         $parameterStr = implode(' ', array_map('escapeshellarg', $buildParameters));
         $command = "-i {INPUTFILE} $parameterStr {OUTPUTFILE}";
         $result = $this->pollProcess($task, 'convert', ["command" => $command]);
+        $this->logger->debug('polled for convert', ['result' => $result, 'command' => $command]);
         if ($result === null) {
             return;
         }
@@ -113,24 +158,28 @@ class CloudConvertConverter implements VideoConverterInterface
         // but adding a lock here would leave me with the strange situation
         // in which i can't easily access the file some other process downloaded.
         // i should just make sure process creates a lock and be done with it
-        $tempFilename = tempnam(sys_get_temp_dir(), 'video_result');
-        $this->guzzle->get($result['output']['url'], [
-            'sink' => $tempFilename,
-            'timeout' => $task->getSourceFile()->getSize() / 1024 / 1024,
-        ]);
+        $tempFilename = GeneralUtility::tempnam('video');
+        try {
+            $this->guzzle->get($result['output']['url'], [
+                'sink' => $tempFilename,
+                'timeout' => $task->getSourceFile()->getSize() / 1024 / 1024,
+            ]);
 
-        $processedFile = $task->getTargetFile();
-        $processedFile->setName($task->getTargetFilename());
-        $processedFile->updateProperties([
-            'checksum' => $task->getConfigurationChecksum(),
+            $processedFile = $task->getTargetFile();
+            $processedFile->setName($task->getTargetFilename());
+            $processedFile->updateProperties([
+                'checksum' => $task->getConfigurationChecksum(),
 
-            // TODO figure out the real resolution
-            'width' => intval($task->getConfiguration()['width'] ?? 0),
-            'height' => intval($task->getConfiguration()['height'] ?? 0),
-        ]);
+                // TODO figure out the real resolution
+                'width' => intval($task->getConfiguration()['width'] ?? 0),
+                'height' => intval($task->getConfiguration()['height'] ?? 0),
+            ]);
 
-        $processedFile->updateWithLocalFile($tempFilename);
-        $task->setExecuted(true);
+            $processedFile->updateWithLocalFile($tempFilename);
+            $task->setExecuted(true);
+        } finally {
+            GeneralUtility::unlink_tempfile($tempFilename);
+        }
     }
 
     public function getInfo(VideoProcessingTask $task): ?array
@@ -145,6 +194,11 @@ class CloudConvertConverter implements VideoConverterInterface
 
     protected function pollProcess(VideoProcessingTask $task, string $mode, array $converteroptions = []): ?array
     {
+        $context = [
+            'file' => $task->getSourceFile()->getUid(),
+            'configuration' => $task->getConfiguration(),
+        ];
+
         $serializedOptions = serialize($converteroptions);
         $serializedOptionsLength = strlen($serializedOptions);
         if ($serializedOptionsLength > 767) {
@@ -164,15 +218,22 @@ class CloudConvertConverter implements VideoConverterInterface
         // TODO make sure not to spam the api with tons of queries... maybe limit to one every 5 seconds
 
         $info = $statement->fetch() ?: [];
+        $this->logger->debug('request process info from db', ['result' => $info] + $context);
         if (isset($info['status'])) {
             $info['status'] = unserialize($info['status']);
         }
 
         if ($info['failed'] ?? false) {
-            throw new ConversionException("Process error: " . print_r($info, true), 1554038915);
+            throw new ConversionException("Process error: " . json_encode($info), 1554038915);
         }
 
+        // do nothing if this task is already done
         if (isset($info['status']['step']) && $info['status']['step'] === 'finished') {
+            return $info['status'];
+        }
+
+        // do nothing it the task was already checked in the last 60 seconds
+        if (isset($info['tstamp']) && $info['tstamp'] + 60 > time()) {
             return $info['status'];
         }
 
@@ -183,6 +244,7 @@ class CloudConvertConverter implements VideoConverterInterface
             $lockMode = Locking\LockingStrategyInterface::LOCK_CAPABILITY_EXCLUSIVE | Locking\LockingStrategyInterface::LOCK_CAPABILITY_NOBLOCK;
             $lock = $this->lockFactory->createLocker($identifier, $lockMode);
             if (!$lock->acquire($lockMode)) {
+                $this->logger->debug('lock not acquired', $context);
                 // if another process is working on this conversion than just stop right here
                 return null;
             }
@@ -195,12 +257,17 @@ class CloudConvertConverter implements VideoConverterInterface
             // passing noblock to acquire will not block on supported platforms
             // and will block on unsuported platforms while throwing this exception afterwards
             // i simply ignore this problem for now and don't do anything without a lock
+            $this->logger->notice('ignored locking exception', ['exception' => $e]);
             return null;
         }
 
+        $processContext = ['mode' => $mode, 'options' => $converteroptions] + $context;
         if (isset($info['status'])) {
+            $processContext['url'] = $info['status']['url'];
+            $this->logger->debug('update cloud convert process', $processContext);
             $promise = $this->updateCloudConvertProcess($info['status']['url']);
         } else {
+            $this->logger->debug('create cloud convert process', $processContext);
             $promise = $this->createCloudConvertProcess($task, $mode, $converteroptions);
         }
 
@@ -227,37 +294,45 @@ class CloudConvertConverter implements VideoConverterInterface
                     'options' => $serializedOptions,
                     'status' => serialize($response),
                     'failed' => 0,
+                    'tstamp' => $_SERVER['REQUEST_TIME'],
                 ];
                 if (isset($info['uid'])) {
                     $this->db->update(self::DB_TABLE, $values, ['uid' => $info['uid']]);
                 } else {
-                    $this->db->insert(self::DB_TABLE, $values);
+                    $this->db->insert(self::DB_TABLE, $values + ['crdate' => $_SERVER['REQUEST_TIME']]);
                 }
                 $lock->release();
                 return $response;
             },
-            function (\Exception $error) use ($task, $mode, $serializedOptions, $info, $lock) {
+            function (\Throwable $error) use ($task, $mode, $serializedOptions, $info, $lock, $context) {
                 if (
                     $error instanceof ServerException
                     && $error->hasResponse()
                     && $error->getResponse()->getStatusCode() === 503
                 ) {
-                    // TODO logging
+                    $this->logger->notice('got 503, try again later', $context);
                     // just ignore that for now
                     return null;
+                }
+
+                $status = ['message' => $error->getMessage(), 'step' => 'exception'];
+
+                if ($error instanceof RequestException && $error->hasResponse()) {
+                    $status['body'] = $error->getResponse()->getBody()->read(1024);
                 }
 
                 $values = [
                     'file' => $task->getSourceFile()->getUid(),
                     'mode' => $mode,
                     'options' => $serializedOptions,
-                    'status' => serialize(['message' => $error->getMessage(), 'step' => 'exception']),
+                    'status' => serialize($status),
                     'failed' => 1,
+                    'tstamp' => $_SERVER['REQUEST_TIME'],
                 ];
                 if (isset($info['uid'])) {
                     $this->db->update(self::DB_TABLE, $values, ['uid' => $info['uid']]);
                 } else {
-                    $this->db->insert(self::DB_TABLE, $values);
+                    $this->db->insert(self::DB_TABLE, $values + ['crdate' => $_SERVER['REQUEST_TIME']]);
                 }
                 $lock->release();
                 return new RejectedPromise(new ConversionException("Communication Error", 1554565455, $error));
@@ -267,20 +342,13 @@ class CloudConvertConverter implements VideoConverterInterface
         return $promise->wait();
     }
 
-    private function getJsonDecodeResponseClosure(): \Closure
-    {
-        return static function (Response $response) {
-            $body = json_decode($response->getBody(), true);
-            if (json_last_error()) {
-                throw new ConversionException(json_last_error_msg());
-            }
-
-            return $body;
-        };
-    }
-
     protected function createCloudConvertProcess(VideoProcessingTask $task, string $mode, array $converteroptions = []): PromiseInterface
     {
+        $loggingContext = [
+            'file' => $task->getSourceFile()->getUid(),
+            'configuration' => $task->getConfiguration(),
+        ];
+
         $createOptions = [];
         $startOptions = [];
 
@@ -299,7 +367,7 @@ class CloudConvertConverter implements VideoConverterInterface
             $startOptions += [
                 'input' => 'download',
                 // TODO ensure that this file has the domain prepended
-                'file' => UriResolver::resolve($this->baseUrl, uri_for($task->getSourceFile()->getPublicUrl())),
+                'file' => (string)UriResolver::resolve($this->baseUrl, uri_for($task->getSourceFile()->getPublicUrl())),
                 'filename' => $task->getSourceFile()->getName(),
             ];
         } else {
@@ -309,9 +377,8 @@ class CloudConvertConverter implements VideoConverterInterface
             ];
         }
 
-        return $this->guzzle->postAsync('/process', ['json' => $createOptions])
-            ->then($this->getJsonDecodeResponseClosure())
-            ->then(function (array $response) use ($task, $mode, $startOptions) {
+        return $this->request('post', '/process', ['json' => $createOptions])
+            ->then(function (array $response) use ($task, $mode, $startOptions, $loggingContext) {
                 // TODO maxconcurrent? is there anything i should check there?
 
                 $sizeInMb = ceil($task->getSourceFile()->getSize() / 1024 / 1024);
@@ -320,12 +387,12 @@ class CloudConvertConverter implements VideoConverterInterface
                     throw new ConversionException($msg);
                 }
 
-                return $this->guzzle->postAsync($response['url'], ['json' => $startOptions])
-                    ->then($this->getJsonDecodeResponseClosure());
+                return $this->request('post', $response['url'], ['json' => $startOptions]);
             })
             // if cloud convert gives us an upload url, than upload the file there
-            ->then(function (array $response) use ($task) {
+            ->then(function (array $response) use ($task, $loggingContext) {
                 if (empty($response['upload']['url'])) {
+                    $this->logger->debug('no upload url', $loggingContext);
                     return $response;
                 }
 
@@ -339,8 +406,7 @@ class CloudConvertConverter implements VideoConverterInterface
                     'timeout' => fstat($resource)['size'] / 1024 / 1024 // expect at least 1 mb/s
                 ];
 
-                return $this->guzzle->putAsync($uploadUrl, $uploadOptions)
-                    ->then($this->getJsonDecodeResponseClosure())
+                return $this->request('put', $uploadUrl, $uploadOptions)
                     ->then(function (array $uploadResponse) use ($task, $response) {
                         $expectedSize = $task->getSourceFile()->getSize();
                         $uploadedSize = $uploadResponse['size'];
@@ -358,7 +424,6 @@ class CloudConvertConverter implements VideoConverterInterface
 
     protected function updateCloudConvertProcess(string $processUrl): PromiseInterface
     {
-        return $this->guzzle->getAsync($processUrl)
-            ->then($this->getJsonDecodeResponseClosure());
+        return $this->request('get', $processUrl);
     }
 }

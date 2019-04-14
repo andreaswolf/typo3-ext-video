@@ -12,7 +12,7 @@ use GuzzleHttp\Psr7\Response;
 use Hn\HauptsacheVideo\Converter\CloudConvertConverter;
 use Hn\HauptsacheVideo\FormatRepository;
 use Hn\HauptsacheVideo\Processing\VideoProcessingTask;
-use Nimut\TestingFramework\TestCase\UnitTestCase;
+use Hn\HauptsacheVideo\Tests\Unit\UnitTestCase;
 use PHPUnit\Framework\MockObject\MockObject;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
@@ -81,7 +81,7 @@ class CloudConvertConverterTest extends UnitTestCase
     {
         $this->client
             ->expects($this->exactly(count($requests)))
-            ->method('__call')
+            ->method('requestAsync')
             ->willReturnArgument(...array_map(function (array $request) {
                 return [$request[0], $request[1], $request[2] ? ['json' => $request[2]] : []];
             }, $requests))
@@ -119,7 +119,7 @@ class CloudConvertConverterTest extends UnitTestCase
         $task = new VideoProcessingTask($this->processedFile, []);
         $this->assertRequests(
             [
-                'postAsync',
+                'post',
                 '/process',
                 ['inputformat' => 'mp4', 'mode' => 'info'],
                 new \Exception("something went wrong"),
@@ -136,6 +136,8 @@ class CloudConvertConverterTest extends UnitTestCase
             'options' => serialize([]),
             'status' => serialize(['message' => "something went wrong", 'step' => 'exception']),
             'failed' => 1,
+            'tstamp' => $_SERVER['REQUEST_TIME'],
+            'crdate' => $_SERVER['REQUEST_TIME'],
         ]);
 
         $this->lock->expects($this->once())->method('acquire')->willReturn(true);
@@ -155,7 +157,7 @@ class CloudConvertConverterTest extends UnitTestCase
 
         $this->assertRequests(
             [
-                'postAsync',
+                'post',
                 '/process',
                 ['mode' => 'info', 'inputformat' => 'mp4'],
                 new Response(200, [], json_encode([
@@ -183,6 +185,8 @@ class CloudConvertConverterTest extends UnitTestCase
                 'step' => 'exception',
             ]),
             'failed' => 1,
+            'tstamp' => $_SERVER['REQUEST_TIME'],
+            'crdate' => $_SERVER['REQUEST_TIME'],
         ]);
 
         $this->lock->expects($this->once())->method('acquire')->willReturn(true);
@@ -199,7 +203,7 @@ class CloudConvertConverterTest extends UnitTestCase
 
         $this->assertRequests(
             [
-                'postAsync',
+                'post',
                 '/process',
                 ['mode' => 'info', 'inputformat' => 'mp4'],
                 new Response(200, [], json_encode([
@@ -213,7 +217,7 @@ class CloudConvertConverterTest extends UnitTestCase
                 ])),
             ],
             [
-                'postAsync',
+                'post',
                 '//esta.infra.cloudconvert.com/process/some-id',
                 [
                     'mode' => 'info',
@@ -270,6 +274,8 @@ class CloudConvertConverterTest extends UnitTestCase
             'options' => serialize([]),
             'status' => serialize($startResponse),
             'failed' => 0,
+            'tstamp' => $_SERVER['REQUEST_TIME'],
+            'crdate' => $_SERVER['REQUEST_TIME'],
         ]);
 
         $this->db->expects($this->once())->method('update')->with(CloudConvertConverter::DB_TABLE, [
@@ -278,6 +284,7 @@ class CloudConvertConverterTest extends UnitTestCase
             'options' => serialize([]),
             'status' => serialize($statusResponse),
             'failed' => 0,
+            'tstamp' => $_SERVER['REQUEST_TIME'],
         ], ['uid' => 1]);
 
         $this->lock->expects($this->exactly(2))->method('acquire')->willReturn(true);
@@ -314,7 +321,7 @@ class CloudConvertConverterTest extends UnitTestCase
 
         $this->assertRequests(
             [
-                'postAsync',
+                'post',
                 '/process',
                 [
                     'outputformat' => 'mp4',
@@ -379,6 +386,8 @@ class CloudConvertConverterTest extends UnitTestCase
             'options' => serialize(['command' => $command]),
             'status' => serialize($startResponse),
             'failed' => 0,
+            'tstamp' => $_SERVER['REQUEST_TIME'],
+            'crdate' => $_SERVER['REQUEST_TIME'],
         ]);
 
         $this->lock->expects($this->exactly(1))->method('acquire')->willReturn(true);
@@ -414,7 +423,7 @@ class CloudConvertConverterTest extends UnitTestCase
 
         $this->assertRequests(
             [
-                'getAsync',
+                'get',
                 '//esta.infra.cloudconvert.com/process/some-id',
                 false,
                 new Response(200, [], json_encode($startResponse = [
@@ -432,14 +441,12 @@ class CloudConvertConverterTest extends UnitTestCase
                         "url" => "//esta.infra.cloudconvert.com/process/some-id/file.mp4",
                     ],
                 ])),
-            ],
-            [
-                'get',
-                "//esta.infra.cloudconvert.com/process/some-id/file.mp4",
-                false,
-                new Response(200, [], 'hello'),
             ]
         );
+        $this->client->expects($this->once())
+            ->method('__call')
+            ->with('get' /* i don't know how to test tempname */)
+            ->willReturn(new Response(200, [], 'hello'));
 
         $formatRepository = $this->createMock(FormatRepository::class);
         $formatRepository->expects($this->once())
