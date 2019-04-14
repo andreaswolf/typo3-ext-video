@@ -86,14 +86,16 @@ call_user_func(function () {
             \Hn\HauptsacheVideo\Command\VideoCommandController::class;
     }
 
-    $isDev = GeneralUtility::getApplicationContext()->isDevelopment();
-    $GLOBALS['TYPO3_CONF_VARS']['LOG']['Hn']['HauptsacheVideo']['writerConfiguration'] = [
-        $isDev ? \TYPO3\CMS\Core\Log\LogLevel::DEBUG : \TYPO3\CMS\Core\Log\LogLevel::INFO => [
-            \TYPO3\CMS\Core\Log\Writer\FileWriter::class => [
-                'logFile' => 'typo3temp/logs/hauptsache_video.log',
+    if (empty($GLOBALS['TYPO3_CONF_VARS']['LOG']['Hn']['HauptsacheVideo'])) {
+        $isDev = GeneralUtility::getApplicationContext()->isDevelopment();
+        $GLOBALS['TYPO3_CONF_VARS']['LOG']['Hn']['HauptsacheVideo']['writerConfiguration'] = [
+            $isDev ? \TYPO3\CMS\Core\Log\LogLevel::DEBUG : \TYPO3\CMS\Core\Log\LogLevel::INFO => [
+                \TYPO3\CMS\Core\Log\Writer\FileWriter::class => [
+                    'logFile' => 'typo3temp/logs/hauptsache_video.log',
+                ],
             ],
-        ],
-    ];
+        ];
+    }
 
     if (!empty($conf['testElement'])) {
         \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addPageTSConfig(<<<PageTSConfig
