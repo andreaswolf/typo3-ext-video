@@ -13,14 +13,12 @@ call_user_func(function () {
         ? GeneralUtility::makeInstance(\TYPO3\CMS\Core\Configuration\ExtensionConfiguration::class)->get('hauptsache_video')
         : unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['hauptsache_video']);
 
-    $h264Defaults = [
-        'preset' => ['veryslow', 'medium', 'fast', 'ultrafast'][$conf['performance'] ?? 1],
-        'scaling' => ['bicubic', 'bicubic', 'bicublin', 'neighbor'][$conf['performance'] ?? 1],
-    ];
-    $aacDefaults = [
-        'fdkAvailable' => !empty($conf['fdkAvailable']) || ($conf['converter'] ?? '') === 'Cloudconvert',
-    ];
+    $h264Defaults = ['preset' => ['veryslow', 'medium', 'fast', 'ultrafast'][$conf['performance'] ?? 1]];
+    $aacDefaults = ['fdkAvailable' => !empty($conf['fdkAvailable']) || ($conf['converter'] ?? '') === 'Cloudconvert'];
     $mp4Defaults = ['-movflags', '+faststart', '-map_metadata', '-1', '-f', 'mp4'];
+    if ($conf['performance'] ?? 1 >= 4) {
+        array_push($mp4Defaults, '-sws_flags', 'neighbor');
+    }
 
     // mp4 general
     // it should work almost anywhere ~ except maybe old low-cost android devices and feature phones

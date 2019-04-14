@@ -36,11 +36,6 @@ abstract class AbstractVideoPreset extends AbstractCompressiblePreset
      */
     private $crop = false;
 
-    /**
-     * @var string
-     */
-    private $scaling = 'bicubic';
-
     protected function getPixelFormat(): string
     {
         // most players don't support other pixel formats
@@ -251,16 +246,6 @@ abstract class AbstractVideoPreset extends AbstractCompressiblePreset
         return false;
     }
 
-    public function getScaling(): string
-    {
-        return $this->scaling;
-    }
-
-    public function setScaling(string $scaling): void
-    {
-        $this->scaling = $scaling;
-    }
-
     /**
      * The parameters specific to this encoder like bitrate.
      *
@@ -300,8 +285,7 @@ abstract class AbstractVideoPreset extends AbstractCompressiblePreset
         $filters[] = "fps=${framerate}";
 
         $dimensions = $this->getDimensions($sourceStream);
-        $scalingAlgorithm = $this->getScaling();
-        $filters[] = "scale=${dimensions[0]}:${dimensions[1]}:flags=$scalingAlgorithm";
+        $filters[] = "scale=${dimensions[0]}:${dimensions[1]}";
 
         return $filters;
     }
