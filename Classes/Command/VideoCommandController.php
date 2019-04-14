@@ -3,24 +3,16 @@
 namespace Hn\HauptsacheVideo\Command;
 
 
-use Hn\HauptsacheVideo\Domain\Model\StoredTask;
-use Hn\HauptsacheVideo\Exception\ConversionException;
+use Hn\HauptsacheVideo\Processing\VideoProcessingTask;
 use TYPO3\CMS\Extbase\Mvc\Controller\CommandController;
-use TYPO3\CMS\Extbase\Persistence\Exception\UnknownObjectException;
 
 class VideoCommandController extends CommandController
 {
     /**
-     * @var \Hn\HauptsacheVideo\Domain\Repository\StoredTaskRepository
+     * @var \Hn\HauptsacheVideo\Processing\VideoTaskRepository
      * @inject
      */
     protected $repository;
-
-    /**
-     * @var \TYPO3\CMS\Extbase\Persistence\Generic\PersistenceManager
-     * @inject
-     */
-    protected $persistenceManager;
 
     /**
      * @var \Hn\HauptsacheVideo\Processing\VideoProcessor
@@ -30,14 +22,12 @@ class VideoCommandController extends CommandController
 
     /**
      * @param float $timeout A timeout (in minutes) after which no further tasks are started.
-     *
-     * @throws UnknownObjectException
      */
     public function processCommand(float $timeout = INF)
     {
         $this->output("Search for new tasks... ");
-        $storedTasks = $this->repository->findByStatus(StoredTask::STATUS_NEW);
-        $count = $storedTasks->count();
+        $storedTasks = $this->repository->findByStatus(VideoProcessingTask::STATUS_NEW);
+        $count = count($storedTasks);
         if ($count <= 0) {
             $this->outputLine("no task found.");
             return;
@@ -47,18 +37,7 @@ class VideoCommandController extends CommandController
         $this->output->progressStart($count);
         $startTime = time();
         foreach ($storedTasks as $storedTask) {
-            try {
-                $task = $storedTask->getOriginalTask();
-                $this->videoProcessor->doProcessTask($task);
-                $storedTask->synchronize($task);
-            } catch (ConversionException $e) {
-                $storedTask->setStatus(StoredTask::STATUS_FAILED);
-                $storedTask->appendException($e);
-            }
-
-            $this->persistenceManager->update($storedTask);
-            $this->persistenceManager->persistAll();
-            $this->output->progressAdvance();
+            $this->videoProcessor->doProcessTask($storedTask);
 
             $timePassed = time() - $startTime;
             if ($timePassed > $timeout * 60) {

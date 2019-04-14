@@ -33,7 +33,6 @@ abstract class FunctionalTestCase extends \Nimut\TestingFramework\TestCase\Funct
     {
         parent::setUp();
         $this->objectManager = GeneralUtility::makeInstance(ObjectManager::class);
-        $this->persistenceManager = $this->objectManager->get(PersistenceManager::class);
 
         $this->storageRepository = $this->objectManager->get(StorageRepository::class);
         $GLOBALS['BE_USER'] = $this->createConfiguredMock(BackendUserAuthentication::class, [
@@ -55,14 +54,6 @@ abstract class FunctionalTestCase extends \Nimut\TestingFramework\TestCase\Funct
         GeneralUtility::purgeInstances();
         unset($GLOBALS['BE_USER']);
         parent::tearDown();
-    }
-
-    public function persistAndFlush(...$entities)
-    {
-        foreach ($entities as $entity) {
-            $this->persistenceManager->add($entity);
-        }
-        $this->persistenceManager->persistAll();
     }
 
     public function __sleep()

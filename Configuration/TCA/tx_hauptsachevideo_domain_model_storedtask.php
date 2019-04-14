@@ -31,9 +31,9 @@ return [
                 'type' => 'select',
                 'renderType' => 'selectSingle',
                 'items' => [
-                    ['new', \Hn\HauptsacheVideo\Domain\Model\StoredTask::STATUS_NEW],
-                    ['finished', \Hn\HauptsacheVideo\Domain\Model\StoredTask::STATUS_FINISHED],
-                    ['failed', \Hn\HauptsacheVideo\Domain\Model\StoredTask::STATUS_FAILED],
+                    ['new', \Hn\HauptsacheVideo\Processing\VideoProcessingTask::STATUS_NEW],
+                    ['finished', \Hn\HauptsacheVideo\Processing\VideoProcessingTask::STATUS_FINISHED],
+                    ['failed', \Hn\HauptsacheVideo\Processing\VideoProcessingTask::STATUS_FAILED],
                 ],
             ],
         ],

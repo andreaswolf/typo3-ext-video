@@ -4,9 +4,8 @@ namespace Hn\HauptsacheVideo\Processing;
 
 
 use Hn\HauptsacheVideo\Converter\VideoConverterInterface;
-use Hn\HauptsacheVideo\Domain\Model\StoredTask;
-use Hn\HauptsacheVideo\Domain\Repository\StoredTaskRepository;
 use Hn\HauptsacheVideo\Exception\ConversionException;
+use Psr\Log\LoggerInterface;
 use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Core\Log\LogManager;
 use TYPO3\CMS\Core\Resource\ProcessedFileRepository;
@@ -14,12 +13,15 @@ use TYPO3\CMS\Core\Resource\Processing\ProcessorInterface;
 use TYPO3\CMS\Core\Resource\Processing\TaskInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Object\ObjectManager;
-use TYPO3\CMS\Extbase\Persistence\Exception\IllegalObjectTypeException;
-use TYPO3\CMS\Extbase\Persistence\Generic\PersistenceManager;
 use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 
 class VideoProcessor implements ProcessorInterface
 {
+    protected function getLogger(): LoggerInterface
+    {
+        return GeneralUtility::makeInstance(LogManager::class)->getLogger(__CLASS__);
+    }
+
     /**
      * Returns TRUE if this processor can process the given task.
      *
@@ -40,9 +42,6 @@ class VideoProcessor implements ProcessorInterface
      * @see \Hn\HauptsacheVideo\Slot\FileProcessingServiceSlot::preFileProcess
      *
      * @param TaskInterface $task
-     *
-     * @throws IllegalObjectTypeException If extbase is being drunk again.
-     * @todo manipulate cache times
      */
     public function processTask(TaskInterface $task)
     {
@@ -55,32 +54,29 @@ class VideoProcessor implements ProcessorInterface
             return;
         }
 
-        $objectManager = GeneralUtility::makeInstance(ObjectManager::class);
-        $storedTaskRepository = $objectManager->get(StoredTaskRepository::class);
-        $storedTask = $storedTaskRepository->findLastByTask($task);
+        $taskRepository = GeneralUtility::makeInstance(VideoTaskRepository::class);
+        $storedTask = $taskRepository->findByTask($task);
 
         // if there wasn't a task before ~ this is the first time someone wants that video with that configuration
         // or if there was one successfully executed ~ the processed file was deleted and we have to do it again
-        if ($storedTask === null || $storedTask->getStatus() === StoredTask::STATUS_FINISHED) {
-            $storedTask = GeneralUtility::makeInstance(StoredTask::class, $task);
+        if ($storedTask === null || $storedTask->getStatus() === VideoProcessingTask::STATUS_FINISHED) {
             try {
+                $task->setStatus(VideoProcessingTask::STATUS_NEW);
                 $this->getConverter()->start($task);
-                $storedTask->synchronize($task);
             } catch (ConversionException $e) {
-                $storedTask->setStatus(StoredTask::STATUS_FAILED);
-                $storedTask->appendException($e);
+                $task->setExecuted(false);
+                $this->getLogger()->error($e->getMessage(), ['exception' => $e]);
                 if (GeneralUtility::getApplicationContext()->isDevelopment()) {
-                    throw $e; // let them know
+                    throw new \RuntimeException('processTask failed', 0, $e); // let them know
                 }
             }
-            $storedTaskRepository->add($storedTask);
-            $objectManager->get(PersistenceManager::class)->persistAll();
+            $taskRepository->store($task);
         }
 
         // the video should never be done processing here ...
 
         // add a cache tag to the current page that the video can be displayed as soon as it's done
-        if ($GLOBALS['TSFE'] instanceof TypoScriptFrontendController) {
+        if (!$task->isExecuted() && $GLOBALS['TSFE'] instanceof TypoScriptFrontendController) {
             $GLOBALS['TSFE']->addCacheTags([$task->getConfigurationChecksum()]);
             $GLOBALS['TSFE']->config['config']['sendCacheHeaders'] = false;
         }
@@ -92,8 +88,6 @@ class VideoProcessor implements ProcessorInterface
      * It may take long and should therefor not be called in a frontend process.
      *
      * @param TaskInterface $task
-     *
-     * @throws ConversionException
      */
     public function doProcessTask(TaskInterface $task)
     {
@@ -116,8 +110,14 @@ class VideoProcessor implements ProcessorInterface
         } catch (\Exception $e) {
             $logger = GeneralUtility::makeInstance(LogManager::class)->getLogger(__CLASS__);
             $logger->critical($e->getMessage());
+
             $task->setExecuted(false);
+            if (GeneralUtility::getApplicationContext()->isDevelopment()) {
+                throw new \RuntimeException('doProcessTask failed', 0, $e); // let them know
+            }
         }
+
+        GeneralUtility::makeInstance(VideoTaskRepository::class)->store($task);
     }
 
     protected function getConverter(): VideoConverterInterface

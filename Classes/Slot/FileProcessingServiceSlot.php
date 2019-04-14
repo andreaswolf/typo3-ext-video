@@ -25,7 +25,6 @@ class FileProcessingServiceSlot
      * @param array $configuration
      *
      * @see \TYPO3\CMS\Core\Resource\Service\FileProcessingService::processFile
-     * @throws \TYPO3\CMS\Extbase\Persistence\Exception\IllegalObjectTypeException
      */
     public function preFileProcess(FileProcessingService $fileProcessingService, DriverInterface $driver, ProcessedFile $processedFile, FileInterface $file, $context, array $configuration)
     {

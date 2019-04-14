@@ -12,6 +12,10 @@ class VideoProcessingTask extends AbstractTask
     const TYPE = 'Video';
     const NAME = 'CropScale';
 
+    const STATUS_NEW = 'new';
+    const STATUS_FINISHED = 'finished';
+    const STATUS_FAILED = 'failed';
+
     /**
      * @var string
      */
@@ -53,5 +57,36 @@ class VideoProcessingTask extends AbstractTask
         $formatRepository = GeneralUtility::makeInstance(FormatRepository::class);
         $definition = $formatRepository->findFormatDefinition($this->getConfiguration());
         return $definition['fileExtension'];
+    }
+
+    public function getStatus(): string
+    {
+        if (!$this->isExecuted()) {
+            return self::STATUS_NEW;
+        }
+
+        if ($this->isSuccessful()) {
+            return self::STATUS_FINISHED;
+        }
+
+        return self::STATUS_FAILED;
+    }
+
+    public function setStatus(string $status)
+    {
+        switch ($status) {
+            case self::STATUS_NEW:
+                $this->executed = false;
+                $this->successful = false;
+                break;
+            case self::STATUS_FAILED:
+                $this->setExecuted(false);
+                break;
+            case self::STATUS_FINISHED:
+                $this->setExecuted(true);
+                break;
+            default:
+                throw new \RuntimeException("Status $status does not exist");
+        }
     }
 }
