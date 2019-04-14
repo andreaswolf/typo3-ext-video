@@ -32,8 +32,14 @@ abstract class AbstractVideoPreset extends AbstractCompressiblePreset
      * If true than the video will be cropped.
      *
      * @var bool
+     * @todo implement
      */
     private $crop = false;
+
+    /**
+     * @var string
+     */
+    private $scaling = 'bicubic';
 
     protected function getPixelFormat(): string
     {
@@ -245,6 +251,16 @@ abstract class AbstractVideoPreset extends AbstractCompressiblePreset
         return false;
     }
 
+    public function getScaling(): string
+    {
+        return $this->scaling;
+    }
+
+    public function setScaling(string $scaling): void
+    {
+        $this->scaling = $scaling;
+    }
+
     /**
      * The parameters specific to this encoder like bitrate.
      *
@@ -284,7 +300,8 @@ abstract class AbstractVideoPreset extends AbstractCompressiblePreset
         $filters[] = "fps=${framerate}";
 
         $dimensions = $this->getDimensions($sourceStream);
-        $filters[] = "scale=${dimensions[0]}:${dimensions[1]}";
+        $scalingAlgorithm = $this->getScaling();
+        $filters[] = "scale=${dimensions[0]}:${dimensions[1]}:flags=$scalingAlgorithm";
 
         return $filters;
     }

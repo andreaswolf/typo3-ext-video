@@ -9,3 +9,6 @@ fdkAvailable = 0
 
 # cat=basic; type=boolean; label=Enable test element:This will add a content element to your instance with which you can easily test different video settings
 testElement = 0
+
+# cat=basic; type=options[Quality=0,Medium=1,Fast=2,Testing=3]; label=Performance:Quickly change the tradeof between conversion speed and quality.
+performance = 1

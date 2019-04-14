@@ -76,7 +76,7 @@ class H264Preset extends AbstractVideoPreset
     ];
 
     /**
-     * @see H264Preset::$performance
+     * @see H264Preset::$preset
      */
     const PERFORMANCE_PRESETS = [
         'ultrafast',
@@ -113,7 +113,7 @@ class H264Preset extends AbstractVideoPreset
      * @see http://dev.beandog.org/x264_preset_reference.html
      * @see https://encodingwissen.de/codecs/x264/referenz/
      */
-    private $performance = 'medium';
+    private $preset = 'medium';
 
     public function getCodecName(): string
     {
@@ -196,7 +196,7 @@ class H264Preset extends AbstractVideoPreset
         $parameters = [];
 
         array_push($parameters, '-c:v', 'libx264');
-        array_push($parameters, '-preset:v', $this->getPerformance());
+        array_push($parameters, '-preset:v', $this->getPreset());
         array_push($parameters, '-profile:v', $this->getProfile());
         array_push($parameters, '-level:v', $this->getLevel());
         array_push($parameters, '-crf:v', (string)round($this->getCrf(), 2));
@@ -239,18 +239,18 @@ class H264Preset extends AbstractVideoPreset
         $this->level = $level;
     }
 
-    public function getPerformance(): string
+    public function getPreset(): string
     {
-        return $this->performance;
+        return $this->preset;
     }
 
-    public function setPerformance(string $performance): void
+    public function setPreset(string $preset): void
     {
-        if (!in_array($performance, self::PERFORMANCE_PRESETS, true)) {
+        if (!in_array($preset, self::PERFORMANCE_PRESETS, true)) {
             $possibleSpeeds = implode(', ', self::PERFORMANCE_PRESETS);
-            throw new \RuntimeException("Speed setting $performance is not defined. Possible levels are: $possibleSpeeds");
+            throw new \RuntimeException("Speed setting $preset is not defined. Possible levels are: $possibleSpeeds");
         }
 
-        $this->performance = $performance;
+        $this->preset = $preset;
     }
 }

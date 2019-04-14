@@ -13,7 +13,14 @@ call_user_func(function () {
         ? GeneralUtility::makeInstance(\TYPO3\CMS\Core\Configuration\ExtensionConfiguration::class)->get('hauptsache_video')
         : unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['hauptsache_video']);
 
-    $fdkAvailable = !empty($conf['fdkAvailable']) || isset($conf['converter']) && $conf['converter'] === 'Cloudconvert';
+    $h264Defaults = [
+        'preset' => ['veryslow', 'medium', 'fast', 'ultrafast'][$conf['performance'] ?? 1],
+        'scaling' => ['bicubic', 'bicubic', 'bicublin', 'neighbor'][$conf['performance'] ?? 1],
+    ];
+    $aacDefaults = [
+        'fdkAvailable' => !empty($conf['fdkAvailable']) || ($conf['converter'] ?? '') === 'Cloudconvert',
+    ];
+    $mp4Defaults = ['-movflags', '+faststart', '-map_metadata', '-1', '-f', 'mp4'];
 
     // mp4 general
     // it should work almost anywhere ~ except maybe old low-cost android devices and feature phones
@@ -21,9 +28,9 @@ call_user_func(function () {
     if (empty($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['hauptsache_video']['formats']['mp4:default'])) {
         $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['hauptsache_video']['formats']['mp4:default'] = [
             'fileExtension' => 'mp4',
-            'video' => [Preset\H264Preset::class, ['profile' => 'main', 'level' => 31]],
-            'audio' => [Preset\AacPreset::class, ['fdkAvailable' => $fdkAvailable]],
-            'additionalParameters' => ['-movflags', '+faststart', '-map_metadata', '-1', '-f', 'mp4'],
+            'video' => [Preset\H264Preset::class, ['profile' => 'main', 'level' => 31] + $h264Defaults],
+            'audio' => [Preset\AacPreset::class, $aacDefaults],
+            'additionalParameters' => $mp4Defaults,
         ];
     }
 
@@ -33,9 +40,9 @@ call_user_func(function () {
     if (empty($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['hauptsache_video']['formats']['mp4:high'])) {
         $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['hauptsache_video']['formats']['mp4:high'] = [
             'fileExtension' => 'mp4',
-            'video' => [Preset\H264Preset::class, ['profile' => 'high', 'level' => 40]],
-            'audio' => [Preset\AacPreset::class, ['fdkAvailable' => $fdkAvailable]],
-            'additionalParameters' => ['-movflags', '+faststart', '-map_metadata', '-1', '-f', 'mp4'],
+            'video' => [Preset\H264Preset::class, ['profile' => 'high', 'level' => 40] + $h264Defaults],
+            'audio' => [Preset\AacPreset::class, $aacDefaults],
+            'additionalParameters' => $mp4Defaults,
         ];
     }
 
@@ -45,8 +52,8 @@ call_user_func(function () {
     if (empty($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['hauptsache_video']['formats']['m4a:default'])) {
         $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['hauptsache_video']['formats']['m4a:default'] = [
             'fileExtension' => 'mp4',
-            'audio' => [Preset\AacPreset::class, ['fdkAvailable' => $fdkAvailable]],
-            'additionalParameters' => ['-movflags', '+faststart', '-map_metadata', '-1', '-f', 'mp4'],
+            'audio' => [Preset\AacPreset::class, $aacDefaults],
+            'additionalParameters' => $mp4Defaults,
         ];
     }
 

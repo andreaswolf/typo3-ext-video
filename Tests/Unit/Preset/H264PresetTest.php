@@ -21,7 +21,7 @@ class H264PresetTest extends AbstractVideoPresetTest
             '-pix_fmt',
             'yuv420p',
             '-vf',
-            'fps=30,scale=1280:720',
+            'fps=30,scale=1280:720:flags=bicubic',
             '-c:v',
             'libx264',
             '-preset:v',
