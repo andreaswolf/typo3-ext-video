@@ -43,22 +43,26 @@ class LocalFFmpegConverter implements VideoConverterInterface
         $localFile = $task->getSourceFile()->getForLocalProcessing(false);
         $streams = $this->ffprobe($localFile)['streams'] ?? [];
 
-        $tempFilename = tempnam(sys_get_temp_dir(), 'video');
-        $parameters = $this->formatRepository->buildParameters($task->getConfiguration(), $streams);
-        $this->ffmpeg('-i', $localFile, ...$parameters, ...['-y', $tempFilename]);
+        $tempFilename = GeneralUtility::tempnam('video');
+        try {
+            $parameters = $this->formatRepository->buildParameters($task->getConfiguration(), $streams);
+            $this->ffmpeg('-i', $localFile, ...$parameters, ...['-y', $tempFilename]);
 
-        $processedFile = $task->getTargetFile();
-        $processedFile->setName($task->getTargetFilename());
-        $processedFile->updateProperties([
-            'checksum' => $task->getConfigurationChecksum(),
+            $processedFile = $task->getTargetFile();
+            $processedFile->setName($task->getTargetFilename());
+            $processedFile->updateProperties([
+                'checksum' => $task->getConfigurationChecksum(),
 
-            // TODO figure out the real resolution
-            'width' => intval($task->getConfiguration()['width']),
-            'height' => intval($task->getConfiguration()['height']),
-        ]);
+                // TODO figure out the real resolution
+                'width' => intval($task->getConfiguration()['width']),
+                'height' => intval($task->getConfiguration()['height']),
+            ]);
 
-        $processedFile->updateWithLocalFile($tempFilename);
-        $task->setExecuted(true);
+            $processedFile->updateWithLocalFile($tempFilename);
+            $task->setExecuted(true);
+        } finally {
+            GeneralUtility::unlink_tempfile($tempFilename);
+        }
     }
 
     /**

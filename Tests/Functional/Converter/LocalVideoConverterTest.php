@@ -47,7 +47,7 @@ class LocalVideoConverterTest extends FunctionalTestCase
                         $tmpFile = end($parameters); // technically escaped but probably fine
                         $this->assertEquals('/usr/bin/nice', $parameters[0]);
                         $this->assertEquals('/usr/local/bin/ffmpeg', $parameters[1]);
-                        $this->assertStringStartsWith(realpath(sys_get_temp_dir()), $tmpFile, $command);
+                        $this->assertStringStartsWith(PATH_site . 'typo3temp/var/transient/', $tmpFile, $command);
                         file_put_contents($tmpFile, "hi");
                         return 0;
                 }
