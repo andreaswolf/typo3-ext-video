@@ -16,7 +16,7 @@ call_user_func(function () {
     $h264Defaults = ['preset' => ['veryslow', 'medium', 'fast', 'ultrafast'][$conf['performance'] ?? 1]];
     $aacDefaults = ['fdkAvailable' => !empty($conf['fdkAvailable']) || ($conf['converter'] ?? '') === 'CloudConvert'];
     $mp4Defaults = ['-movflags', '+faststart', '-map_metadata', '-1', '-f', 'mp4'];
-    if ($conf['performance'] ?? 1 >= 4) {
+    if (($conf['performance'] ?? 1) >= 4) {
         array_push($mp4Defaults, '-sws_flags', 'neighbor');
     }
 
