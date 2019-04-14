@@ -27,30 +27,31 @@ class LocalVideoConverterTest extends FunctionalTestCase
     public function testProcess()
     {
         $calls = 0;
-        $this->commandUtility->expects($this->exactly(2))->method('getCommand')->willReturnOnConsecutiveCalls(
-            '/usr/local/bin/ffprobe',
-            '/usr/local/bin/ffmpeg'
-        );
-        $this->commandUtility->expects($this->exactly(2))->method('exec')->willReturnCallback(function ($command) use (&$calls) {
-            $parameters = str_getcsv($command, " ", "'");
-            switch ($calls++) {
-                case 0:
-                    $this->assertEquals('/usr/local/bin/ffprobe', reset($parameters));
-                    return json_encode([
-                        'streams' => [
-                            ['codec_type' => 'audio'],
-                            ['codec_type' => 'video'],
-                        ],
-                    ]);
-                    break;
-                case 1:
-                    $tmpFile = end($parameters); // technically escaped but probably fine
-                    $this->assertEquals('/usr/local/bin/ffmpeg', reset($parameters));
-                    $this->assertStringStartsWith(realpath(sys_get_temp_dir()), $tmpFile, $command);
-                    file_put_contents($tmpFile, "hi");
-                    return 0;
-            }
-        });
+        $this->commandUtility->expects($this->exactly(3))->method('getCommand')
+            ->withConsecutive('ffprobe', 'ffmpeg', 'nice')
+            ->willReturnOnConsecutiveCalls('/usr/local/bin/ffprobe', '/usr/local/bin/ffmpeg', '/usr/bin/nice');
+        $this->commandUtility->expects($this->exactly(2))->method('exec')
+            ->willReturnCallback(function ($command) use (&$calls) {
+                $parameters = str_getcsv($command, " ", "'");
+                switch ($calls++) {
+                    case 0:
+                        $this->assertEquals('/usr/local/bin/ffprobe', reset($parameters));
+                        return json_encode([
+                            'streams' => [
+                                ['codec_type' => 'audio'],
+                                ['codec_type' => 'video'],
+                            ],
+                        ]);
+                        break;
+                    case 1:
+                        $tmpFile = end($parameters); // technically escaped but probably fine
+                        $this->assertEquals('/usr/bin/nice', $parameters[0]);
+                        $this->assertEquals('/usr/local/bin/ffmpeg', $parameters[1]);
+                        $this->assertStringStartsWith(realpath(sys_get_temp_dir()), $tmpFile, $command);
+                        file_put_contents($tmpFile, "hi");
+                        return 0;
+                }
+            });
 
         $file = new ProcessedFile($this->file, 'Video.CropScale', []);
         $task = $file->getTask();
