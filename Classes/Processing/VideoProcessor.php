@@ -96,6 +96,10 @@ class VideoProcessor implements ProcessorInterface
             throw new \InvalidArgumentException("Expected " . VideoProcessingTask::class . ", got $type");
         }
 
+        if ($task->getStatus() !== VideoProcessingTask::STATUS_NEW) {
+            throw new \RuntimeException("This task is not new.");
+        }
+
         try {
             $converter = $this->getConverter();
             $converter->process($task);

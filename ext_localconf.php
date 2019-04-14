@@ -67,6 +67,8 @@ call_user_func(function () {
 
     $GLOBALS['TYPO3_CONF_VARS']['SYS']['fal']['processingTaskTypes']['Video.CropScale']
         = \Hn\HauptsacheVideo\Processing\VideoProcessingTask::class;
+    $GLOBALS['TYPO3_CONF_VARS']['FE']['eID_include']['hauptsache_video']
+        = \Hn\HauptsacheVideo\Processing\VideoProcessingEid::class . '::process';
 
     $dispatcher = GeneralUtility::makeInstance(\TYPO3\CMS\Extbase\SignalSlot\Dispatcher::class);
     $dispatcher->connect(

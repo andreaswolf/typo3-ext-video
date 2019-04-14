@@ -35,11 +35,10 @@ class VideoCommandController extends CommandController
 
         $this->outputLine("found <info>%s</info> tasks:", [$count]);
         $this->output->progressStart($count);
-        $startTime = time();
         foreach ($storedTasks as $storedTask) {
             $this->videoProcessor->doProcessTask($storedTask);
 
-            $timePassed = time() - $startTime;
+            $timePassed = time() - $_SERVER['REQUEST_TIME'];
             if ($timePassed > $timeout * 60) {
                 $this->outputLine("Abort because of the timeout ($timeout minutes).");
                 break;

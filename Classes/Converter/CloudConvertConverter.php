@@ -13,6 +13,7 @@ use function GuzzleHttp\Psr7\uri_for;
 use GuzzleHttp\Psr7\UriResolver;
 use Hn\HauptsacheVideo\Exception\ConversionException;
 use Hn\HauptsacheVideo\FormatRepository;
+use Hn\HauptsacheVideo\Processing\VideoProcessingEid;
 use Hn\HauptsacheVideo\Processing\VideoProcessingTask;
 use Psr\Http\Message\UriInterface;
 use Psr\Log\LoggerInterface;
@@ -232,8 +233,9 @@ class CloudConvertConverter implements VideoConverterInterface
             return $info['status'];
         }
 
-        // do nothing it the task was already checked in the last 60 seconds
-        if (isset($info['tstamp']) && $info['tstamp'] + 60 > time()) {
+        // do nothing it the task was already checked within this second
+        // this could potentially create a problems when the callback eid is called very often.
+        if (isset($info['tstamp']) && $info['tstamp'] >= $_SERVER['REQUEST_TIME']) {
             return $info['status'];
         }
 
@@ -367,8 +369,9 @@ class CloudConvertConverter implements VideoConverterInterface
             $startOptions += [
                 'input' => 'download',
                 // TODO ensure that this file has the domain prepended
-                'file' => (string)UriResolver::resolve($this->baseUrl, uri_for($task->getSourceFile()->getPublicUrl())),
                 'filename' => $task->getSourceFile()->getName(),
+                'file' => (string)UriResolver::resolve($this->baseUrl, uri_for($task->getSourceFile()->getPublicUrl())),
+                'callback' => (string)UriResolver::resolve($this->baseUrl, uri_for(VideoProcessingEid::getUrl())),
             ];
         } else {
             $startOptions += [
