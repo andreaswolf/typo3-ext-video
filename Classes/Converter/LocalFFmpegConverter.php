@@ -4,8 +4,10 @@ namespace Hn\HauptsacheVideo\Converter;
 
 
 use Hn\HauptsacheVideo\Exception\ConversionException;
+use Hn\HauptsacheVideo\FormatRepository;
 use Hn\HauptsacheVideo\Processing\VideoProcessingTask;
 use TYPO3\CMS\Core\Log\LogManager;
+use TYPO3\CMS\Core\Utility\CommandUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class LocalFFmpegConverter implements VideoConverterInterface
@@ -15,15 +17,13 @@ class LocalFFmpegConverter implements VideoConverterInterface
      * But creating an instance allows overwriting it for testing and flexibility reasons.
      *
      * @var \TYPO3\CMS\Core\Utility\CommandUtility
-     * @inject
      */
     protected $commandUtility;
 
-    /**
-     * @var \Hn\HauptsacheVideo\FormatRepository
-     * @inject
-     */
-    protected $formatRepository;
+    public function __construct()
+    {
+        $this->commandUtility = GeneralUtility::makeInstance(CommandUtility::class);
+    }
 
     /**
      * @param VideoProcessingTask $task
@@ -45,7 +45,8 @@ class LocalFFmpegConverter implements VideoConverterInterface
 
         $tempFilename = GeneralUtility::tempnam('video');
         try {
-            $parameters = $this->formatRepository->buildParameters($task->getConfiguration(), $streams);
+            $formatRepository = GeneralUtility::makeInstance(FormatRepository::class);
+            $parameters = $formatRepository->buildParameters($task->getConfiguration(), $streams);
             $this->ffmpeg('-i', $localFile, ...$parameters, ...['-y', $tempFilename]);
 
             $processedFile = $task->getTargetFile();
