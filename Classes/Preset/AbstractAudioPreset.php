@@ -90,6 +90,13 @@ abstract class AbstractAudioPreset extends AbstractCompressiblePreset
      */
     protected abstract function getBitratePerChannel(): int;
 
+    /**
+     * the target bitrate in kbit/s.
+     *
+     * @param array $sourceStream
+     *
+     * @return int
+     */
     public function getBitrate(array $sourceStream): int
     {
         $maxBitrate = $this->getBitratePerChannel() * $this->getChannels($sourceStream);
@@ -106,16 +113,16 @@ abstract class AbstractAudioPreset extends AbstractCompressiblePreset
             return true;
         }
 
-        if (!isset($sourceStream['sample_rate']) || $sourceStream['sample_rate'] !== $this->getSampleRate($sourceStream)) {
+        if (!isset($sourceStream['sample_rate']) || $sourceStream['sample_rate'] !== (string)$this->getSampleRate($sourceStream)) {
             return true;
         }
 
-        if (!isset($sourceStream['channels']) || $sourceStream['channels'] > $this->getMaxChannels()) {
+        if (!isset($sourceStream['channels']) || $sourceStream['channels'] !== $this->getChannels($sourceStream)) {
             return true;
         }
         // TODO maybe check channel layout? it should not matter up until stereo but ~ i don't know
 
-        if (!isset($sourceStream['bit_rate']) || $sourceStream['bit_rate'] > ($this->getBitrate($sourceStream) * self::BITRATE_TOLERANCE)) {
+        if (!isset($sourceStream['bit_rate']) || ($sourceStream['bit_rate'] / 1024) > ($this->getBitrate($sourceStream) * self::BITRATE_TOLERANCE)) {
             return true;
         }
 
