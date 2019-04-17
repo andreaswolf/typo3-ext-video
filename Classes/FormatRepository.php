@@ -26,7 +26,7 @@ class FormatRepository implements SingletonInterface
         return null;
     }
 
-    public function buildParameters(array $options = [], array $sourceStreams = null): array
+    public function buildParameters(?string $input, ?string $output, array $options = [], array $sourceStreams = null): array
     {
         $parameters = [];
         $options = $this->normalizeOptions($options);
@@ -34,6 +34,18 @@ class FormatRepository implements SingletonInterface
         $definition = $this->findFormatDefinition($options);
         if ($definition === null) {
             throw new FormatException("No format defintion found for configuration: " . print_r($options, true));
+        }
+
+        if ($input !== null) {
+            if (isset($options['start'])) {
+                array_push($parameters, '-ss', $options['start']);
+            }
+
+            if (isset($options['duration'])) {
+                array_push($parameters, '-t', $options['duration']);
+            }
+
+            array_push($parameters, '-i', $input);
         }
 
         foreach (['video' => '-vn', 'audio' => '-an', 'subtitle' => '-sn', 'data' => '-dn'] as $steamType => $disableParameter) {
@@ -80,7 +92,18 @@ class FormatRepository implements SingletonInterface
             array_push($parameters, ...$definition['additionalParameters']);
         }
 
+        if ($output !== null) {
+            array_push($parameters, '-y', $output);
+        }
+
         return $parameters;
+    }
+
+    public function buildParameterString(?string $input, ?string $output, array $options = [], array $sourceStreams = null): string
+    {
+        $parameters = $this->buildParameters($input, $output, $options, $sourceStreams);
+        $parameters = array_map('escapeshellarg', $parameters);
+        return implode(' ', $parameters);
     }
 
     /**
@@ -90,21 +113,32 @@ class FormatRepository implements SingletonInterface
      */
     public static function normalizeOptions(array $options): array
     {
-        if (isset($options['width']) && is_numeric($options['width'])) {
-            $options['video']['maxWidth'] = intval($options['width']);
-        }
-
-        if (isset($options['height']) && is_numeric($options['height'])) {
-            $options['video']['maxHeight'] = intval($options['height']);
-        }
-
-        if (isset($options['muted']) && $options['muted']) {
-            $options['audio']['disabled'] = true;
-        }
-
-        return [
+        $result = [
+            'format' => $options['format'] ?? 'mp4',
             'audio' => $options['audio'] ?? [],
             'video' => $options['video'] ?? [],
         ];
+
+        if (isset($options['width']) && is_numeric($options['width'])) {
+            $result['video']['maxWidth'] = intval($options['width']);
+        }
+
+        if (isset($options['height']) && is_numeric($options['height'])) {
+            $result['video']['maxHeight'] = intval($options['height']);
+        }
+
+        if (!empty($options['muted'])) {
+            $result['audio']['disabled'] = true;
+        }
+
+        if (!empty($options['start'])) {
+            $result['start'] = $options['start'];
+        }
+
+        if (!empty($options['duration'])) {
+            $result['duration'] = $options['duration'];
+        }
+
+        return $result;
     }
 }

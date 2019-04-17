@@ -44,13 +44,13 @@ class FormatRepositoryTest extends UnitTestCase
      */
     public function testBuildUnknown()
     {
-        $this->repository->buildParameters(['format' => 'mp4']);
+        $this->repository->buildParameters(null, null, ['format' => 'mp4']);
     }
 
     public function testBuildEmpty()
     {
         $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['hauptsache_video']['formats']['mp4:default'] = [];
-        $this->assertEquals(['-vn', '-an', '-sn', '-dn'], $this->repository->buildParameters(['format' => 'mp4']));
+        $this->assertEquals(['-vn', '-an', '-sn', '-dn'], $this->repository->buildParameters(null, null, ['format' => 'mp4']));
     }
 
     public function testBuildVideo()
@@ -64,7 +64,7 @@ class FormatRepositoryTest extends UnitTestCase
             'video' => [get_class($videoPreset)],
         ];
 
-        $this->assertEquals(['-c:v', 'libx264', '-an', '-sn', '-dn'], $this->repository->buildParameters(['format' => 'mp4']));
+        $this->assertEquals(['-c:v', 'libx264', '-an', '-sn', '-dn'], $this->repository->buildParameters(null, null, ['format' => 'mp4']));
     }
 
 }

@@ -46,8 +46,7 @@ class LocalFFmpegConverter implements VideoConverterInterface
         $tempFilename = GeneralUtility::tempnam('video');
         try {
             $formatRepository = GeneralUtility::makeInstance(FormatRepository::class);
-            $parameters = $formatRepository->buildParameters($task->getConfiguration(), $streams);
-            $this->ffmpeg('-i', $localFile, ...$parameters, ...['-y', $tempFilename]);
+            $this->ffmpeg($formatRepository->buildParameterString($localFile, $tempFilename, $task->getConfiguration(), $streams));
 
             $processedFile = $task->getTargetFile();
             $processedFile->setName($task->getTargetFilename());
@@ -112,11 +111,11 @@ class LocalFFmpegConverter implements VideoConverterInterface
     }
 
     /**
-     * @param string ...$parameters
+     * @param string $parameters
      *
      * @throws ConversionException
      */
-    protected function ffmpeg(string ...$parameters): void
+    protected function ffmpeg(string $parameters): void
     {
         $logger = GeneralUtility::makeInstance(LogManager::class)->getLogger(__CLASS__);
 
@@ -134,7 +133,7 @@ class LocalFFmpegConverter implements VideoConverterInterface
             $ffmpeg = "$nice $ffmpeg";
         }
 
-        $commandStr = "$ffmpeg " . implode(' ', array_map('escapeshellarg', $parameters));
+        $commandStr = "$ffmpeg $parameters";
         $logger->notice("run ffmpeg command", ['command' => $commandStr]);
         $this->commandUtility->exec($commandStr, $output, $returnValue);
         $logger->debug('ffprobe result', ['output' => $output, 'returnValue' => $returnValue]);

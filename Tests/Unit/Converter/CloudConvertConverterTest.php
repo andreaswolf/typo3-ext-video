@@ -62,7 +62,7 @@ class CloudConvertConverterTest extends UnitTestCase
         $this->client = $this->createMock(Client::class);
         GeneralUtility::addInstance(Client::class, $this->client);
 
-        $this->converter = new CloudConvertConverter('key', 'http://www.example.com');
+        $this->converter = new CloudConvertConverter('key');
     }
 
     protected function tearDown()
@@ -346,7 +346,7 @@ class CloudConvertConverterTest extends UnitTestCase
                     'file' => 'http://www.example.com/fileadmin/example.mp4',
                     'filename' => 'example.mp4',
                     'converteroptions' => [
-                        'command' => $command = "-i {INPUTFILE} '-c:v' 'libx264' {OUTPUTFILE}",
+                        'command' => $command = "-i {INPUTFILE} -c:v libx264 -y {OUTPUTFILE}",
                     ],
                 ],
                 new Response(200, [], json_encode($startResponse = [
@@ -366,9 +366,9 @@ class CloudConvertConverterTest extends UnitTestCase
 
         $formatRepository = $this->createMock(FormatRepository::class);
         $formatRepository->expects($this->once())
-            ->method('buildParameters')
-            ->with([], [['index' => 0, 'codec_type' => 'video'], ['index' => 1, 'codec_type' => 'audio']])
-            ->willReturn(['-c:v', 'libx264']);
+            ->method('buildParameterString')
+            ->with('{INPUTFILE}', '{OUTPUTFILE}', [], [['index' => 0, 'codec_type' => 'video'], ['index' => 1, 'codec_type' => 'audio']])
+            ->willReturn('-i {INPUTFILE} -c:v libx264 -y {OUTPUTFILE}');
         $formatRepository->expects($this->atLeastOnce())
             ->method('findFormatDefinition')
             ->with([])
@@ -419,7 +419,6 @@ class CloudConvertConverterTest extends UnitTestCase
                 ],
             ],
         ];
-        $command = "-i {INPUTFILE} '-c:v' 'libx264' {OUTPUTFILE}";
 
         $this->assertRequests(
             [
@@ -450,9 +449,9 @@ class CloudConvertConverterTest extends UnitTestCase
 
         $formatRepository = $this->createMock(FormatRepository::class);
         $formatRepository->expects($this->once())
-            ->method('buildParameters')
-            ->with([], [['index' => 0, 'codec_type' => 'video'], ['index' => 1, 'codec_type' => 'audio']])
-            ->willReturn(['-c:v', 'libx264']);
+            ->method('buildParameterString')
+            ->with('{INPUTFILE}', '{OUTPUTFILE}', [], [['index' => 0, 'codec_type' => 'video'], ['index' => 1, 'codec_type' => 'audio']])
+            ->willReturn($command = "-i {INPUTFILE} -c:v libx264 {OUTPUTFILE}");
         $formatRepository->expects($this->atLeastOnce())
             ->method('findFormatDefinition')
             ->with([])
