@@ -14,7 +14,6 @@ class AbstractVideoPresetTest extends AbstractPresetTest
     protected function createPreset()
     {
         $preset = $this->getMockForAbstractClass(AbstractVideoPreset::class);
-        $preset->method('getMaxResolution')->willReturn(1920*1080);
         return $preset;
     }
 
@@ -57,19 +56,27 @@ class AbstractVideoPresetTest extends AbstractPresetTest
     public static function dimensions()
     {
         return [
-            [[1280, 720], []],
-            [[640, 480], ['width' => 640, 'height' => 480]],
-            [[900, 720], ['width' => 1280, 'height' => 1024]],
-            [[124, 124], ['width' => 123, 'height' => 123]],
+            [[1280, 720], [], []],
+            [[1280, 720], [1280, 720], []],
+            [[640, 480], [1280, 720], ['width' => 640, 'height' => 480]],
+            [[900, 720], [1280, 720], ['width' => 1280, 'height' => 1024]],
+            [[124, 124], [1280, 720], ['width' => 123, 'height' => 123]],
         ];
     }
 
     /**
      * @dataProvider dimensions
      */
-    public function testDimensions($expectedDimensions, array $sourceStream)
+    public function testDimensions($expectedDimensions, array $maxDimensions, array $sourceStream)
     {
-        $this->assertEquals($expectedDimensions, $this->preset->getDimensions($sourceStream));
+        if (!empty($maxDimensions)) {
+            $this->preset->setMaxWidth($maxDimensions[0]);
+            $this->preset->setMaxHeight($maxDimensions[1]);
+        }
+
+        $dimensions = $this->preset->getDimensions($sourceStream);
+        $this->assertEquals($expectedDimensions, $dimensions);
+        return $dimensions;
     }
 
 }

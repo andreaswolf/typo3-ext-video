@@ -63,7 +63,8 @@ class VideoProcessor implements ProcessorInterface
             try {
                 $task->setStatus(VideoProcessingTask::STATUS_NEW);
                 $this->getConverter()->start($task);
-            } catch (ConversionException $e) {
+                $this->handleTaskIfDone($task);
+            } catch (\Exception $e) {
                 $task->setExecuted(false);
                 $this->getLogger()->error($e->getMessage(), ['exception' => $e]);
                 if (GeneralUtility::getApplicationContext()->isDevelopment()) {
@@ -103,14 +104,7 @@ class VideoProcessor implements ProcessorInterface
         try {
             $converter = $this->getConverter();
             $converter->process($task);
-
-            if ($task->isExecuted() && $task->isSuccessful() && $task->getTargetFile()->isProcessed()) {
-                $processedFileRepository = GeneralUtility::makeInstance(ProcessedFileRepository::class);
-                $processedFileRepository->add($task->getTargetFile());
-
-                $cacheManager = GeneralUtility::makeInstance(CacheManager::class);
-                $cacheManager->flushCachesInGroupByTag('pages', $task->getConfigurationChecksum());
-            }
+            $this->handleTaskIfDone($task);
         } catch (\Exception $e) {
             $logger = GeneralUtility::makeInstance(LogManager::class)->getLogger(__CLASS__);
             $logger->critical($e->getMessage());
@@ -132,5 +126,21 @@ class VideoProcessor implements ProcessorInterface
         }
 
         return GeneralUtility::makeInstance(ObjectManager::class)->get(...$videoConverter);
+    }
+
+    /**
+     * @param TaskInterface $task
+     *
+     * @throws \TYPO3\CMS\Core\Cache\Exception\NoSuchCacheGroupException
+     */
+    protected function handleTaskIfDone(TaskInterface $task): void
+    {
+        if ($task->isExecuted() && $task->isSuccessful() && $task->getTargetFile()->isProcessed()) {
+            $processedFileRepository = GeneralUtility::makeInstance(ProcessedFileRepository::class);
+            $processedFileRepository->add($task->getTargetFile());
+
+            $cacheManager = GeneralUtility::makeInstance(CacheManager::class);
+            $cacheManager->flushCachesInGroupByTag('pages', $task->getConfigurationChecksum());
+        }
     }
 }

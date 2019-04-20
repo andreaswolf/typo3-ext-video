@@ -30,7 +30,6 @@ class FormatRepository implements SingletonInterface
     {
         $parameters = [];
         $options = $this->normalizeOptions($options);
-
         $definition = $this->findFormatDefinition($options);
         if ($definition === null) {
             throw new FormatException("No format defintion found for configuration: " . print_r($options, true));
@@ -101,15 +100,25 @@ class FormatRepository implements SingletonInterface
 
     public function buildParameterString(?string $input, ?string $output, array $options = [], array $sourceStreams = null): string
     {
+        $escapeShellArg = static function ($parameter) {
+            return preg_match('#^[\w-]+$#', $parameter) ? $parameter : escapeshellarg($parameter);
+        };
+
         $parameters = $this->buildParameters($input, $output, $options, $sourceStreams);
-        $parameters = array_map('escapeshellarg', $parameters);
+        $parameters = array_map($escapeShellArg, $parameters);
         return implode(' ', $parameters);
     }
 
     /**
+     * This method normalizes the given options. This is important to prevent unnecessary reencodes.
+     *
+     * It is currently not possible to hook into the typo3 processing pipeline before it searches for a processed file.
+     * That means that you must do the normalization yourself before asking typo3 for a processed video.
+     *
      * @param array $options
      *
      * @return array
+     * @todo this method must take much more effort to normalize the parameters because unnecessary encodes are horrible
      */
     public static function normalizeOptions(array $options): array
     {

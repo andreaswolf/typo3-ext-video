@@ -19,14 +19,14 @@ abstract class AbstractVideoPreset extends AbstractCompressiblePreset
     private $maxFramerate = 30.0;
 
     /**
-     * @var int
+     * @var int|null
      */
-    private $maxWidth = 1280;
+    private $maxWidth = null;
 
     /**
-     * @var int
+     * @var int|null
      */
-    private $maxHeight = 720;
+    private $maxHeight = null;
 
     /**
      * If true than the video will be cropped.
@@ -85,36 +85,28 @@ abstract class AbstractVideoPreset extends AbstractCompressiblePreset
         return min($targetFrameRate, $maxFramerate);
     }
 
-    /**
-     * Returns the maximum number of luma samples (or the max dimensions) allowed in the video.
-     * This is most likely a technical limit, the method should probably be overridden by your codec.
-     *
-     * @return int
-     */
-    protected abstract function getMaxResolution(): int;
-
-    public function getMaxWidth(): int
+    public function getMaxWidth(): ?int
     {
         return $this->maxWidth;
     }
 
-    public function setMaxWidth(int $maxWidth): void
+    public function setMaxWidth(?int $maxWidth): void
     {
-        if ($maxWidth < 8) {
+        if ($maxWidth < 8 && $maxWidth !== null) {
             throw new \RuntimeException("width must be 8 or higher0");
         }
 
         $this->maxWidth = $maxWidth;
     }
 
-    public function getMaxHeight(): int
+    public function getMaxHeight(): ?int
     {
         return $this->maxHeight;
     }
 
-    public function setMaxHeight(int $maxHeight): void
+    public function setMaxHeight(?int $maxHeight): void
     {
-        if ($maxHeight < 8) {
+        if ($maxHeight < 8 && $maxHeight !== null) {
             throw new \RuntimeException("height must be 8 or higher");
         }
 
@@ -135,7 +127,7 @@ abstract class AbstractVideoPreset extends AbstractCompressiblePreset
      * This final resolution will be divisible by this value.
      * This is required to get chroma sub-sampling to work.
      *
-     * It'll probably be 2 or 8.
+     * It'll probably be 2.
      *
      * @return int
      */
@@ -144,63 +136,65 @@ abstract class AbstractVideoPreset extends AbstractCompressiblePreset
         return 2;
     }
 
-    public function getDimensions(array $sourceStream): array
+    /**
+     * Determine the scale factor for the video.
+     *
+     * If the video is supposed to be cropped than the source dimensions are already modified.
+     *
+     * @param float[] $sourceDimensions
+     *
+     * @return float
+     */
+    protected function getScaleFactor(array $sourceDimensions): float
     {
-        $divisor = $this->getDimensionDivisor();
+        $candidates = [1.0];
 
-        if (!isset($sourceStream['width']) || !isset($sourceStream['width'])) {
-            return [
-                (int)(round($this->getMaxWidth() / $divisor) * $divisor),
-                (int)(round($this->getMaxHeight() / $divisor) * $divisor),
-            ];
+        if ($this->getMaxWidth() !== null) {
+            $candidates[] = $this->getMaxWidth() / $sourceDimensions[0];
         }
 
-        $scaleFactor = min(
-            1.0,
-            $this->getMaxWidth() / $sourceStream['width'],
-            $this->getMaxHeight() / $sourceStream['height'],
-            sqrt($this->getMaxResolution() / ($sourceStream['width'] * $sourceStream['height']))
-        );
+        if ($this->getMaxHeight() !== null) {
+            $candidates[] = $this->getMaxHeight() / $sourceDimensions[1];
+        }
 
+        return min($candidates);
+    }
+
+    /**
+     * Returns the dimensions for the final video.
+     *
+     * @param array $sourceStream
+     *
+     * @return int[]
+     */
+    public function getDimensions(array $sourceStream): array
+    {
+        if (isset($sourceStream['width']) && isset($sourceStream['height'])) {
+            $sourceDimensions = [$sourceStream['width'], $sourceStream['height']];
+        } else if ($this->getMaxWidth() && $this->getMaxHeight()) {
+            $sourceDimensions = [$this->getMaxWidth(), $this->getMaxHeight()];
+        } else {
+            $sourceDimensions = [1280, 720]; // ¯\_(ツ)_/¯
+        }
+
+        // TODO implement cropping
+
+        $divisor = $this->getDimensionDivisor();
+        $scaleFactor = $this->getScaleFactor($sourceDimensions);
         return [
-            (int)(round($sourceStream['width'] * $scaleFactor / $divisor) * $divisor),
-            (int)(round($sourceStream['height'] * $scaleFactor / $divisor) * $divisor),
+            (int)(round($sourceDimensions[0] * $scaleFactor / $divisor) * $divisor),
+            (int)(round($sourceDimensions[1] * $scaleFactor / $divisor) * $divisor),
         ];
     }
 
     /**
-     * Calculates a rough estimate of how much bitrate is necessary to encode the video at the given quality.
-     * This is based on a per pixel definition.
-     *
-     * Here are a few examples:
-     * 0.6 * 1280*720*(30**0.5)/1024 = 3943.6024140372
-     *
-     * @return float
-     */
-    protected abstract function getBitsPerPixel(): float;
-
-    /**
-     * The maximum bitrate allowed by the codec or the codec configuration.
-     * Most of the time this is configured using a level.
-     *
-     * @return int
-     */
-    protected abstract function getBitrateLimit(): int;
-
-    /**
-     * Calculates the bitrate in kbit/s
+     * Calculates the bitrate in kbit/s.
      *
      * @param array $sourceStream
      *
      * @return int
      */
-    public function getMaxBitrate(array $sourceStream): int
-    {
-        list($width, $height) = $this->getDimensions($sourceStream);
-        $framerate = MathUtility::calculateWithParentheses($this->getFramerate($sourceStream));
-        $bitrate = round($width * $height * ($framerate ** 0.5) * $this->getBitsPerPixel() / 1024);
-        return min($bitrate, $this->getBitrateLimit());
-    }
+    public abstract function getMaxBitrate(array $sourceStream): int;
 
     public function requiresTranscoding(array $sourceStream): bool
     {
@@ -242,6 +236,8 @@ abstract class AbstractVideoPreset extends AbstractCompressiblePreset
         if (!isset($sourceStream['bit_rate']) || $sourceStream['bit_rate'] > $this->getMaxBitrate($sourceStream)) {
             return true;
         }
+
+        // TODO check and handle pixel aspect-ratios... someone somewhere will mess with that
 
         return false;
     }
