@@ -19,7 +19,19 @@
                                 <valuePicker type="array">
                                     <items type="array">
                                         <numIndex index="0" type="array">
-                                            <numIndex index="0">mp4 quality 100%, 80%, 60%, 40%, 20%, 0%</numIndex>
+                                            <numIndex index="0">mp4 360p 720p 1080p</numIndex>
+                                            <numIndex index="1">{"format": "%mp4,mp4,mp4:high%", "video": {"maxWidth": %640,1280,1920%, "maxHeight": %360,720,1080%}}</numIndex>
+                                        </numIndex>
+                                        <numIndex index="10" type="array">
+                                            <numIndex index="0">mp4 720p quality 80%</numIndex>
+                                            <numIndex index="1">{"format": "mp4", "video": {"quality": 0.8}, "audio": {"quality": 0.8}}</numIndex>
+                                        </numIndex>
+                                        <numIndex index="11" type="array">
+                                            <numIndex index="0">mp4 720p quality 100% 80% 60%</numIndex>
+                                            <numIndex index="1">{"format": "mp4", "video": {"quality": %1.0,0.8,0.6%}, "audio": {"quality": %1.0,0.8,0.6%}}</numIndex>
+                                        </numIndex>
+                                        <numIndex index="12" type="array">
+                                            <numIndex index="0">mp4 720p quality 100%, 80%, 60%, 40%, 20%, 0%</numIndex>
                                             <numIndex index="1">{"format": "mp4", "video": {"quality": %1.0,0.8,0.6,0.4,0.2,0.0%}, "audio": {"quality": %1.0,0.8,0.6,0.4,0.2,0.0%}}</numIndex>
                                         </numIndex>
                                     </items>
