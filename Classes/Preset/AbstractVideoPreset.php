@@ -284,7 +284,12 @@ abstract class AbstractVideoPreset extends AbstractCompressiblePreset
         $filters[] = "fps=${framerate}";
 
         $dimensions = $this->getDimensions($sourceStream);
-        $filters[] = "scale=${dimensions[0]}:${dimensions[1]}";
+        if ($this->isCrop()) {
+            $filters[] = "scale=${dimensions[0]}:${dimensions[1]}:force_original_aspect_ratio=increase";
+            $filters[] = "crop=${dimensions[0]}:${dimensions[1]}";
+        } else {
+            $filters[] = "scale=${dimensions[0]}:${dimensions[1]}";
+        }
 
         return $filters;
     }
