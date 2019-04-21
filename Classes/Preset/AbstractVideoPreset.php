@@ -177,7 +177,10 @@ abstract class AbstractVideoPreset extends AbstractCompressiblePreset
             $sourceDimensions = [1280, 720]; // ¯\_(ツ)_/¯
         }
 
-        // TODO implement cropping
+        if ($this->getMaxWidth() && $this->getMaxHeight() && $this->isCrop()) {
+            $sourceDimensions[0] = min($sourceDimensions[0], $sourceDimensions[1] / $this->getMaxHeight() * $this->getMaxWidth());
+            $sourceDimensions[1] = min($sourceDimensions[1], $sourceDimensions[0] / $this->getMaxWidth() * $this->getMaxHeight());
+        }
 
         $divisor = $this->getDimensionDivisor();
         $scaleFactor = $this->getScaleFactor($sourceDimensions);

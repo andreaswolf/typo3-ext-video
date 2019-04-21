@@ -56,27 +56,27 @@ class AbstractVideoPresetTest extends AbstractPresetTest
     public static function dimensions()
     {
         return [
-            [[1280, 720], [], []],
-            [[1280, 720], [1280, 720], []],
-            [[640, 480], [1280, 720], ['width' => 640, 'height' => 480]],
-            [[900, 720], [1280, 720], ['width' => 1280, 'height' => 1024]],
-            [[124, 124], [1280, 720], ['width' => 123, 'height' => 123]],
+            [[1280, 720], [1280, 720], [], []],
+            [[1280, 720], [1280, 720], [1280, 720], []],
+            [[640, 480], [640, 360], [1280, 720], ['width' => 640, 'height' => 480]],
+            [[900, 720], [1280, 720], [1280, 720], ['width' => 1280, 'height' => 1024]],
+            [[124, 124], [124, 70], [1280, 720], ['width' => 123, 'height' => 123]],
         ];
     }
 
     /**
      * @dataProvider dimensions
      */
-    public function testDimensions($expectedDimensions, array $maxDimensions, array $sourceStream)
+    public function testDimensions($expectedDimensions, $expectedCroppedDimensions, array $maxDimensions, array $sourceStream)
     {
         if (!empty($maxDimensions)) {
             $this->preset->setMaxWidth($maxDimensions[0]);
             $this->preset->setMaxHeight($maxDimensions[1]);
         }
 
-        $dimensions = $this->preset->getDimensions($sourceStream);
-        $this->assertEquals($expectedDimensions, $dimensions);
-        return $dimensions;
+        $this->assertEquals($expectedDimensions, $this->preset->getDimensions($sourceStream), "none cropped resolution");
+        $this->preset->setCrop(true);
+        $this->assertEquals($expectedCroppedDimensions, $this->preset->getDimensions($sourceStream), "cropped resolution");
     }
 
 }
