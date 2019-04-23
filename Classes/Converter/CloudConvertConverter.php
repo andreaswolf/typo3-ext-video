@@ -142,6 +142,12 @@ class CloudConvertConverter implements VideoConverterInterface
         }
 
         $command = $formatRepository->buildParameterString('{INPUTFILE}', '{OUTPUTFILE}', $task->getConfiguration(), $info['streams']);
+        // remove possible escaping from the inputfile/outputfile segments since they are actually placeholders
+        $command = strtr($command, [
+            escapeshellarg('{INPUTFILE}') => '{INPUTFILE}',
+            escapeshellarg('{OUTPUTFILE}') => '{OUTPUTFILE}',
+        ]);
+
         $result = $this->pollProcess($task, 'convert', ["command" => $command]);
         $this->logger->debug('polled for convert', ['result' => $result, 'command' => $command]);
         if ($result === null) {
