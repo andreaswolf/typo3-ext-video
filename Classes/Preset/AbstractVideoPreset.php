@@ -138,8 +138,8 @@ abstract class AbstractVideoPreset extends AbstractCompressiblePreset
 
     /**
      * Determine the scale factor for the video.
-     *
      * If the video is supposed to be cropped than the source dimensions are already modified.
+     * This method must be modified by implementing presets if there are limitations present by the codec.
      *
      * @param float[] $sourceDimensions
      *
@@ -182,12 +182,50 @@ abstract class AbstractVideoPreset extends AbstractCompressiblePreset
             $sourceDimensions[1] = min($sourceDimensions[1], $sourceDimensions[0] / $this->getMaxWidth() * $this->getMaxHeight());
         }
 
-        $divisor = $this->getDimensionDivisor();
         $scaleFactor = $this->getScaleFactor($sourceDimensions);
+        $divisor = $this->getDimensionDivisor();
+
         return [
             (int)(round($sourceDimensions[0] * $scaleFactor / $divisor) * $divisor),
             (int)(round($sourceDimensions[1] * $scaleFactor / $divisor) * $divisor),
         ];
+    }
+
+    /**
+     * This method returns the same as #getQuality except in one special case:
+     * If the source video is smaller than what the max dimension are expecting than the quality will be boosted.
+     * There are multiple reasons why that is useful:
+     * - if you want to fill a specific space but only get a low-res video
+     *   than it would be a bad idea to compress it as hard as you would the high-res video since it will be upscaled
+     * - if you build some form of adaptive streaming but only have a low-res video
+     *   than the higher quality settings will still increase the quality without wasting bandwidth by upscaling
+     *
+     * The quality is multiplied by the dimension difference.
+     * So if the source video is 720p but you wanted 1080p than the boost will be 1.5.
+     * If your requested quality was 0.8 than 0.8 * 1.5 would result in a quality ~1.2 or 1.0 since that is the max.
+     * If your requested quality was 0.6 than 0.6 * 1.5 would result in a quality ~0.9
+     *
+     * @param array $sourceStream
+     *
+     * @return float
+     */
+    public function getBoostedQuality(array $sourceStream): float
+    {
+        $scaleFactors = [];
+
+        if ($this->getMaxWidth() !== null && !empty($sourceStream['width'])) {
+            $scaleFactors[] = $this->getMaxWidth() / $sourceStream['width'];
+        }
+
+        if ($this->getMaxHeight() !== null && !empty($sourceStream['height'])) {
+            $scaleFactors[] = $this->getMaxHeight() / $sourceStream['height'];
+        }
+
+        if (empty($scaleFactors) || min($scaleFactors) <= 1.0) {
+            return $this->getQuality();
+        }
+
+        return min(1.0, $this->getQuality() * min($scaleFactors));
     }
 
     /**

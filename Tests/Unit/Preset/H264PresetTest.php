@@ -31,7 +31,7 @@ class H264PresetTest extends AbstractVideoPresetTest
             '-level:v',
             '31',
             '-crf:v',
-            (string)$this->preset->getCrf(),
+            (string)$this->preset->getCrf([]),
             '-maxrate:v',
             $this->preset->getMaxBitrate([]) . 'k',
             '-bufsize:v',
@@ -53,7 +53,7 @@ class H264PresetTest extends AbstractVideoPresetTest
         $result = [];
         foreach ($mapping as $quality => $crf) {
             $this->preset->setQuality($quality);
-            $result[$quality] = $this->preset->getCrf();
+            $result[$quality] = $this->preset->getCrf([]);
         }
 
         $this->assertEquals($mapping, $result);

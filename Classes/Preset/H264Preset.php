@@ -210,7 +210,7 @@ class H264Preset extends AbstractVideoPreset
     {
         $pixels = array_product($this->getDimensions($sourceStream));
         $framerate = MathUtility::calculateWithParentheses($this->getFramerate($sourceStream));
-        $quality = ($this->getQuality() ** 2 * 0.9 + 0.1);
+        $quality = $this->getBoostedQuality($sourceStream) ** 2 * 0.9 + 0.1;
         $bitrate = round($pixels ** 0.9 * $framerate ** 0.5 * $quality * 0.003);
         return min($bitrate, $this->getBitrateLimit());
     }
@@ -227,14 +227,16 @@ class H264Preset extends AbstractVideoPreset
      * quality 0.8 = crf 24
      * quality 0.6 = crf 30
      *
-     * @see http://fooplot.com/#W3sidHlwZSI6MCwiZXEiOiI0MysoMTgtNDMpKngiLCJjb2xvciI6IiMwMDAwMDAifSx7InR5cGUiOjEwMDAsIndpbmRvdyI6WyIwIiwiMSIsIjAiLCI1MCJdfV0-
+     * @param array $sourceStream
+     *
      * @return float
+     * @see http://fooplot.com/#W3sidHlwZSI6MCwiZXEiOiI0MysoMTgtNDMpKngiLCJjb2xvciI6IiMwMDAwMDAifSx7InR5cGUiOjEwMDAsIndpbmRvdyI6WyIwIiwiMSIsIjAiLCI1MCJdfV0-
      */
-    public function getCrf(): float
+    public function getCrf(array $sourceStream): float
     {
         $max = 18;
         $min = 48;
-        return $min + ($max - $min) * $this->getQuality();
+        return $min + ($max - $min) * $this->getBoostedQuality($sourceStream);
     }
 
     public function requiresTranscoding(array $sourceStream): bool
@@ -263,7 +265,7 @@ class H264Preset extends AbstractVideoPreset
         array_push($parameters, '-preset:v', $this->getPreset());
         array_push($parameters, '-profile:v', $this->getProfile());
         array_push($parameters, '-level:v', $this->getLevel());
-        array_push($parameters, '-crf:v', (string)round($this->getCrf(), 2));
+        array_push($parameters, '-crf:v', (string)round($this->getCrf($sourceStream), 2));
 
         $bitrate = $this->getMaxBitrate($sourceStream);
         $bufsize = min($bitrate * 5, $this->getBitrateLimit());

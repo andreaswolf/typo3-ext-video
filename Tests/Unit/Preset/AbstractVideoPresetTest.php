@@ -79,4 +79,14 @@ class AbstractVideoPresetTest extends AbstractPresetTest
         $this->assertEquals($expectedCroppedDimensions, $this->preset->getDimensions($sourceStream), "cropped resolution");
     }
 
+    public function testBoostedQuality()
+    {
+        $this->preset->setMaxWidth(1280);
+        $this->preset->setMaxHeight(720);
+        $this->assertEquals(0.8, $this->preset->getBoostedQuality([]), '', 0.01);
+        $this->assertEquals(0.8, $this->preset->getBoostedQuality(['width' => 1920, 'height' => 1080]), '', 0.01);
+        $this->assertEquals(0.8, $this->preset->getBoostedQuality(['width' => 1280, 'height' => 720]), '', 0.01);
+        $this->assertEquals(0.85, $this->preset->getBoostedQuality(['width' => 1200, 'height' => 675]), '', 0.01);
+        $this->assertEquals(1.0, $this->preset->getBoostedQuality(['width' => 640, 'height' => 360]), '', 0.01);
+    }
 }
