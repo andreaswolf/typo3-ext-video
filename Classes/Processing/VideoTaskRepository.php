@@ -126,6 +126,7 @@ class VideoTaskRepository implements SingletonInterface
 
         $qb->setParameter('status', $status);
         $qb->andWhere($qb->expr()->eq('task.status', ':status'));
+        $qb->orderBy('task.uid', 'asc');
 
         $rows = $qb->execute()->fetchAll();
         return array_map([$this, 'serializeTask'], $rows);
