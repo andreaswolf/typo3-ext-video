@@ -13,7 +13,9 @@ call_user_func(function () {
         ? GeneralUtility::makeInstance(\TYPO3\CMS\Core\Configuration\ExtensionConfiguration::class)->get('hauptsache_video')
         : unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['hauptsache_video']);
 
-    $h264Defaults = ['preset' => ['veryslow', 'medium', 'fast', 'ultrafast'][$conf['performance'] ?? 1]];
+    // a great chart comparing encoding speeds vs quality can be found here:
+    // https://blogs.gnome.org/rbultje/2015/09/28/vp9-encodingdecoding-performance-vs-hevch-264/
+    $h264Defaults = ['preset' => ['veryslow', 'slow', 'medium', 'ultrafast'][$conf['performance'] ?? 2]];
     $aacDefaults = ['fdkAvailable' => !empty($conf['fdkAvailable']) || ($conf['converter'] ?? '') === 'CloudConvert'];
     $mp4Defaults = ['-movflags', '+faststart', '-map_metadata', '-1', '-f', 'mp4'];
     if (($conf['performance'] ?? 1) >= 4) {
