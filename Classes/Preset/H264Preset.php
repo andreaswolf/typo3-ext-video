@@ -98,15 +98,18 @@ class H264Preset extends AbstractVideoPreset
     ];
 
     /**
-     * @var string
+     * If null than the profile will be chosen based on the level.
+     * Basically if the level is >= 4 than high will be used, main otherwise.
+     *
+     * @var string|null
      */
-    private $profile = 'main';
+    private $profile = null;
 
     /**
      * @var int
      * @see https://en.wikipedia.org/wiki/H.264/MPEG-4_AVC#Levels
      */
-    private $level = 31;
+    private $level = 30;
 
     /**
      * The performance preset.
@@ -250,7 +253,7 @@ class H264Preset extends AbstractVideoPreset
             return true;
         }
 
-        if (!isset($sourceStream['level']) || $sourceStream['level'] > $this->getLevel()) {
+        if (!isset($sourceStream['level']) || $sourceStream['level'] > $this->getLevel() || $sourceStream['level'] < 10) {
             return true;
         }
 
@@ -277,12 +280,16 @@ class H264Preset extends AbstractVideoPreset
 
     public function getProfile(): string
     {
+        if ($this->profile === null) {
+            return $this->getLevel() >= 40 ? 'high' : 'main';
+        }
+
         return $this->profile;
     }
 
-    public function setProfile(string $profile): void
+    public function setProfile(?string $profile): void
     {
-        if (!isset(self::PROFILE_BITRATE_MULTIPLIER[$profile])) {
+        if ($profile !== null && !isset(self::PROFILE_BITRATE_MULTIPLIER[$profile])) {
             $possibleProfiles = implode(', ', array_keys(self::PROFILE_BITRATE_MULTIPLIER));
             throw new \RuntimeException("Profile $profile does not exist. Possible profiles are: $possibleProfiles");
         }

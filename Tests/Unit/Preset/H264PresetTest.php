@@ -21,7 +21,7 @@ class H264PresetTest extends AbstractVideoPresetTest
             '-pix_fmt',
             'yuv420p',
             '-vf',
-            'fps=30,scale=1280:720',
+            'fps=30,scale=768:432',
             '-c:v',
             'libx264',
             '-preset:v',
@@ -29,7 +29,7 @@ class H264PresetTest extends AbstractVideoPresetTest
             '-profile:v',
             'main',
             '-level:v',
-            '31',
+            '30',
             '-crf:v',
             (string)$this->preset->getCrf([]),
             '-maxrate:v',
@@ -61,6 +61,7 @@ class H264PresetTest extends AbstractVideoPresetTest
 
     public function testMaxBitrate()
     {
+        $this->preset->setLevel(31);
         $mapping = [
             '0.0' => 350,
             '0.3' => 700,
@@ -80,6 +81,7 @@ class H264PresetTest extends AbstractVideoPresetTest
 
     public function testDimensions()
     {
+        $this->preset->setLevel(31);
         for ($x = 1444; $x < 2560; $x += 16) {
             $dimensions = $this->preset->getDimensions(['width' => $x, 'height' => '1080']);
             $this->assertLessThanOrEqual(

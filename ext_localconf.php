@@ -26,19 +26,7 @@ call_user_func(function () {
     if (empty($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['hauptsache_video']['formats']['mp4:default'])) {
         $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['hauptsache_video']['formats']['mp4:default'] = [
             'fileExtension' => 'mp4',
-            'video' => [Preset\H264Preset::class, ['profile' => 'main', 'level' => 31] + $h264Defaults],
-            'audio' => [Preset\AacPreset::class, $aacDefaults],
-            'additionalParameters' => $mp4Defaults,
-        ];
-    }
-
-    // mp4 full-hd videos
-    // be sure to implement some kind of quality switch if you use this as the bitrates can get quiet high with this one
-    // the level supports ~1080p
-    if (empty($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['hauptsache_video']['formats']['mp4:high'])) {
-        $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['hauptsache_video']['formats']['mp4:high'] = [
-            'fileExtension' => 'mp4',
-            'video' => [Preset\H264Preset::class, ['profile' => 'high', 'level' => 40] + $h264Defaults],
+            'video' => [Preset\H264Preset::class, $h264Defaults],
             'audio' => [Preset\AacPreset::class, $aacDefaults],
             'additionalParameters' => $mp4Defaults,
         ];
