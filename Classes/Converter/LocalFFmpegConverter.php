@@ -84,7 +84,7 @@ class LocalFFmpegConverter implements VideoConverterInterface
         $commandStr = $ffprobe . ' ' . implode(' ', array_map('escapeshellarg', $parameters));
         $logger->info('run ffprobe command', ['command' => $commandStr]);
         $returnResponse = $this->commandUtility->exec($commandStr, $output, $returnValue);
-        $logger->debug('ffprobe result', ['output' => $output, 'returnValue' => $returnValue]);
+        $logger->debug('ffprobe result', ['output' => preg_replace('#\s{2,}#', ' ', $output), 'returnValue' => $returnValue]);
         $response = implode("\n", $output);
 
         if ($returnValue !== 0 && $returnValue !== null) {
