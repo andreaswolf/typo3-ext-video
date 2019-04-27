@@ -19,11 +19,6 @@ class AacPreset extends AbstractAudioPreset
         return 'aac';
     }
 
-    protected function getMaxChannels(): int
-    {
-        return 2;
-    }
-
     protected function getSampleRates(): array
     {
         return [48000, 44100, 32000];

@@ -28,7 +28,10 @@ abstract class AbstractAudioPreset extends AbstractCompressiblePreset
      *
      * @return int
      */
-    protected abstract function getMaxChannels(): int;
+    protected function getMaxChannels(): int
+    {
+        return 2;
+    }
 
     public function getChannels(array $sourceStream): int
     {

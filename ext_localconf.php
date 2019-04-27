@@ -16,8 +16,11 @@ call_user_func(function () {
     // a great chart comparing encoding speeds vs quality can be found here:
     // https://blogs.gnome.org/rbultje/2015/09/28/vp9-encodingdecoding-performance-vs-hevch-264/
     $h264Defaults = ['preset' => ['veryslow', 'slow', 'medium', 'ultrafast'][$conf['performance'] ?? 2]];
+    $vp9Defaults = ['speed' => ([0, 1, 2, 5][$conf['performance'] ?? 2])];
     $aacDefaults = ['fdkAvailable' => !empty($conf['fdkAvailable']) || ($conf['converter'] ?? '') === 'CloudConvert'];
+    $opusDefaults = [];
     $mp4Defaults = ['-movflags', '+faststart', '-map_metadata', '-1', '-f', 'mp4'];
+    $webmDefaults = ['-map_metadata', '-1', '-f', 'webm'];
     if (($conf['performance'] ?? 1) >= 4) {
         array_push($mp4Defaults, '-sws_flags', 'neighbor');
     }
@@ -31,6 +34,17 @@ call_user_func(function () {
             'video' => [Preset\H264Preset::class, $h264Defaults],
             'audio' => [Preset\AacPreset::class, $aacDefaults],
             'additionalParameters' => $mp4Defaults,
+        ];
+    }
+
+    // webm video
+    // higher efficiency than h264 but lacks support in safari
+    if (empty($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['hauptsache_video']['formats']['webm:default'])) {
+        $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['hauptsache_video']['formats']['webm:default'] = [
+            'fileExtension' => 'webm',
+            'video' => [Preset\VP9Preset::class, $vp9Defaults],
+            'audio' => [Preset\OpusPreset::class, $opusDefaults],
+            'additionalParameters' => $webmDefaults,
         ];
     }
 

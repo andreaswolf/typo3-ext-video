@@ -207,7 +207,7 @@ class H264Preset extends AbstractVideoPreset
      * @param array $sourceStream
      *
      * @return int
-     * @see http://fooplot.com/#W3sidHlwZSI6MCwiZXEiOiIoeCoqMiowLjkrMC4xKSooKDM4NDAqMjE2MCkqKjAuOCkqKDMwKiowLjUpKjEyLzEwMjQiLCJjb2xvciI6IiMwMDAwMDAifSx7InR5cGUiOjAsImVxIjoiKHgqKjIqMC45KzAuMSkqKCgxOTIwKjEwODApKiowLjgpKigzMCoqMC41KSoxMi8xMDI0IiwiY29sb3IiOiIjMDAwMDAwIn0seyJ0eXBlIjowLCJlcSI6Iih4KioyKjAuOSswLjEpKigoMTI4MCo3MjApKiowLjgpKigzMCoqMC41KSoxMi8xMDI0IiwiY29sb3IiOiIjMDAwMDAwIn0seyJ0eXBlIjowLCJlcSI6Iih4KioyKjAuOSswLjEpKigoNjQwKjM2MCkqKjAuOCkqKDMwKiowLjUpKjEyLzEwMjQiLCJjb2xvciI6IiMwMDAwMDAifSx7InR5cGUiOjEwMDAsIndpbmRvdyI6WyIwIiwiMS4wIiwiMCIsIjE1MDAwIl19XQ--
+     * @see http://fooplot.com/#W3sidHlwZSI6MCwiZXEiOiIoeCoqMiowLjkrMC4xKSooKDM4NDAqMjE2MCkqKjAuOSkqKDMwKiowLjUpKjAuMDAzIiwiY29sb3IiOiIjMDAwMDAwIn0seyJ0eXBlIjowLCJlcSI6Iih4KioyKjAuOSswLjEpKigoMTkyMCoxMDgwKSoqMC45KSooMzAqKjAuNSkqMC4wMDMiLCJjb2xvciI6IiMwMDAwMDAifSx7InR5cGUiOjAsImVxIjoiKHgqKjIqMC45KzAuMSkqKCgxMjgwKjcyMCkqKjAuOSkqKDMwKiowLjUpKjAuMDAzIiwiY29sb3IiOiIjMDAwMDAwIn0seyJ0eXBlIjowLCJlcSI6Iih4KioyKjAuOSswLjEpKigoNjQwKjM2MCkqKjAuOSkqKDMwKiowLjUpKjAuMDAzIiwiY29sb3IiOiIjMDAwMDAwIn0seyJ0eXBlIjoxMDAwLCJ3aW5kb3ciOlsiMCIsIjEuMCIsIjAiLCIxNTAwMCJdfV0-
      */
     public function getMaxBitrate(array $sourceStream): int
     {
@@ -226,6 +226,7 @@ class H264Preset extends AbstractVideoPreset
      *
      * for h264 the range should is 51-0 according to ffmpeg https://trac.ffmpeg.org/wiki/Encode/H.264#crf
      * The recommended range is 18 to 28
+     * Every 6 points = halfing of the size which i mapped to every 0.2 quality percent
      * quality 1.0 = crf 18
      * quality 0.8 = crf 24
      * quality 0.6 = crf 30
@@ -238,7 +239,7 @@ class H264Preset extends AbstractVideoPreset
     public function getCrf(array $sourceStream): float
     {
         $max = 18;
-        $min = 48;
+        $min = $max + 6 / 0.2; // +6 every 0.2 for half the bitrate
         return $min + ($max - $min) * $this->getBoostedQuality($sourceStream);
     }
 
