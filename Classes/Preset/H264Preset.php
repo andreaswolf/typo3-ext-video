@@ -207,14 +207,14 @@ class H264Preset extends AbstractVideoPreset
      * @param array $sourceStream
      *
      * @return int
-     * @see http://fooplot.com/#W3sidHlwZSI6MCwiZXEiOiIoeCoqMiowLjkrMC4xKSooKDM4NDAqMjE2MCkqKjAuOSkqKDMwKiowLjUpKjAuMDAzIiwiY29sb3IiOiIjMDAwMDAwIn0seyJ0eXBlIjowLCJlcSI6Iih4KioyKjAuOSswLjEpKigoMTkyMCoxMDgwKSoqMC45KSooMzAqKjAuNSkqMC4wMDMiLCJjb2xvciI6IiMwMDAwMDAifSx7InR5cGUiOjAsImVxIjoiKHgqKjIqMC45KzAuMSkqKCgxMjgwKjcyMCkqKjAuOSkqKDMwKiowLjUpKjAuMDAzIiwiY29sb3IiOiIjMDAwMDAwIn0seyJ0eXBlIjowLCJlcSI6Iih4KioyKjAuOSswLjEpKigoNjQwKjM2MCkqKjAuOSkqKDMwKiowLjUpKjAuMDAzIiwiY29sb3IiOiIjMDAwMDAwIn0seyJ0eXBlIjoxMDAwLCJ3aW5kb3ciOlsiMCIsIjEuMCIsIjAiLCIxNTAwMCJdfV0-
+     * @see http://fooplot.com/#W3sidHlwZSI6MCwiZXEiOiIoeCoqMiowLjkrMC4xKSooKDM4NDAqMjE2MCkqKjAuOSkqKDMwKiowLjUpKjAuMDA0IiwiY29sb3IiOiIjMDAwMDAwIn0seyJ0eXBlIjowLCJlcSI6Iih4KioyKjAuOSswLjEpKigoMTkyMCoxMDgwKSoqMC45KSooMzAqKjAuNSkqMC4wMDQiLCJjb2xvciI6IiMwMDAwMDAifSx7InR5cGUiOjAsImVxIjoiKHgqKjIqMC45KzAuMSkqKCgxMjgwKjcyMCkqKjAuOSkqKDMwKiowLjUpKjAuMDA0IiwiY29sb3IiOiIjMDAwMDAwIn0seyJ0eXBlIjowLCJlcSI6Iih4KioyKjAuOSswLjEpKigoNjQwKjM2MCkqKjAuOSkqKDMwKiowLjUpKjAuMDA0IiwiY29sb3IiOiIjMDAwMDAwIn0seyJ0eXBlIjoxMDAwLCJ3aW5kb3ciOlsiMCIsIjEuMCIsIjAiLCIxNTAwMCJdfV0-
      */
-    public function getMaxBitrate(array $sourceStream): int
+    public function getTargetBitrate(array $sourceStream): int
     {
         $pixels = array_product($this->getDimensions($sourceStream));
         $framerate = MathUtility::calculateWithParentheses($this->getFramerate($sourceStream));
         $quality = $this->getBoostedQuality($sourceStream) ** 2 * 0.9 + 0.1;
-        $bitrate = round($pixels ** 0.9 * $framerate ** 0.5 * $quality * 0.003);
+        $bitrate = round($pixels ** 0.9 * $framerate ** 0.5 * $quality * 0.006);
         return min($bitrate, $this->getBitrateLimit());
     }
 
@@ -271,7 +271,7 @@ class H264Preset extends AbstractVideoPreset
         array_push($parameters, '-level:v', $this->getLevel());
         array_push($parameters, '-crf:v', (string)round($this->getCrf($sourceStream), 2));
 
-        $bitrate = $this->getMaxBitrate($sourceStream);
+        $bitrate = $this->getTargetBitrate($sourceStream);
         $bufsize = min($bitrate * 5, $this->getBitrateLimit());
         array_push($parameters, '-maxrate:v', $bitrate . 'k');
         array_push($parameters, '-bufsize:v', $bufsize . 'k');

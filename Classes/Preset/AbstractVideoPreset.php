@@ -229,13 +229,16 @@ abstract class AbstractVideoPreset extends AbstractCompressiblePreset
     }
 
     /**
-     * Calculates the bitrate in kbit/s.
+     * Calculates the target bitrate in kbit/s.
+     *
+     * How this value is interpreted depends on the specific implementation
+     * but in general you can think of it as the maximum average bitrate.
      *
      * @param array $sourceStream
      *
      * @return int
      */
-    public abstract function getMaxBitrate(array $sourceStream): int;
+    public abstract function getTargetBitrate(array $sourceStream): int;
 
     public function requiresTranscoding(array $sourceStream): bool
     {
@@ -274,7 +277,7 @@ abstract class AbstractVideoPreset extends AbstractCompressiblePreset
             return true;
         }
 
-        if (!isset($sourceStream['bit_rate']) || $sourceStream['bit_rate'] > $this->getMaxBitrate($sourceStream)) {
+        if (!isset($sourceStream['bit_rate']) || $sourceStream['bit_rate'] > $this->getTargetBitrate($sourceStream)) {
             return true;
         }
 

@@ -113,25 +113,18 @@ class VP9Preset extends AbstractVideoPreset
         );
     }
 
-    /**
-     * Calculates the bitrate in kbit/s.
-     *
-     * @param array $sourceStream
-     *
-     * @return int
-     */
-    public function getMaxBitrate(array $sourceStream): int
+    public function getTargetBitrate(array $sourceStream): int
     {
         $pixels = array_product($this->getDimensions($sourceStream));
         $framerate = MathUtility::calculateWithParentheses($this->getFramerate($sourceStream));
         $quality = $this->getBoostedQuality($sourceStream) ** 2 * 0.9 + 0.1;
-        $bitrate = round($pixels ** 0.9 * $framerate ** 0.5 * $quality * 0.003);
+        $bitrate = round($pixels ** 0.9 * $framerate ** 0.5 * $quality * 0.005);
         return min($bitrate, $this->getBitrateLimit());
     }
 
     public function getCrf(array $sourceStream): float
     {
-        $max = 25;
+        $max = 23;
         $min = $max + 10 / 0.2; // +10 every 0.2 for half the bitrate...
         $result = $min + ($max - $min) * $this->getBoostedQuality($sourceStream);
         return min($result, 63); // this formula actually overshoots the minimum quality possible in vp9
@@ -175,12 +168,11 @@ class VP9Preset extends AbstractVideoPreset
         array_push($parameters, '-profile:v', '0');
         array_push($parameters, '-level:v', $this->getLevel());
 
-        array_push($parameters, '-crf:v', (string)round($this->getCrf($sourceStream), 2));
-        $maxrate = $this->getMaxBitrate($sourceStream);
-        array_push($parameters, '-b:v', $maxrate . 'k');
-//        array_push($parameters, '-b:v', round($maxrate * 0.66) . 'k');
-//        array_push($parameters, '-maxrate:v', $maxrate . 'k');
-//        array_push($parameters, '-minrate:v', round($maxrate * 0.33) . 'k');
+        array_push($parameters, '-crf:v', round($this->getCrf($sourceStream)));
+        $maxrate = $this->getTargetBitrate($sourceStream);
+        array_push($parameters, '-maxrate:v', round($maxrate * 1.5) . 'k');
+        array_push($parameters, '-b:v'/*  */, round($maxrate * 1.0) . 'k');
+        array_push($parameters, '-minrate:v', round($maxrate * 0.5) . 'k');
 
         $dimensions = $this->getDimensions($sourceStream);
         $log2columns = floor(log(min($this->getMaxTiles(), $dimensions[0] / 256), 2));

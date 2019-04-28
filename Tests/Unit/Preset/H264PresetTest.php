@@ -31,11 +31,11 @@ class H264PresetTest extends AbstractVideoPresetTest
             '-level:v',
             '30',
             '-crf:v',
-            (string)$this->preset->getCrf([]),
+            '24',
             '-maxrate:v',
-            $this->preset->getMaxBitrate([]) . 'k',
+            '2067k',
             '-bufsize:v',
-            $this->preset->getMaxBitrate([]) * 5 . 'k',
+            '10000k',
         ], $this->preset->getParameters([]));
     }
 
@@ -63,20 +63,20 @@ class H264PresetTest extends AbstractVideoPresetTest
     {
         $this->preset->setLevel(31);
         $mapping = [
-            '0.0' => 350,
-            '0.3' => 700,
-            '0.5' => 1250,
-            '0.8' => 2600,
-            '1.0' => 3800,
+            '0.0' => 750,
+            '0.3' => 1400,
+            '0.5' => 2500,
+            '0.8' => 5100,
+            '1.0' => 7600,
         ];
 
         $result = [];
         foreach ($mapping as $quality => $bitrate) {
             $this->preset->setQuality($quality);
-            $result[$quality] = $this->preset->getMaxBitrate([]);
+            $result[$quality] = $this->preset->getTargetBitrate([]);
         }
 
-        $this->assertEquals($mapping, $result, '', 50);
+        $this->assertEquals($mapping, $result, '', 100);
     }
 
     public function testDimensions()
