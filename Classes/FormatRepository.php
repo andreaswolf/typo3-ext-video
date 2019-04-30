@@ -4,6 +4,7 @@ namespace Hn\HauptsacheVideo;
 
 
 use Hn\HauptsacheVideo\Exception\FormatException;
+use Hn\HauptsacheVideo\Preset\AbstractVideoPreset;
 use Hn\HauptsacheVideo\Preset\PresetInterface;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -24,6 +25,63 @@ class FormatRepository implements SingletonInterface
         }
 
         return null;
+    }
+
+    protected function getPresets(array $options = [], array $sourceStreams = null): array
+    {
+        $result = [];
+
+        $options = $this->normalizeOptions($options);
+        $definition = $this->findFormatDefinition($options);
+
+        foreach (['video', 'audio', 'subtitle', 'data'] as $steamType) {
+            if (empty($definition[$steamType])) {
+                continue;
+            }
+
+            if ($options[$steamType]['disabled'] ?? false) {
+                continue;
+            }
+
+            $sourceStream = [];
+            if ($sourceStreams !== null) {
+                $sourceStreamIndex = array_search($steamType, array_column($sourceStreams, 'codec_type'));
+                if ($sourceStreamIndex === false) {
+                    continue;
+                } else {
+                    $sourceStream = $sourceStreams[$sourceStreamIndex];
+                }
+            }
+
+            $preset = GeneralUtility::makeInstance(...$definition[$steamType]);
+            if (!$preset instanceof PresetInterface) {
+                $type = is_object($preset) ? get_class($preset) : gettype($preset);
+                throw new \RuntimeException("Expected " . PresetInterface::class . ", got $type");
+            }
+
+            if (isset($options[$steamType])) {
+                $preset->setOptions($options[$steamType]);
+            }
+
+            $result[$steamType] = [
+                'preset' => $preset,
+                'stream' => $sourceStream,
+            ];
+        }
+
+        return $result;
+    }
+
+    public function getProperties(array $options = [], array $sourceStreams = null): array
+    {
+        $properties = [];
+        $presets = $this->getPresets($options, $sourceStreams);
+        foreach ($presets as $preset) {
+            if ($preset['preset'] instanceof AbstractVideoPreset) {
+                list($properties['width'], $properties['height']) = $preset['preset']->getDimensions($preset['stream']);
+            }
+        }
+        return $properties;
     }
 
     public function buildParameters(?string $input, ?string $output, array $options = [], array $sourceStreams = null): array
@@ -47,44 +105,21 @@ class FormatRepository implements SingletonInterface
             array_push($parameters, '-i', $input);
         }
 
-        foreach (['video' => '-vn', 'audio' => '-an', 'subtitle' => '-sn', 'data' => '-dn'] as $steamType => $disableParameter) {
-            if (!isset($definition[$steamType])) {
+        $presets = $this->getPresets($options, $sourceStreams);
+        $streamTypes = ['video' => '-vn', 'audio' => '-an', 'subtitle' => '-sn', 'data' => '-dn'];
+        foreach ($streamTypes as $steamType => $disableParameter) {
+            if (!isset($presets[$steamType])) {
                 array_push($parameters, $disableParameter);
                 continue;
             }
 
-            if ($options[$steamType]['disabled'] ?? false) {
-                array_push($parameters, $disableParameter);
-                continue;
+            $preset = $presets[$steamType];
+            if (!$preset['preset'] instanceof PresetInterface) {
+                $type = is_object($preset['preset']) ? get_class($preset['preset']) : gettype($preset['preset']);
+                throw new \RuntimeException("Expected PresetInterface, got $type");
             }
 
-            if ($sourceStreams !== null) {
-                $sourceStreamIndex = array_search($steamType, array_column($sourceStreams, 'codec_type'));
-                if ($sourceStreamIndex === false) {
-                    // disable this stream type if the source does not contain it
-                    array_push($parameters, $disableParameter);
-                    continue;
-                }
-
-                $sourceStream = $sourceStreams[$sourceStreamIndex];
-            } else {
-                $sourceStream = [];
-            }
-
-            $preset = GeneralUtility::makeInstance(...$definition[$steamType]);
-            if (!$preset instanceof PresetInterface) {
-                $type = is_object($preset) ? get_class($preset) : gettype($preset);
-                throw new \RuntimeException("Expected " . PresetInterface::class . ", got $type");
-            }
-
-            if (isset($options[$steamType])) {
-                $preset->setOptions($options[$steamType]);
-            }
-
-            $streamParameters = $preset->getParameters($sourceStream);
-            if (!empty($streamParameters)) {
-                array_push($parameters, ...$streamParameters);
-            }
+            array_push($parameters, ...$preset['preset']->getParameters($preset['stream']));
         }
 
         if (!empty($definition['additionalParameters'])) {
@@ -128,12 +163,18 @@ class FormatRepository implements SingletonInterface
             'video' => $options['video'] ?? [],
         ];
 
-        if (isset($options['width']) && is_numeric($options['width'])) {
+        if (!empty($options['width'])) {
             $result['video']['maxWidth'] = intval($options['width']);
+            if (substr($options['width'], -1)) {
+                $result['video']['crop'] = true;
+            }
         }
 
-        if (isset($options['height']) && is_numeric($options['height'])) {
+        if (!empty($options['height'])) {
             $result['video']['maxHeight'] = intval($options['height']);
+            if (substr($options['height'], -1)) {
+                $result['video']['crop'] = true;
+            }
         }
 
         if (!empty($options['muted'])) {

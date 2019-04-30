@@ -22,7 +22,7 @@ use TYPO3\CMS\Core\Locking;
 use TYPO3\CMS\Core\Log\LogManager;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-class CloudConvertConverter implements VideoConverterInterface
+class CloudConvertConverter extends AbstractVideoConverter
 {
     const DB_TABLE = 'tx_hauptsachevideo_cloudconvert_process';
 
@@ -170,18 +170,7 @@ class CloudConvertConverter implements VideoConverterInterface
                 'timeout' => $task->getSourceFile()->getSize() / 1024 / 1024,
             ]);
 
-            $processedFile = $task->getTargetFile();
-            $processedFile->setName($task->getTargetFilename());
-            $processedFile->updateProperties([
-                'checksum' => $task->getConfigurationChecksum(),
-
-                // TODO figure out the real resolution
-                'width' => intval($task->getConfiguration()['width'] ?? 0),
-                'height' => intval($task->getConfiguration()['height'] ?? 0),
-            ]);
-
-            $processedFile->updateWithLocalFile($tempFilename);
-            $task->setExecuted(true);
+            $this->finishTask($task, $tempFilename, $info['streams']);
         } finally {
             GeneralUtility::unlink_tempfile($tempFilename);
         }

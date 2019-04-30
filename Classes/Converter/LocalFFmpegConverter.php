@@ -10,7 +10,7 @@ use TYPO3\CMS\Core\Log\LogManager;
 use TYPO3\CMS\Core\Utility\CommandUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-class LocalFFmpegConverter implements VideoConverterInterface
+class LocalFFmpegConverter extends AbstractVideoConverter
 {
     /**
      * Yes, i know, the CommandUtility is ment to be used statically.
@@ -27,14 +27,6 @@ class LocalFFmpegConverter implements VideoConverterInterface
 
     /**
      * @param VideoProcessingTask $task
-     */
-    public function start(VideoProcessingTask $task): void
-    {
-        // nothing to do here.
-    }
-
-    /**
-     * @param VideoProcessingTask $task
      *
      * @throws ConversionException
      */
@@ -47,19 +39,7 @@ class LocalFFmpegConverter implements VideoConverterInterface
         try {
             $formatRepository = GeneralUtility::makeInstance(FormatRepository::class);
             $this->ffmpeg($formatRepository->buildParameterString($localFile, $tempFilename, $task->getConfiguration(), $streams));
-
-            $processedFile = $task->getTargetFile();
-            $processedFile->setName($task->getTargetFilename());
-            $processedFile->updateProperties([
-                'checksum' => $task->getConfigurationChecksum(),
-
-                // TODO figure out the real resolution
-                'width' => intval($task->getConfiguration()['width']),
-                'height' => intval($task->getConfiguration()['height']),
-            ]);
-
-            $processedFile->updateWithLocalFile($tempFilename);
-            $task->setExecuted(true);
+            $this->finishTask($task, $tempFilename, $streams);
         } finally {
             GeneralUtility::unlink_tempfile($tempFilename);
         }
