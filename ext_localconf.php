@@ -82,8 +82,18 @@ call_user_func(function () {
         'preFileProcess'
     );
 
+    $dispatcher->connect(
+        \TYPO3\CMS\Core\Resource\Index\MetaDataRepository::class,
+        'recordPostRetrieval',
+        \Hn\HauptsacheVideo\Slot\MetaDataRepositorySlot::class,
+        'recordPostRetrieval'
+    );
+
     \TYPO3\CMS\Core\Resource\Rendering\RendererRegistry::getInstance()
         ->registerRendererClass(\Hn\HauptsacheVideo\Rendering\VideoTagRenderer::class);
+
+    \TYPO3\CMS\Core\Resource\Index\ExtractorRegistry::getInstance()
+        ->registerExtractionService(\Hn\HauptsacheVideo\VideoMetadataExtractor::class);
 
     if (TYPO3_MODE === 'BE') {
         $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['extbase']['commandControllers'][] =
