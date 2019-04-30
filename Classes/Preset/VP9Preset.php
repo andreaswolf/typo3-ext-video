@@ -17,7 +17,7 @@ class VP9Preset extends AbstractVideoPreset
      *
      * @see https://www.webmproject.org/vp9/levels/
      */
-    const LEVEL_DEFINITION = [
+    private const LEVEL_DEFINITION = [
         '1.0' => [36864, 829440, 512, 200, 1],
         '1.1' => [73728, 2764800, 768, 800, 1],
         '2.0' => [122880, 4608000, 960, 1800, 1],

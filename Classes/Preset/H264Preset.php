@@ -15,7 +15,7 @@ class H264Preset extends AbstractVideoPreset
      *
      * @see https://en.wikipedia.org/wiki/H.264/MPEG-4_AVC#Levels
      */
-    const LEVEL_DEFINITION = [
+    private const LEVEL_DEFINITION = [
         10 => [99, 1485, 64], // eg. 128×96@30 176×144@15
         11 => [396, 3000, 192], // eg. 176×144@30 352×288@7.5
         12 => [396, 6000, 384], // eg. 176×144@60 352×288@15
@@ -40,6 +40,9 @@ class H264Preset extends AbstractVideoPreset
         51 => [36864, 983040, 240000], // eg. 4096×2048@30
         52 => [36864, 2073600, 240000], // eg. 4096×2160@60
 
+        // levels below this line are fairly new and may not be interpreted as valid
+        // and even if they are, most hardware decoders won't be able to play them
+
         60 => [139264, 4177920, 240000], // eg. 8192×4320@30
         61 => [139264, 8355840, 480000], // eg. 8192×4320@60
         62 => [139264, 16711680, 800000], // eg. 8192×4320@120
@@ -49,7 +52,7 @@ class H264Preset extends AbstractVideoPreset
      * The side length of a macroblock. (16x16)
      * This value is required to calculate the max dimension in a level.
      */
-    const MACROBLOCK_SIZE = 16;
+    private const MACROBLOCK_SIZE = 16;
 
     /**
      * Defines implemented profiles.
@@ -57,7 +60,7 @@ class H264Preset extends AbstractVideoPreset
      *
      * @see https://en.wikipedia.org/wiki/H.264/MPEG-4_AVC#Levels
      */
-    const PROFILE_BITRATE_MULTIPLIER = [
+    private const PROFILE_BITRATE_MULTIPLIER = [
         'baseline' => 1.0,
         'main' => 1.0,
         'high' => 1.25,
@@ -76,7 +79,7 @@ class H264Preset extends AbstractVideoPreset
      * @see https://en.wikipedia.org/wiki/H.264/MPEG-4_AVC#Feature_support_in_particular_profiles
      * @see https://www.vocal.com/video/profiles-and-levels-in-h-264-avc/
      */
-    const PROFILES_ALLOWED_MAP = [
+    private const PROFILES_ALLOWED_MAP = [
         'baseline' => ['baseline'],
         'main' => ['main'],
         'high' => ['high', 'main'],
@@ -85,7 +88,7 @@ class H264Preset extends AbstractVideoPreset
     /**
      * @see H264Preset::$preset
      */
-    const PERFORMANCE_PRESETS = [
+    public const PERFORMANCE_PRESETS = [
         'ultrafast',
         'veryfast',
         'faster',
