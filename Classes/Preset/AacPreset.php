@@ -6,6 +6,33 @@ namespace Hn\HauptsacheVideo\Preset;
 class AacPreset extends AbstractAudioPreset
 {
     /**
+     * This table contains a very rough estimate what bitrates to expect from what vbr setting.
+     * This is in no way scientific and there should be a lot more testing.
+     * I noticed that the table that ffmpeg provides is way of ~ i'd like to know what im doing wrong.
+     *
+     * The table contains 2 conditions and one value
+     * 1 = the fdk profile for which to use this vbr value
+     * 2 = lower threshold bitrate per channel, use the row of which this value is lower than your target (only tested with stereo)
+     * 3 = the vbr value to use if the previous conditions are met
+     * The conditions must be processed in the order provided.
+     * If none of these match than a fallback is used using constant bitrate.
+     *
+     * @see https://hydrogenaud.io/index.php/topic,95989.0.html
+     * @see https://wiki.hydrogenaud.io/index.php?title=Fraunhofer_FDK_AAC#Bitrate_Modes
+     * @see \Hn\HauptsacheVideo\Preset\AacPreset::getFdkVbrValue
+     */
+    private const FDK_VBR_MAPPING = [
+        ['aac_low', 72, 5],
+        ['aac_low', 56, 4],
+        ['aac_low', 48, 3],
+        ['aac_low', 40, 2],
+        ['aac_low', 32, 1],
+        ['aac_he', 36, 3],
+        ['aac_he', 32, 2],
+        ['aac_he', 18, 1],
+    ];
+
+    /**
      * Weather ot not to use libfdk for audio encoding.
      * libfdk will sound better especially at lower bitrates than the native ffmpeg encoder.
      * However it is probably not present on your system unless you compiled ffmpeg yourself.
@@ -99,21 +126,60 @@ class AacPreset extends AbstractAudioPreset
         return false;
     }
 
-    protected function getEncoderParameters(array $sourceStream): array
+    protected function getFdkVbrValue(): ?int
+    {
+        $profile = $this->getProfile();
+        $bitrate = $this->getBitratePerChannel();
+        foreach (self::FDK_VBR_MAPPING as list($targetProfile, $targetBitrate, $vbrValue)) {
+            if ($profile !== $targetProfile) {
+                continue;
+            }
+
+            if ($targetBitrate > $bitrate) {
+                continue;
+            }
+
+            return $vbrValue;
+        }
+
+        return null;
+    }
+
+    protected function getFdkEncoderParameters(array $sourceStream): array
     {
         $parameters = [];
 
-        if ($this->isFdkAvailable()) {
-            array_push($parameters, '-c:a', 'libfdk_aac');
-            array_push($parameters, '-profile:a', $this->getProfile($sourceStream));
+        array_push($parameters, '-c:a', 'libfdk_aac');
+        array_push($parameters, '-profile:a', $this->getProfile());
+
+        $vbrValue = $this->getFdkVbrValue();
+        if ($vbrValue !== null) {
+            array_push($parameters, '-vbr:a', $vbrValue);
         } else {
-            array_push($parameters, '-c:a', 'aac');
-            // TODO experiment with a high-pass filter for lower bitrates ~ just like fdk does natively
+            array_push($parameters, '-b:a', $this->getBitrate($sourceStream) . 'k');
         }
 
+        return $parameters;
+    }
+
+    protected function getNativeEncoderParameters(array $sourceStream): array
+    {
+        $parameters = [];
+
+        array_push($parameters, '-c:a', 'aac');
         array_push($parameters, '-b:a', $this->getBitrate($sourceStream) . 'k');
+        // TODO experiment with a high-pass filter for lower bitrates ~ just like fdk does natively
 
         return $parameters;
+    }
+
+    protected function getEncoderParameters(array $sourceStream): array
+    {
+        if ($this->isFdkAvailable()) {
+            return $this->getFdkEncoderParameters($sourceStream);
+        } else {
+            return $this->getNativeEncoderParameters($sourceStream);
+        }
     }
 
     public function isFdkAvailable(): bool

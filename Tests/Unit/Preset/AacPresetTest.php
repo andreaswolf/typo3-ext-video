@@ -26,8 +26,8 @@ class AacPresetTest extends AbstractAudioPresetTest
             'libfdk_aac',
             '-profile:a',
             'aac_low',
-            '-b:a',
-            '128k',
+            '-vbr:a',
+            '4',
         ], $this->preset->getParameters([]));
     }
 
