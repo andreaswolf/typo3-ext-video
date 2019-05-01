@@ -19,6 +19,17 @@ class AacPreset extends AbstractAudioPreset
         return 'aac';
     }
 
+    public function getMimeCodecParameter(array $sourceStream): string
+    {
+        if ($this->requiresTranscoding($sourceStream)) {
+            $profile = ['aac_low' => '2', 'aac_he' => '5'][$this->getProfile()];
+        } else {
+            $profile = ['LC' => '2', 'HE-AAC' => '5'][$sourceStream['profile']];
+        }
+
+        return sprintf('mp4a.40.%s', $profile);
+    }
+
     protected function getSampleRates(): array
     {
         return [48000, 44100, 32000];
@@ -63,11 +74,12 @@ class AacPreset extends AbstractAudioPreset
     /**
      * Determines the aac profile to use.
      *
-     * @param array $sourceStream
+     * Note that this is the name of the profile that the fdk uses.
+     * mp4 metadata has a different name.
      *
      * @return string
      */
-    protected function getProfile(array $sourceStream): string
+    protected function getProfile(): string
     {
         // with 40 kbit/s per channel (80 kbit/s stereo) use he-aac since it'll sound better
         return $this->getBitratePerChannel() <= 40 ? 'aac_he' : 'aac_low';

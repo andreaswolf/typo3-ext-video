@@ -26,3 +26,8 @@ CREATE TABLE `tx_hauptsachevideo_cloudconvert_process`
   PRIMARY KEY (`uid`),
   UNIQUE KEY `process` (`file`, `mode`, `options`),
 );
+
+CREATE TABLE `sys_file_processedfile`
+(
+    `mime_type` varchar(255) NOT NULL DEFAULT '',
+);

@@ -78,4 +78,11 @@ class AacPresetTest extends AbstractAudioPresetTest
 
         $this->assertEquals($mapping, $result, '', 8);
     }
+
+    public function testGetMimeCodecParameter()
+    {
+        $this->assertEquals('mp4a.40.2', $this->preset->getMimeCodecParameter([]));
+        $this->preset->setQuality(0.0);
+        $this->assertEquals('mp4a.40.5', $this->preset->getMimeCodecParameter([]));
+    }
 }

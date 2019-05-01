@@ -1,7 +1,7 @@
 <?php
 
-use Hn\HauptsacheVideo\Preset;
 use Hn\HauptsacheVideo\Converter;
+use Hn\HauptsacheVideo\Preset;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 if (!defined('TYPO3_MODE')) {
@@ -27,10 +27,10 @@ call_user_func(function () {
 
     // mp4 general
     // it should work almost anywhere ~ except maybe old low-cost android devices and feature phones
-    // the level supports ~720p
     if (empty($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['hauptsache_video']['formats']['mp4:default'])) {
         $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['hauptsache_video']['formats']['mp4:default'] = [
             'fileExtension' => 'mp4',
+            'mimeType' => 'video/mp4',
             'video' => [Preset\H264Preset::class, $h264Defaults],
             'audio' => [Preset\AacPreset::class, $aacDefaults],
             'additionalParameters' => $mp4Defaults,
@@ -42,6 +42,7 @@ call_user_func(function () {
     if (empty($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['hauptsache_video']['formats']['webm:default'])) {
         $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['hauptsache_video']['formats']['webm:default'] = [
             'fileExtension' => 'webm',
+            'mimeType' => 'video/webm',
             'video' => [Preset\VP9Preset::class, $vp9Defaults],
             'audio' => [Preset\OpusPreset::class, $opusDefaults],
             'additionalParameters' => $webmDefaults,
@@ -53,7 +54,8 @@ call_user_func(function () {
     // ~ it is more efficient than mp3 and has nearly the same browser support
     if (empty($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['hauptsache_video']['formats']['m4a:default'])) {
         $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['hauptsache_video']['formats']['m4a:default'] = [
-            'fileExtension' => 'mp4',
+            'fileExtension' => 'm4a',
+            'mimeType' => 'audio/mp4',
             'audio' => [Preset\AacPreset::class, $aacDefaults],
             'additionalParameters' => $mp4Defaults,
         ];
@@ -75,6 +77,7 @@ call_user_func(function () {
         = \Hn\HauptsacheVideo\Processing\VideoProcessingEid::class . '::process';
 
     $dispatcher = GeneralUtility::makeInstance(\TYPO3\CMS\Extbase\SignalSlot\Dispatcher::class);
+
     $dispatcher->connect(
         \TYPO3\CMS\Core\Resource\ResourceStorage::class,
         \TYPO3\CMS\Core\Resource\Service\FileProcessingService::SIGNAL_PreFileProcess,

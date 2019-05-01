@@ -46,6 +46,16 @@ class VP9Preset extends AbstractVideoPreset
      */
     private $speed = 2;
 
+    public function getCodecName(): string
+    {
+        return 'vp9';
+    }
+
+    public function getMimeCodecParameter(array $sourceStream): string
+    {
+        return 'vp9.0';
+    }
+
     /**
      * @return array
      */
@@ -84,17 +94,6 @@ class VP9Preset extends AbstractVideoPreset
     protected function getMaxTiles(): int
     {
         return $this->getLevelDefinition()[4];
-    }
-
-    /**
-     * The short name of this codec.
-     * It must match with the codec type ffprobe reports.
-     *
-     * @return string
-     */
-    public function getCodecName(): string
-    {
-        return 'vp9';
     }
 
     protected function getScaleFactor(array $sourceDimensions): float

@@ -25,4 +25,15 @@ interface PresetInterface
      * @return array
      */
     public function getParameters(array $sourceStream): array;
+
+    /**
+     * Has to build the current codec mime parameter necessary.
+     * This is necessary for the html type parameter.
+     *
+     * @return string
+     * @see https://www.ietf.org/rfc/rfc4281.txt
+     * @see https://wiki.whatwg.org/wiki/video_type_parameters
+     * @see https://chromium.googlesource.com/chromium/src/media/+/master/base/mime_util_internal.cc
+     */
+    public function getMimeCodecParameter(array $sourceStream): ?string;
 }

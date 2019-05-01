@@ -57,14 +57,14 @@ class FormatRepositoryTest extends UnitTestCase
     {
         $videoPreset = $this->createMock(PresetInterface::class);
         GeneralUtility::addInstance(get_class($videoPreset), $videoPreset);
-        $videoPreset->expects($this->once())->method('setOptions')->with([]);
+        $videoPreset->expects($this->once())->method('setOptions')->with(['x' => 'y']);
         $videoPreset->expects($this->once())->method('getParameters')->with([])->willReturn(['-c:v', 'libx264']);
 
         $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['hauptsache_video']['formats']['mp4:default'] = [
             'video' => [get_class($videoPreset)],
         ];
 
-        $this->assertEquals(['-c:v', 'libx264', '-an', '-sn', '-dn'], $this->repository->buildParameters(null, null, ['format' => 'mp4']));
+        $this->assertEquals(['-c:v', 'libx264', '-an', '-sn', '-dn'], $this->repository->buildParameters(null, null, ['format' => 'mp4', 'video' => ['x' => 'y']]));
     }
 
 }

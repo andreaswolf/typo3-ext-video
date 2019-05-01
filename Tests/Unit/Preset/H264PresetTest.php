@@ -97,4 +97,19 @@ class H264PresetTest extends AbstractVideoPresetTest
         }
     }
 
+    public function testGetMimeCodecParameter()
+    {
+        $this->assertEquals('avc1.4D401E', $this->preset->getMimeCodecParameter([]));
+
+        $this->preset->setProfile('high');
+        $this->assertEquals('avc1.64001E', $this->preset->getMimeCodecParameter([]));
+
+        $this->preset->setProfile('baseline');
+        $this->assertEquals('avc1.42E01E', $this->preset->getMimeCodecParameter([]));
+
+        $this->preset->setProfile('high');
+        $this->preset->setLevel(40);
+        $this->assertEquals('avc1.640028', $this->preset->getMimeCodecParameter([]));
+    }
+
 }

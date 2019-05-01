@@ -74,13 +74,16 @@ class FormatRepository implements SingletonInterface
 
     public function getProperties(array $options = [], array $sourceStreams = null): array
     {
-        $properties = [];
+        $properties = [
+            'mime_type' => $this->buildMimeType($options, $sourceStreams),
+        ];
+
         $presets = $this->getPresets($options, $sourceStreams);
-        foreach ($presets as $preset) {
-            if ($preset['preset'] instanceof AbstractVideoPreset) {
-                list($properties['width'], $properties['height']) = $preset['preset']->getDimensions($preset['stream']);
-            }
+        if (isset($presets['video']) && $presets['video']['preset'] instanceof AbstractVideoPreset) {
+            $dimensions = $presets['video']['preset']->getDimensions($presets['video']['stream']);
+            list($properties['width'], $properties['height']) = $dimensions;
         }
+
         return $properties;
     }
 
@@ -145,6 +148,41 @@ class FormatRepository implements SingletonInterface
     }
 
     /**
+     * Builds the source type parameter.
+     *
+     * @param array $options
+     * @param array $sourceStream
+     *
+     * @return string
+     * @see https://wiki.whatwg.org/wiki/video_type_parameters
+     */
+    public function buildMimeType(array $options, array $sourceStream = null): string
+    {
+        $options = $this->normalizeOptions($options);
+        $definition = $this->findFormatDefinition($options);
+        if (!isset($definition['mimeType'])) {
+            throw new \RuntimeException("A format is missing it's mimeType: " . print_r($definition, true));
+        }
+
+        $result = [$definition['mimeType']];
+
+        $codecs = [];
+        /** @var PresetInterface $preset */
+        foreach ($this->getPresets($options, $sourceStream) as list('preset' => $preset)) {
+            $codec = $preset->getMimeCodecParameter($sourceStream ?? []);
+            if ($codec !== null) {
+                $codecs[] = $codec;
+            }
+        }
+
+        if (!empty($codecs)) {
+            $result[] = 'codecs="' . implode(', ', $codecs) . '"';
+        }
+
+        return implode('; ', $result);
+    }
+
+    /**
      * This method normalizes the given options. This is important to prevent unnecessary reencodes.
      *
      * It is currently not possible to hook into the typo3 processing pipeline before it searches for a processed file.
@@ -159,20 +197,24 @@ class FormatRepository implements SingletonInterface
     {
         $result = [
             'format' => $options['format'] ?? 'mp4',
-            'audio' => $options['audio'] ?? [],
-            'video' => $options['video'] ?? [],
         ];
+
+        foreach (['audio', 'video', 'subtitles', 'data'] as $streamType) {
+            if (!empty($options[$streamType])) {
+                $result[$streamType] = $options[$streamType];
+            }
+        }
 
         if (!empty($options['width'])) {
             $result['video']['maxWidth'] = intval($options['width']);
-            if (substr($options['width'], -1)) {
+            if (preg_match('#c$#i', $options['width'])) {
                 $result['video']['crop'] = true;
             }
         }
 
         if (!empty($options['height'])) {
             $result['video']['maxHeight'] = intval($options['height']);
-            if (substr($options['height'], -1)) {
+            if (preg_match('#c$#i', $options['height'])) {
                 $result['video']['crop'] = true;
             }
         }
@@ -189,6 +231,6 @@ class FormatRepository implements SingletonInterface
             $result['duration'] = $options['duration'];
         }
 
-        return $result;
+        return array_filter($result); // remove all empty/falsy values from the first level
     }
 }

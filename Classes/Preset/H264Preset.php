@@ -133,6 +133,19 @@ class H264Preset extends AbstractVideoPreset
         return 'h264';
     }
 
+    public function getMimeCodecParameter(array $sourceStream): string
+    {
+        $requiresTranscoding = $this->requiresTranscoding($sourceStream);
+        $profile = $requiresTranscoding ? $this->getProfile() : strtolower($sourceStream['profile']);
+        $level = $requiresTranscoding ? $this->getLevel() : $sourceStream['level'];
+
+        return sprintf(
+            'avc1.%04s%02s',
+            ['baseline' => '42E0', 'main' => '4D40', 'high' => '6400'][$profile],
+            strtoupper(dechex($level))
+        );
+    }
+
     /**
      * This method determines the macroblock limit per frame.
      * This value is influenced by the level and the _max_ framerate.

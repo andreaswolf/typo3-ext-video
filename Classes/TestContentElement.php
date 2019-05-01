@@ -65,7 +65,7 @@ class TestContentElement
                 }
 
                 $renderer = RendererRegistry::getInstance()->getRenderer($file);
-                $content .= $renderer->render($file, 1280, 720, $configuration);
+                $content .= $renderer->render($file, 0, 0, $configuration);
                 $content .= '</figure>';
             }
         }

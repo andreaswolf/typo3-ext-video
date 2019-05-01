@@ -10,6 +10,11 @@ class OpusPreset extends AbstractAudioPreset
         return 'opus';
     }
 
+    public function getMimeCodecParameter(array $sourceStream): string
+    {
+        return 'opus';
+    }
+
     protected function getSampleRates(): array
     {
         return [48000];
