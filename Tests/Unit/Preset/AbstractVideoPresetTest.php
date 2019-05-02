@@ -86,7 +86,8 @@ class AbstractVideoPresetTest extends AbstractPresetTest
         $this->assertEquals(0.8, $this->preset->getBoostedQuality([]), '', 0.01);
         $this->assertEquals(0.8, $this->preset->getBoostedQuality(['width' => 1920, 'height' => 1080]), '', 0.01);
         $this->assertEquals(0.8, $this->preset->getBoostedQuality(['width' => 1280, 'height' => 720]), '', 0.01);
-        $this->assertEquals(0.85, $this->preset->getBoostedQuality(['width' => 1200, 'height' => 675]), '', 0.01);
-        $this->assertEquals(1.0, $this->preset->getBoostedQuality(['width' => 640, 'height' => 360]), '', 0.01);
+        $this->assertEquals(0.85, $this->preset->getBoostedQuality(['width' => 1100, 'height' => 600]), '', 0.01);
+        $this->assertEquals(0.95, $this->preset->getBoostedQuality(['width' => 640, 'height' => 360]), '', 0.01);
+        $this->assertEquals(1.0, $this->preset->getBoostedQuality(['width' => 320, 'height' => 240]), '', 0.01);
     }
 }

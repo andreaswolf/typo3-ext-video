@@ -161,6 +161,6 @@ abstract class AbstractCompressiblePreset extends AbstractPreset
             throw new \RuntimeException("Quality must be equal or below 1.0");
         }
 
-        $this->quality = $quality;
+        $this->quality = round($quality * 20) / 20;
     }
 }

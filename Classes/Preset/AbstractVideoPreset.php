@@ -200,10 +200,10 @@ abstract class AbstractVideoPreset extends AbstractCompressiblePreset
      * - if you build some form of adaptive streaming but only have a low-res video
      *   than the higher quality settings will still increase the quality without wasting bandwidth by upscaling
      *
-     * The quality is multiplied by the dimension difference.
-     * So if the source video is 720p but you wanted 1080p than the boost will be 1.5.
-     * If your requested quality was 0.8 than 0.8 * 1.5 would result in a quality ~1.2 or 1.0 since that is the max.
-     * If your requested quality was 0.6 than 0.6 * 1.5 would result in a quality ~0.9
+     * The quality is multiplied by the dimension difference to the power of 0.25.
+     * So if the source video is 720p but you wanted 1080p than the boost will be 1.5 ** 0.25 so ~1.1.
+     * If your requested quality was 0.8 than the quality would be quality ~0.9
+     * If your requested quality was 0.6 than the quality would be quality ~0.65
      *
      * @param array $sourceStream
      *
@@ -225,7 +225,8 @@ abstract class AbstractVideoPreset extends AbstractCompressiblePreset
             return $this->getQuality();
         }
 
-        return min(1.0, $this->getQuality() * min($scaleFactors));
+        $boostFactor = min($scaleFactors) ** 0.25;
+        return min(1.0, round($this->getQuality() * $boostFactor * 20) / 20);
     }
 
     /**
