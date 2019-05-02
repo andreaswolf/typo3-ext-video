@@ -2,7 +2,7 @@
 converter = LocalFFmpeg
 
 # cat=basic; type=string; label=CloudConvert Api-Key:If you want to use CloudConvert than you'll need to define this.
-cloudconvertApiKey =
+cloudConvertApiKey =
 
 # cat=basic; type=boolean; label=FDK AAC available:Enable this if your local ffmpeg instance can encode using libfdk_aac. This encoder creates noticeably better audio quality especially at lower bitrates. This options is ignored if CloudConvert is used since they have fdk available and not using it would be a waste.
 fdkAvailable = 0

@@ -71,7 +71,7 @@ call_user_func(function () {
 
     $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['hauptsache_video']['video_converters'] = [
         'LocalFFmpeg' => [Converter\LocalFFmpegConverter::class],
-        'CloudConvert' => [Converter\CloudConvertConverter::class, $conf['cloudconvertApiKey'] ?? ''],
+        'CloudConvert' => [Converter\CloudConvertConverter::class, $conf['cloudConvertApiKey'] ?? ''],
     ];
 
     if (!isset($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['hauptsache_video']['video_converter'])) {
