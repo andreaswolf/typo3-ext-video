@@ -206,24 +206,6 @@ class FormatRepository implements SingletonInterface
             }
         }
 
-        if (!empty($options['width'])) {
-            $result['video']['maxWidth'] = intval($options['width']);
-            if (preg_match('#c$#i', $options['width'])) {
-                $result['video']['crop'] = true;
-            }
-        }
-
-        if (!empty($options['height'])) {
-            $result['video']['maxHeight'] = intval($options['height']);
-            if (preg_match('#c$#i', $options['height'])) {
-                $result['video']['crop'] = true;
-            }
-        }
-
-        if (!empty($options['muted'])) {
-            $result['audio']['disabled'] = true;
-        }
-
         if (!empty($options['start'])) {
             $result['start'] = $options['start'];
         }
