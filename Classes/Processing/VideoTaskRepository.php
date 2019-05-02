@@ -39,6 +39,7 @@ class VideoTaskRepository implements SingletonInterface
             'file' => $task->getSourceFile()->getUid(),
             'configuration' => serialize($task->getConfiguration()),
             'status' => $task->getStatus(),
+            'priority' => $task->getPriority(),
         ];
 
         if ($this->tasks->contains($task)) {
@@ -49,6 +50,19 @@ class VideoTaskRepository implements SingletonInterface
             $id = $this->connection->lastInsertId(self::TABLE_NAME);
             $this->tasks->attach($task, $id);
         }
+    }
+
+    /**
+     * @return QueryBuilder
+     */
+    private function createQueryBuilder(): QueryBuilder
+    {
+        $qb = $this->connection->createQueryBuilder();
+        $qb->from(self::TABLE_NAME, 'task');
+        $qb->select('task.uid', 'task.file', 'task.configuration', 'task.status');
+        $qb->addOrderBy('task.priority', 'desc');
+        $qb->addOrderBy('task.uid', 'asc');
+        return $qb;
     }
 
     /**
@@ -66,26 +80,13 @@ class VideoTaskRepository implements SingletonInterface
         $qb->setParameter('configuration', serialize($task->getConfiguration()));
         $qb->andWhere($qb->expr()->eq('task.configuration', ':configuration'));
 
-        $qb->orderBy('task.uid', 'desc');
         $qb->setMaxResults(1);
-
         $row = $qb->execute()->fetch();
         if (!$row) {
             return null;
         }
 
         return $this->serializeTask($row);
-    }
-
-    /**
-     * @return QueryBuilder
-     */
-    private function createQueryBuilder(): QueryBuilder
-    {
-        $qb = $this->connection->createQueryBuilder();
-        $qb->from(self::TABLE_NAME, 'task');
-        $qb->select('task.uid', 'task.file', 'task.configuration', 'task.status');
-        return $qb;
     }
 
     protected function serializeTask(array $row): VideoProcessingTask
@@ -126,7 +127,6 @@ class VideoTaskRepository implements SingletonInterface
 
         $qb->setParameter('status', $status);
         $qb->andWhere($qb->expr()->eq('task.status', ':status'));
-        $qb->orderBy('task.uid', 'asc');
 
         $rows = $qb->execute()->fetchAll();
         return array_map([$this, 'serializeTask'], $rows);

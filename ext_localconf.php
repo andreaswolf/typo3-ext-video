@@ -61,6 +61,14 @@ call_user_func(function () {
         ];
     }
 
+    // this is the default format list used for video
+    // the order will be the same as in the final source definition
+    // it should reflect which format the browser should choose
+    $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['hauptsache_video']['default_video_formats'] = [
+        'webm' => ['priority' => -1 /* this takes longer so create it last even though the browser should prefer it*/],
+        'mp4' => [],
+    ];
+
     $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['hauptsache_video']['video_converters'] = [
         'LocalFFmpeg' => [Converter\LocalFFmpegConverter::class],
         'CloudConvert' => [Converter\CloudConvertConverter::class, $conf['cloudconvertApiKey'] ?? ''],

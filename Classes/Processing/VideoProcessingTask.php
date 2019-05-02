@@ -89,4 +89,9 @@ class VideoProcessingTask extends AbstractTask
                 throw new \RuntimeException("Status $status does not exist");
         }
     }
+
+    public function getPriority(): int
+    {
+        return $this->getConfiguration()['priority'] ?? 0;
+    }
 }

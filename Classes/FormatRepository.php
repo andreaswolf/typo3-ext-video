@@ -197,6 +197,7 @@ class FormatRepository implements SingletonInterface
     {
         $result = [
             'format' => $options['format'] ?? 'mp4',
+            'priority' => (int)($options['priority'] ?? 0),
         ];
 
         foreach (['audio', 'video', 'subtitles', 'data'] as $streamType) {

@@ -116,12 +116,12 @@ class VideoTagRenderer implements Resource\Rendering\FileRendererInterface
         $sources = [];
 
         // TODO make this more configurable
-        $formats = (array)($options['formats'] ?? $options['format'] ?? ['webm', 'mp4']);
-        foreach ($formats as $format) {
+        $formats = $options['formats'] ?? $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['hauptsache_video']['default_video_formats'];
+        foreach ($formats as $formatKey => $formatOptions) {
             $sourceOptions = FormatRepository::normalizeOptions(array_replace(
                 $options,
-                $options[$format] ?? [],
-                ['format' => $format]
+                ['format' => $formatKey],
+                $formatOptions
             ));
 
             $video = $file->process('Video.CropScale', $sourceOptions);
