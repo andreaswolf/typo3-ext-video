@@ -3,8 +3,8 @@
 namespace Hn\HauptsacheVideo;
 
 
-use TYPO3\CMS\Core\Resource\Index\ExtractorInterface;
 use TYPO3\CMS\Core\Resource;
+use TYPO3\CMS\Core\Resource\Index\ExtractorInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
@@ -15,30 +15,6 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  */
 class VideoMetadataExtractor implements ExtractorInterface
 {
-    const AUDIO_MIME_TYPES = [
-        'audio/aac',
-        'audio/mpeg',
-        'audio/ogg',
-        'application/ogg',
-        'audio/wav',
-        'audio/webm',
-        'audio/3gpp',
-        'audio/3gpp2',
-    ];
-
-    const VIDEO_MIME_TYPES = [
-        'video/mp4',
-        'video/x-matroska',
-        'video/quicktime',
-        'video/x-msvideo',
-        'video/mpeg',
-        'video/ogg',
-        'application/ogg',
-        'video/webm',
-        'video/3gpp',
-        'video/3gpp2',
-    ];
-
     private $getID3;
 
     public function __construct()
@@ -127,8 +103,8 @@ class VideoMetadataExtractor implements ExtractorInterface
             return false;
         }
 
-        $mimeType = $file->getMimeType();
-        return in_array($mimeType, self::VIDEO_MIME_TYPES) || in_array($mimeType, self::AUDIO_MIME_TYPES);
+        $allowedTypes = array_merge(TypeUtility::VIDEO_MIME_TYPES, TypeUtility::AUDIO_MIME_TYPES);
+        return TypeUtility::inList($file->getMimeType(), $allowedTypes);
     }
 
     /**

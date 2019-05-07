@@ -4,7 +4,7 @@ namespace Hn\HauptsacheVideo\Rendering;
 
 
 use Hn\HauptsacheVideo\FormatRepository;
-use Hn\HauptsacheVideo\VideoMetadataExtractor;
+use Hn\HauptsacheVideo\TypeUtility;
 use TYPO3\CMS\Core\Resource;
 
 class VideoTagRenderer implements Resource\Rendering\FileRendererInterface
@@ -34,7 +34,7 @@ class VideoTagRenderer implements Resource\Rendering\FileRendererInterface
      */
     public function canRender(Resource\FileInterface $file)
     {
-        return in_array($file->getMimeType(), VideoMetadataExtractor::VIDEO_MIME_TYPES, true)
+        return TypeUtility::inList($file->getMimeType(), TypeUtility::VIDEO_MIME_TYPES)
             && $file->getProperty('width') && $file->getProperty('height');
     }
 
