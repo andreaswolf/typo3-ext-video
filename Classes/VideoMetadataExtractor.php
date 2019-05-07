@@ -103,8 +103,7 @@ class VideoMetadataExtractor implements ExtractorInterface
             return false;
         }
 
-        $allowedTypes = array_merge(TypeUtility::VIDEO_MIME_TYPES, TypeUtility::AUDIO_MIME_TYPES);
-        return TypeUtility::inList($file->getMimeType(), $allowedTypes);
+        return TypeUtility::inList($file->getMimeType(), TypeUtility::VIDEO_MIME_TYPES);
     }
 
     /**

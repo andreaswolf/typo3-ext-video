@@ -31,3 +31,8 @@ CREATE TABLE `sys_file_processedfile`
 (
     `mime_type` varchar(255) NOT NULL DEFAULT '',
 );
+
+CREATE TABLE `sys_file_metadata`
+(
+    `video_metadata_extraction_tried` tinyint(1) NOT NULL DEFAULT '0',
+);
