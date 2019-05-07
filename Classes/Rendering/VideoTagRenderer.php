@@ -35,7 +35,6 @@ class VideoTagRenderer implements Resource\Rendering\FileRendererInterface
     public function canRender(Resource\FileInterface $file)
     {
         return in_array($file->getMimeType(), VideoMetadataExtractor::VIDEO_MIME_TYPES, true)
-            && !$file instanceof Resource\ProcessedFile // i only handle the unprocessed files to avoid reprocessing
             && $file->getProperty('width') && $file->getProperty('height');
     }
 
@@ -57,16 +56,16 @@ class VideoTagRenderer implements Resource\Rendering\FileRendererInterface
         $width = $width ?: $file->getProperty('width');
         $height = $height ?: $file->getProperty('height');
 
-        if (preg_match('/[cm]$/', $width)) {
-            $width = (int)min($width, $height * $file->getProperty('width') / $file->getProperty('height'));
+        if (preg_match('/m$/', $width)) {
+            $width = min($width, $height * $file->getProperty('width') / $file->getProperty('height'));
         }
 
-        if (preg_match('/[cm]$/', $height)) {
-            $height = (int)min($height, $width * $file->getProperty('height') / $file->getProperty('width'));
+        if (preg_match('/m$/', $height)) {
+            $height = min($height, $width * $file->getProperty('height') / $file->getProperty('width'));
         }
 
-        $attributes[] = 'width="' . $width . '"';
-        $attributes[] = 'height="' . $height . '"';
+        $attributes[] = 'width="' . round($width) . '"';
+        $attributes[] = 'height="' . round($height) . '"';
 
         if ($options['passive'] ?? false) {
             $options += [
@@ -104,6 +103,17 @@ class VideoTagRenderer implements Resource\Rendering\FileRendererInterface
 
     protected function buildSources(Resource\FileInterface $file, array $options, $usedPathsRelativeToCurrentScript): array
     {
+        // do not process a processed file
+        if ($file instanceof Resource\ProcessedFile) {
+            return [
+                sprintf(
+                    '<source src="%s" type="%s" />',
+                    htmlspecialchars($file->getPublicUrl($usedPathsRelativeToCurrentScript)),
+                    htmlspecialchars($file->getMimeType())
+                ),
+            ];
+        }
+
         if ($file instanceof Resource\FileReference) {
             $file = $file->getOriginalFile();
         }
@@ -115,7 +125,6 @@ class VideoTagRenderer implements Resource\Rendering\FileRendererInterface
 
         $sources = [];
 
-        // TODO make this more configurable
         $formats = $options['formats'] ?? $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['hauptsache_video']['default_video_formats'];
         foreach ($formats as $formatKey => $formatOptions) {
             $sourceOptions = FormatRepository::normalizeOptions(array_replace(
