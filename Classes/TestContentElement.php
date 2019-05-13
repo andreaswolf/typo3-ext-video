@@ -52,20 +52,23 @@ class TestContentElement
                 $processedFile = $file->process('Video.CropScale', $configuration);
 
                 $json = json_encode($configuration, JSON_UNESCAPED_SLASHES);
-                $content .= '<pre>' . htmlspecialchars($json) . '</pre>';
+                $content .= '<div><code>' . htmlspecialchars($json) . '</code></div>';
 
                 if ($processedFile->exists()) {
                     if ($processedFile->hasProperty('ffmpeg')) {
                         $command = $processedFile->getProperty('ffmpeg');
-                        $content .= "<pre>ffmpeg -i {input-file} $command {output-file}</pre>";
+                        $content .= "<div><code>ffmpeg -i {input-file} $command {output-file}</code></div>";
                     }
 
                     $size = round($processedFile->getSize() / 1024) . ' kB';
                     $content .= "<div>size: $size</div>";
+
+                    $renderer = RendererRegistry::getInstance()->getRenderer($processedFile);
+                    $content .= $renderer->render($processedFile, 0, 0, $configuration);
+                } else {
+                    $content .= "<div>file is still processing</div>";
                 }
 
-                $renderer = RendererRegistry::getInstance()->getRenderer($processedFile);
-                $content .= $renderer->render($processedFile, 0, 0, $configuration);
                 $content .= '</figure>';
             }
         }
