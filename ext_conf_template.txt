@@ -10,5 +10,5 @@ fdkAvailable = 0
 # cat=basic; type=boolean; label=Enable test element:This will add a content element to your instance with which you can easily test different video settings
 testElement = 0
 
-# cat=basic; type=options[Very slow=0,Slow=1,Medium (default)=2,Testing=3]; label=Performance:Quickly change the tradeof between conversion speed and quality. These presets match from the meaning the x264 presets but also affect other codecs. The Testing setting will configure everything to run as fast as possible. This can be useful for testing but the quality will suffer significantly.
-performance = 2
+# cat=basic; type=options[h264:ultrafast (for testing)=0,h264:medium=1,h264:slow (default)=2,h264:veryslow=3,h264:slow vp9:2 (good compromise)=4,h264:veryslow vp9:1=5]; label=Performance Preset:Quickly change the tradeof between conversion speed and quality.
+preset = 2

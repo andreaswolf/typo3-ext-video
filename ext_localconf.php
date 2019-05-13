@@ -13,40 +13,48 @@ call_user_func(function () {
         ? GeneralUtility::makeInstance(\TYPO3\CMS\Core\Configuration\ExtensionConfiguration::class)->get('hauptsache_video')
         : unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['hauptsache_video']);
 
+    // parse performance syntax
     // a great chart comparing encoding speeds vs quality can be found here:
     // https://blogs.gnome.org/rbultje/2015/09/28/vp9-encodingdecoding-performance-vs-hevch-264/
-    $h264Defaults = ['preset' => ['veryslow', 'slow', 'medium', 'ultrafast'][$conf['performance'] ?? 2]];
-    $vp9Defaults = ['speed' => ([0, 1, 2, 5][$conf['performance'] ?? 2])];
+    $performanceOptions = [
+        // @formatter:off
+        'h264' => ['ultrafast', 'medium', 'slow', 'veryslow', 'slow', 'veryslow'][$conf['preset'] ?? 2],
+        'vp0' =>  [ null      ,  null   ,  null ,  null     ,  2    ,  1        ][$conf['preset'] ?? 2],
+        // @formatter:on
+    ];
+
+    $h264Defaults = [Preset\H264Preset::class, ['preset' => $performanceOptions['h264']]];
     $aacDefaults = ['fdkAvailable' => !empty($conf['fdkAvailable']) || ($conf['converter'] ?? '') === 'CloudConvert'];
-    $opusDefaults = [];
     $mp4Defaults = ['-movflags', '+faststart', '-map_metadata', '-1', '-f', 'mp4'];
+    $vp9Defaults = ['speed' => $performanceOptions['vp9']];
     $webmDefaults = ['-map_metadata', '-1', '-f', 'webm'];
-    if (($conf['performance'] ?? 1) >= 4) {
-        array_push($mp4Defaults, '-sws_flags', 'neighbor');
-    }
 
     // mp4 general
     // it should work almost anywhere ~ except maybe old low-cost android devices and feature phones
     if (empty($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['hauptsache_video']['formats']['mp4:default'])) {
-        $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['hauptsache_video']['formats']['mp4:default'] = [
-            'fileExtension' => 'mp4',
-            'mimeType' => 'video/mp4',
-            'video' => [Preset\H264Preset::class, $h264Defaults],
-            'audio' => [Preset\AacPreset::class, $aacDefaults],
-            'additionalParameters' => $mp4Defaults,
-        ];
+        if (isset($performanceOptions['h264'])) {
+            $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['hauptsache_video']['formats']['mp4:default'] = [
+                'fileExtension' => 'mp4',
+                'mimeType' => 'video/mp4',
+                'video' => $h264Defaults,
+                'audio' => [Preset\AacPreset::class, $aacDefaults],
+                'additionalParameters' => $mp4Defaults,
+            ];
+        }
     }
 
     // webm video
     // higher efficiency than h264 but lacks support in safari
     if (empty($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['hauptsache_video']['formats']['webm:default'])) {
-        $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['hauptsache_video']['formats']['webm:default'] = [
-            'fileExtension' => 'webm',
-            'mimeType' => 'video/webm',
-            'video' => [Preset\VP9Preset::class, $vp9Defaults],
-            'audio' => [Preset\OpusPreset::class, $opusDefaults],
-            'additionalParameters' => $webmDefaults,
-        ];
+        if (isset($performanceOptions['vp9'])) {
+            $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['hauptsache_video']['formats']['webm:default'] = [
+                'fileExtension' => 'webm',
+                'mimeType' => 'video/webm',
+                'video' => [Preset\VP9Preset::class, $vp9Defaults],
+                'audio' => [Preset\OpusPreset::class],
+                'additionalParameters' => $webmDefaults,
+            ];
+        }
     }
 
     // m4a audio
@@ -64,10 +72,15 @@ call_user_func(function () {
     // this is the default format list used for video
     // the order will be the same as in the final source definition
     // it should reflect which format the browser should choose
-    $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['hauptsache_video']['default_video_formats'] = [
-        'webm' => ['priority' => -1 /* this takes longer so create it last even though the browser should prefer it*/],
-        'mp4' => [],
-    ];
+    if (empty($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['hauptsache_video']['default_video_formats'])) {
+        $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['hauptsache_video']['default_video_formats'] = [];
+
+        if (isset($performanceOptions['vp9'])) {
+            $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['hauptsache_video']['default_video_formats']['webm'] = ['priority' => -1];
+        }
+
+        $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['hauptsache_video']['default_video_formats']['mp4'] = [];
+    }
 
     $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['hauptsache_video']['video_converters'] = [
         'LocalFFmpeg' => [Converter\LocalFFmpegConverter::class],
