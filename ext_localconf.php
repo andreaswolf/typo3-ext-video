@@ -2,7 +2,6 @@
 
 use Hn\HauptsacheVideo\Converter;
 use Hn\HauptsacheVideo\Preset;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 if (!defined('TYPO3_MODE')) {
     die('Access denied.');
@@ -10,7 +9,7 @@ if (!defined('TYPO3_MODE')) {
 
 call_user_func(function () {
     $conf = class_exists(\TYPO3\CMS\Core\Configuration\ExtensionConfiguration::class)
-        ? GeneralUtility::makeInstance(\TYPO3\CMS\Core\Configuration\ExtensionConfiguration::class)->get('hauptsache_video')
+        ? \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Core\Configuration\ExtensionConfiguration::class)->get('hauptsache_video')
         : unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['hauptsache_video']);
 
     // parse performance syntax
@@ -97,7 +96,7 @@ call_user_func(function () {
     $GLOBALS['TYPO3_CONF_VARS']['FE']['eID_include']['hauptsache_video']
         = \Hn\HauptsacheVideo\Processing\VideoProcessingEid::class . '::process';
 
-    $dispatcher = GeneralUtility::makeInstance(\TYPO3\CMS\Extbase\SignalSlot\Dispatcher::class);
+    $dispatcher = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Extbase\SignalSlot\Dispatcher::class);
 
     $dispatcher->connect(
         \TYPO3\CMS\Core\Resource\ResourceStorage::class,
@@ -125,7 +124,7 @@ call_user_func(function () {
     }
 
     if (empty($GLOBALS['TYPO3_CONF_VARS']['LOG']['Hn']['HauptsacheVideo'])) {
-        $isDev = GeneralUtility::getApplicationContext()->isDevelopment();
+        $isDev = \TYPO3\CMS\Core\Utility\GeneralUtility::getApplicationContext()->isDevelopment();
         $GLOBALS['TYPO3_CONF_VARS']['LOG']['Hn']['HauptsacheVideo']['writerConfiguration'] = [
             $isDev ? \TYPO3\CMS\Core\Log\LogLevel::DEBUG : \TYPO3\CMS\Core\Log\LogLevel::INFO => [
                 \TYPO3\CMS\Core\Log\Writer\FileWriter::class => [
