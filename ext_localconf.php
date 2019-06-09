@@ -91,6 +91,12 @@ call_user_func(function () {
             = $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['hauptsache_video']['video_converters'][$conf['converter']];
     }
 
+    // TODO double check this list
+    // TODO check if this list actually triggers the VideoTagRenderer
+    //$GLOBALS['TYPO3_CONF_VARS']['SYS']['mediafile_ext'] .= ',aac,ac3,aif,aifc,aiff,amr,au,caf,flac,m4a,m4b,mp3,oga,ogg,sfark,voc,wav,weba,wma';
+    $GLOBALS['TYPO3_CONF_VARS']['SYS']['mediafile_ext'] .= ',3g2,3gp,3gpp,avi,cavs,dv,dvr,flv,gif,m2ts,m4v,mkv,mod,mov,mp4,mpeg,mpg,mts,mxf,ogg,rm,rmvb,swf,ts,vob,webm,wmv,wtv';
+    $GLOBALS['TYPO3_CONF_VARS']['SYS']['mediafile_ext'] = \TYPO3\CMS\Core\Utility\GeneralUtility::uniqueList($GLOBALS['TYPO3_CONF_VARS']['SYS']['mediafile_ext']);
+
     $GLOBALS['TYPO3_CONF_VARS']['SYS']['fal']['processingTaskTypes']['Video.CropScale']
         = \Hn\HauptsacheVideo\Processing\VideoProcessingTask::class;
     $GLOBALS['TYPO3_CONF_VARS']['FE']['eID_include']['hauptsache_video']
