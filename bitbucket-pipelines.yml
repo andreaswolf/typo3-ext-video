@@ -25,18 +25,6 @@ pipelines:
               - composer test:unit -- --log-junit test-reports/unit.xml
               - composer test:functional -- --log-junit test-reports/functional.xml
         - step:
-            name: TYPO3 8.7 (high) PHP 7.1
-            image: chialab/php:7.1
-            caches:
-              - composer
-            services:
-              - mysql
-            script:
-              - composer require typo3/cms-core:^8.7.10 --no-interaction --update-with-all-dependencies
-              - export typo3DatabaseName=test typo3DatabaseHost=127.0.0.1 typo3DatabaseUsername=root typo3DatabasePassword=password
-              - composer test:unit -- --log-junit test-reports/unit.xml
-              - composer test:functional -- --log-junit test-reports/functional.xml
-        - step:
             name: TYPO3 8.7 (high) PHP 7.2
             image: chialab/php:7.2
             caches:
