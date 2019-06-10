@@ -1,6 +1,6 @@
 <?php
 
-namespace Hn\HauptsacheVideo\Tests\Functional;
+namespace Hn\Video\Tests\Functional;
 
 
 use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
@@ -15,7 +15,7 @@ use TYPO3\CMS\Extbase\Persistence\Generic\PersistenceManager;
 abstract class FunctionalTestCase extends \Nimut\TestingFramework\TestCase\FunctionalTestCase
 {
     protected $testExtensionsToLoad = [
-        'typo3conf/ext/hauptsache_video',
+        'typo3conf/ext/video',
     ];
 
     /** @var ObjectManager */

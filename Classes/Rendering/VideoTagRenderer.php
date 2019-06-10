@@ -1,10 +1,10 @@
 <?php
 
-namespace Hn\HauptsacheVideo\Rendering;
+namespace Hn\Video\Rendering;
 
 
-use Hn\HauptsacheVideo\FormatRepository;
-use Hn\HauptsacheVideo\TypeUtility;
+use Hn\Video\FormatRepository;
+use Hn\Video\TypeUtility;
 use TYPO3\CMS\Core\Resource;
 
 class VideoTagRenderer implements Resource\Rendering\FileRendererInterface
@@ -125,7 +125,7 @@ class VideoTagRenderer implements Resource\Rendering\FileRendererInterface
 
         $sources = [];
 
-        $formats = $options['formats'] ?? $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['hauptsache_video']['default_video_formats'];
+        $formats = $options['formats'] ?? $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['video']['default_video_formats'];
         foreach ($formats as $formatKey => $formatOptions) {
             $sourceOptions = FormatRepository::normalizeOptions(array_replace(
                 $options,

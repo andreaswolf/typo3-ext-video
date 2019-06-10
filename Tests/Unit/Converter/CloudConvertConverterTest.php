@@ -1,18 +1,17 @@
 <?php
 
-namespace Hn\HauptsacheVideo\Tests\Unit\Converter;
+namespace Hn\Video\Tests\Unit\Converter;
 
 
 use Doctrine\DBAL\Statement;
 use GuzzleHttp\Client;
 use GuzzleHttp\Promise\FulfilledPromise;
-use function GuzzleHttp\Promise\queue;
 use GuzzleHttp\Promise\RejectedPromise;
 use GuzzleHttp\Psr7\Response;
-use Hn\HauptsacheVideo\Converter\CloudConvertConverter;
-use Hn\HauptsacheVideo\FormatRepository;
-use Hn\HauptsacheVideo\Processing\VideoProcessingTask;
-use Hn\HauptsacheVideo\Tests\Unit\UnitTestCase;
+use Hn\Video\Converter\CloudConvertConverter;
+use Hn\Video\FormatRepository;
+use Hn\Video\Processing\VideoProcessingTask;
+use Hn\Video\Tests\Unit\UnitTestCase;
 use PHPUnit\Framework\MockObject\MockObject;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
@@ -21,6 +20,7 @@ use TYPO3\CMS\Core\Locking\LockingStrategyInterface;
 use TYPO3\CMS\Core\Resource\File;
 use TYPO3\CMS\Core\Resource\ProcessedFile;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use function GuzzleHttp\Promise\queue;
 
 class CloudConvertConverterTest extends UnitTestCase
 {
@@ -112,7 +112,7 @@ class CloudConvertConverterTest extends UnitTestCase
     }
 
     /**
-     * @expectedException \Hn\HauptsacheVideo\Exception\ConversionException
+     * @expectedException \Hn\Video\Exception\ConversionException
      */
     public function testInfoFailure()
     {
@@ -148,7 +148,7 @@ class CloudConvertConverterTest extends UnitTestCase
     }
 
     /**
-     * @expectedException \Hn\HauptsacheVideo\Exception\ConversionException
+     * @expectedException \Hn\Video\Exception\ConversionException
      */
     public function testGetInfoOversize()
     {

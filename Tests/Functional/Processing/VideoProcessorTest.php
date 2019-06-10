@@ -1,13 +1,13 @@
 <?php
 
-namespace Hn\HauptsacheVideo\Tests\Functional\Processing;
+namespace Hn\Video\Tests\Functional\Processing;
 
 
-use Hn\HauptsacheVideo\Converter\VideoConverterInterface;
-use Hn\HauptsacheVideo\Processing\VideoProcessingTask;
-use Hn\HauptsacheVideo\Processing\VideoProcessor;
-use Hn\HauptsacheVideo\Processing\VideoTaskRepository;
-use Hn\HauptsacheVideo\Tests\Functional\FunctionalTestCase;
+use Hn\Video\Converter\VideoConverterInterface;
+use Hn\Video\Processing\VideoProcessingTask;
+use Hn\Video\Processing\VideoProcessor;
+use Hn\Video\Processing\VideoTaskRepository;
+use Hn\Video\Tests\Functional\FunctionalTestCase;
 use PHPUnit\Framework\MockObject\MockObject;
 use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Core\Resource\ProcessedFile;
@@ -24,21 +24,21 @@ class VideoProcessorTest extends FunctionalTestCase
         parent::setUp();
 
         $this->converter = $this->createMock(VideoConverterInterface::class);
-        $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['hauptsache_video']['video_converter'] = $this->converter;
+        $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['video']['video_converter'] = $this->converter;
 
         $this->assertTasksAndProcessedFiles(0, 0);
     }
 
     protected function tearDown()
     {
-        unset($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['hauptsache_video']['video_converter']); // TODO reset
+        unset($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['video']['video_converter']); // TODO reset
         parent::tearDown();
     }
 
     protected function assertTasksAndProcessedFiles(int $expectedTasks, int $expectedProcessedFiles)
     {
-        $storedTasks = $this->getDatabaseConnection()->selectCount('uid', 'tx_hauptsachevideo_task');
-        $this->assertEquals($expectedTasks, $storedTasks, 'tx_hauptsachevideo_task');
+        $storedTasks = $this->getDatabaseConnection()->selectCount('uid', 'tx_video_task');
+        $this->assertEquals($expectedTasks, $storedTasks, 'tx_video_task');
         $processedFiles = $this->getDatabaseConnection()->selectCount('uid', 'sys_file_processedfile');
         $this->assertEquals($expectedProcessedFiles, $processedFiles, 'sys_file_processedfile');
     }

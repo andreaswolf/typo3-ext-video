@@ -1,10 +1,10 @@
 <?php
 
-namespace Hn\HauptsacheVideo\Tests\Functional\Converter;
+namespace Hn\Video\Tests\Functional\Converter;
 
 
-use Hn\HauptsacheVideo\Converter\LocalFFmpegConverter;
-use Hn\HauptsacheVideo\Tests\Functional\FunctionalTestCase;
+use Hn\Video\Converter\LocalFFmpegConverter;
+use Hn\Video\Tests\Functional\FunctionalTestCase;
 use PHPUnit\Framework\MockObject\MockObject;
 use TYPO3\CMS\Core\Resource\ProcessedFile;
 

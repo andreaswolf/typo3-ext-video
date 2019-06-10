@@ -1,10 +1,10 @@
 <?php
 
-namespace Hn\HauptsacheVideo\Tests\Unit;
+namespace Hn\Video\Tests\Unit;
 
 
-use Hn\HauptsacheVideo\FormatRepository;
-use Hn\HauptsacheVideo\Preset\PresetInterface;
+use Hn\Video\FormatRepository;
+use Hn\Video\Preset\PresetInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class FormatRepositoryTest extends UnitTestCase
@@ -15,13 +15,13 @@ class FormatRepositoryTest extends UnitTestCase
     protected function setUp()
     {
         parent::setUp();
-        $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['hauptsache_video'] = [];
+        $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['video'] = [];
         $this->repository = new FormatRepository();
     }
 
     protected function tearDown()
     {
-        unset($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['hauptsache_video']);
+        unset($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['video']);
         parent::tearDown();
     }
 
@@ -29,10 +29,10 @@ class FormatRepositoryTest extends UnitTestCase
     {
         $this->assertNull($this->repository->findFormatDefinition(['format' => 'mp4']));
 
-        $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['hauptsache_video']['formats'] = [];
+        $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['video']['formats'] = [];
         $this->assertNull($this->repository->findFormatDefinition(['format' => 'mp4']));
 
-        $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['hauptsache_video']['formats']['mp4:default'] = ['foo' => 'bar'];
+        $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['video']['formats']['mp4:default'] = ['foo' => 'bar'];
         $this->assertEquals(['foo' => 'bar'], $this->repository->findFormatDefinition(['format' => 'mp4']));
         $this->assertEquals(['foo' => 'bar'], $this->repository->findFormatDefinition(['format' => 'mp4:default']));
 
@@ -40,7 +40,7 @@ class FormatRepositoryTest extends UnitTestCase
     }
 
     /**
-     * @expectedException \Hn\HauptsacheVideo\Exception\FormatException
+     * @expectedException \Hn\Video\Exception\FormatException
      */
     public function testBuildUnknown()
     {
@@ -49,7 +49,7 @@ class FormatRepositoryTest extends UnitTestCase
 
     public function testBuildEmpty()
     {
-        $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['hauptsache_video']['formats']['mp4:default'] = [];
+        $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['video']['formats']['mp4:default'] = [];
         $this->assertEquals(['-vn', '-an', '-sn', '-dn'], $this->repository->buildParameters(null, null, ['format' => 'mp4']));
     }
 
@@ -60,7 +60,7 @@ class FormatRepositoryTest extends UnitTestCase
         $videoPreset->expects($this->once())->method('setOptions')->with(['x' => 'y']);
         $videoPreset->expects($this->once())->method('getParameters')->with([])->willReturn(['-c:v', 'libx264']);
 
-        $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['hauptsache_video']['formats']['mp4:default'] = [
+        $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['video']['formats']['mp4:default'] = [
             'video' => [get_class($videoPreset)],
         ];
 

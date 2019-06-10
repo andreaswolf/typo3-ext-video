@@ -1,6 +1,6 @@
 <?php
 
-namespace Hn\HauptsacheVideo\Exception;
+namespace Hn\Video\Exception;
 
 
 class FormatException extends \RuntimeException

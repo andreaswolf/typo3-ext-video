@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Hn\HauptsacheVideo\Preset;
+namespace Hn\Video\Preset;
 
 
 interface PresetInterface

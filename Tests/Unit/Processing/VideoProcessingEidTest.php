@@ -1,11 +1,10 @@
 <?php
 
-namespace Hn\HauptsacheVideo\Tests\Unit\Processing;
+namespace Hn\Video\Tests\Unit\Processing;
 
 
-use function GuzzleHttp\Psr7\parse_query;
-use Hn\HauptsacheVideo\Processing\VideoProcessingEid;
-use Hn\HauptsacheVideo\Tests\Unit\UnitTestCase;
+use Hn\Video\Processing\VideoProcessingEid;
+use Hn\Video\Tests\Unit\UnitTestCase;
 
 class VideoProcessingEidTest extends UnitTestCase
 {
@@ -22,6 +21,6 @@ class VideoProcessingEidTest extends UnitTestCase
         $keys = VideoProcessingEid::getKeys();
         $this->assertEquals(28, strlen($keys[0]));
         $this->assertEquals(28, strlen($keys[1]));
-        $this->assertEquals(['eID' => 'hauptsache_video', 'key' => $keys[0]], $result);
+        $this->assertEquals(['eID' => 'video', 'key' => $keys[0]], $result);
     }
 }

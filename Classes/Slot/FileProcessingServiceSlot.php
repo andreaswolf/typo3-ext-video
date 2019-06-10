@@ -1,6 +1,6 @@
 <?php
 
-namespace Hn\HauptsacheVideo\Slot;
+namespace Hn\Video\Slot;
 
 
 use TYPO3\CMS\Core\Resource\Driver\DriverInterface;
@@ -11,7 +11,7 @@ use TYPO3\CMS\Core\Resource\Service\FileProcessingService;
 class FileProcessingServiceSlot
 {
     /**
-     * @var \Hn\HauptsacheVideo\Processing\VideoProcessor
+     * @var \Hn\Video\Processing\VideoProcessor
      * @inject
      */
     protected $videoProcessor;

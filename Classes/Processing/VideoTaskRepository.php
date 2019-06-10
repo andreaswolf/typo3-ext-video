@@ -1,6 +1,6 @@
 <?php
 
-namespace Hn\HauptsacheVideo\Processing;
+namespace Hn\Video\Processing;
 
 
 use TYPO3\CMS\Core\Database\Connection;
@@ -14,7 +14,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class VideoTaskRepository implements SingletonInterface
 {
-    const TABLE_NAME = 'tx_hauptsachevideo_task';
+    const TABLE_NAME = 'tx_video_task';
 
     /**
      * @var Connection

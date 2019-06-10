@@ -1,9 +1,9 @@
 <?php
 
-namespace Hn\HauptsacheVideo\Slot;
+namespace Hn\Video\Slot;
 
 
-use Hn\HauptsacheVideo\VideoMetadataExtractor;
+use Hn\Video\VideoMetadataExtractor;
 use TYPO3\CMS\Core\Resource\File;
 use TYPO3\CMS\Core\Resource\FileRepository;
 use TYPO3\CMS\Core\Resource\Index\MetaDataRepository;

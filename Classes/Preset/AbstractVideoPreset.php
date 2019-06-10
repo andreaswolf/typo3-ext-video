@@ -1,6 +1,6 @@
 <?php
 
-namespace Hn\HauptsacheVideo\Preset;
+namespace Hn\Video\Preset;
 
 
 use TYPO3\CMS\Core\Utility\MathUtility;

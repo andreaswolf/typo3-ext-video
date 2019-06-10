@@ -1,5 +1,5 @@
 {
-    "name": "hn/hauptsache_video",
+    "name": "hn/video",
     "description": "Video transcoding in typo3",
     "type": "typo3-cms-extension",
     "license": "GPL-2.0-or-later",
@@ -9,12 +9,6 @@
             "email": "marco@hauptsache.net",
             "homepage": "https://www.marco.zone",
             "role": "Developer"
-        },
-        {
-            "name": "Alexander Bernhardt",
-            "email": "bernhardt@hauptsache.net",
-            "homepage": "https://www.hauptsache.net",
-            "role": "Project manager"
         }
     ],
     "require": {
@@ -30,12 +24,12 @@
     },
     "autoload": {
         "psr-4": {
-            "Hn\\HauptsacheVideo\\": "Classes"
+            "Hn\\Video\\": "Classes"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Hn\\HauptsacheVideo\\Tests\\": "Tests"
+            "Hn\\Video\\Tests\\": "Tests"
         }
     },
     "config": {
@@ -52,7 +46,7 @@
     "scripts": {
         "post-autoload-dump": [
             "mkdir -p .Build/typo3conf/ext",
-            "ln -s ../../../ .Build/typo3conf/ext/hauptsache_video || true"
+            "ln -s ../../../ .Build/typo3conf/ext/video || true"
         ],
         "cc": [
             "rm -rf .Build/typo3temp/var/tests/"

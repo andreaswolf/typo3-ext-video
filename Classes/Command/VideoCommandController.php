@@ -1,21 +1,21 @@
 <?php
 
-namespace Hn\HauptsacheVideo\Command;
+namespace Hn\Video\Command;
 
 
-use Hn\HauptsacheVideo\Processing\VideoProcessingTask;
+use Hn\Video\Processing\VideoProcessingTask;
 use TYPO3\CMS\Extbase\Mvc\Controller\CommandController;
 
 class VideoCommandController extends CommandController
 {
     /**
-     * @var \Hn\HauptsacheVideo\Processing\VideoTaskRepository
+     * @var \Hn\Video\Processing\VideoTaskRepository
      * @inject
      */
     protected $repository;
 
     /**
-     * @var \Hn\HauptsacheVideo\Processing\VideoProcessor
+     * @var \Hn\Video\Processing\VideoProcessor
      * @inject
      */
     protected $videoProcessor;

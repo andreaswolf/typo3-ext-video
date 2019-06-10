@@ -1,9 +1,9 @@
 <?php
 
-namespace Hn\HauptsacheVideo\Tests\Unit\Preset;
+namespace Hn\Video\Tests\Unit\Preset;
 
 
-use Hn\HauptsacheVideo\Preset\AbstractVideoPreset;
+use Hn\Video\Preset\AbstractVideoPreset;
 use PHPUnit\Framework\MockObject\MockObject;
 
 class AbstractVideoPresetTest extends AbstractPresetTest

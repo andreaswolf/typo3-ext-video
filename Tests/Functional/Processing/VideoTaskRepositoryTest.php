@@ -1,11 +1,11 @@
 <?php
 
-namespace Hn\HauptsacheVideo\Tests\Functional\Processing;
+namespace Hn\Video\Tests\Functional\Processing;
 
 
-use Hn\HauptsacheVideo\Processing\VideoProcessingTask;
-use Hn\HauptsacheVideo\Processing\VideoTaskRepository;
-use Hn\HauptsacheVideo\Tests\Functional\FunctionalTestCase;
+use Hn\Video\Processing\VideoProcessingTask;
+use Hn\Video\Processing\VideoTaskRepository;
+use Hn\Video\Tests\Functional\FunctionalTestCase;
 use TYPO3\CMS\Core\Resource\ProcessedFile;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 

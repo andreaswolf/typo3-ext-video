@@ -1,6 +1,6 @@
 <?php
 
-namespace Hn\HauptsacheVideo\Preset;
+namespace Hn\Video\Preset;
 
 
 abstract class AbstractAudioPreset extends AbstractCompressiblePreset

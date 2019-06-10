@@ -1,11 +1,11 @@
 <?php
 
-namespace Hn\HauptsacheVideo\Converter;
+namespace Hn\Video\Converter;
 
 
-use Hn\HauptsacheVideo\Exception\ConversionException;
-use Hn\HauptsacheVideo\FormatRepository;
-use Hn\HauptsacheVideo\Processing\VideoProcessingTask;
+use Hn\Video\Exception\ConversionException;
+use Hn\Video\FormatRepository;
+use Hn\Video\Processing\VideoProcessingTask;
 use TYPO3\CMS\Core\Log\LogManager;
 use TYPO3\CMS\Core\Utility\CommandUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;

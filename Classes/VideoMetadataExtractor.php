@@ -1,6 +1,6 @@
 <?php
 
-namespace Hn\HauptsacheVideo;
+namespace Hn\Video;
 
 
 use TYPO3\CMS\Core\Resource;

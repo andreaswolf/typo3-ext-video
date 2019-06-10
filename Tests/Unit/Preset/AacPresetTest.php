@@ -1,9 +1,9 @@
 <?php
 
-namespace Hn\HauptsacheVideo\Tests\Unit\Preset;
+namespace Hn\Video\Tests\Unit\Preset;
 
 
-use Hn\HauptsacheVideo\Preset\AacPreset;
+use Hn\Video\Preset\AacPreset;
 
 class AacPresetTest extends AbstractAudioPresetTest
 {

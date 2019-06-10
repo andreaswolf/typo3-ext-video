@@ -1,11 +1,11 @@
 <?php
 
-namespace Hn\HauptsacheVideo;
+namespace Hn\Video;
 
 
-use Hn\HauptsacheVideo\Exception\FormatException;
-use Hn\HauptsacheVideo\Preset\AbstractVideoPreset;
-use Hn\HauptsacheVideo\Preset\PresetInterface;
+use Hn\Video\Exception\FormatException;
+use Hn\Video\Preset\AbstractVideoPreset;
+use Hn\Video\Preset\PresetInterface;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -13,7 +13,7 @@ class FormatRepository implements SingletonInterface
 {
     public function findFormatDefinition(array $options): ?array
     {
-        $formats = $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['hauptsache_video']['formats'] ?? [];
+        $formats = $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['video']['formats'] ?? [];
         $format = $options['format'] ?? 'mp4';
 
         if (isset($formats[$format])) {

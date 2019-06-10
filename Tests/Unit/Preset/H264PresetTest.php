@@ -1,9 +1,9 @@
 <?php
 
-namespace Hn\HauptsacheVideo\Tests\Unit\Preset;
+namespace Hn\Video\Tests\Unit\Preset;
 
 
-use Hn\HauptsacheVideo\Preset\H264Preset;
+use Hn\Video\Preset\H264Preset;
 
 class H264PresetTest extends AbstractVideoPresetTest
 {

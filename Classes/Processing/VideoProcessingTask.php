@@ -1,9 +1,9 @@
 <?php
 
-namespace Hn\HauptsacheVideo\Processing;
+namespace Hn\Video\Processing;
 
 
-use Hn\HauptsacheVideo\FormatRepository;
+use Hn\Video\FormatRepository;
 use TYPO3\CMS\Core\Resource\Processing\AbstractTask;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 

@@ -1,4 +1,4 @@
-CREATE TABLE `tx_hauptsachevideo_task`
+CREATE TABLE `tx_video_task`
 (
     `uid`           int(11)        NOT NULL AUTO_INCREMENT,
     `pid`           int(11)        NOT NULL DEFAULT '0',
@@ -12,7 +12,7 @@ CREATE TABLE `tx_hauptsachevideo_task`
     KEY `task` (`file`, `configuration`, `status`),
 );
 
-CREATE TABLE `tx_hauptsachevideo_cloudconvert_process`
+CREATE TABLE `tx_video_cloudconvert_process`
 (
   `uid`     int(11)        NOT NULL AUTO_INCREMENT,
   `pid`     int(11)        NOT NULL DEFAULT '0',

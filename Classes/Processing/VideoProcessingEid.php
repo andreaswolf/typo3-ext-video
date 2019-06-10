@@ -1,6 +1,6 @@
 <?php
 
-namespace Hn\HauptsacheVideo\Processing;
+namespace Hn\Video\Processing;
 
 
 use Psr\Http\Message\ResponseInterface;
@@ -54,6 +54,6 @@ class VideoProcessingEid
 
     public static function getUrl()
     {
-        return 'index.php?eID=hauptsache_video&key=' . urlencode(self::getKeys()[0]);
+        return 'index.php?eID=video&key=' . urlencode(self::getKeys()[0]);
     }
 }

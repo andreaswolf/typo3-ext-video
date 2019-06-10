@@ -1,6 +1,6 @@
 <?php
 
-namespace Hn\HauptsacheVideo\Exception;
+namespace Hn\Video\Exception;
 
 
 class ConversionException extends \Exception

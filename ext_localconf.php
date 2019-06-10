@@ -1,7 +1,7 @@
 <?php
 
-use Hn\HauptsacheVideo\Converter;
-use Hn\HauptsacheVideo\Preset;
+use Hn\Video\Converter;
+use Hn\Video\Preset;
 
 if (!defined('TYPO3_MODE')) {
     die('Access denied.');
@@ -9,8 +9,8 @@ if (!defined('TYPO3_MODE')) {
 
 call_user_func(function () {
     $conf = class_exists(\TYPO3\CMS\Core\Configuration\ExtensionConfiguration::class)
-        ? \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Core\Configuration\ExtensionConfiguration::class)->get('hauptsache_video')
-        : unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['hauptsache_video']);
+        ? \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Core\Configuration\ExtensionConfiguration::class)->get('video')
+        : unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['video']);
 
     // parse performance syntax
     // a great chart comparing encoding speeds vs quality can be found here:
@@ -30,9 +30,9 @@ call_user_func(function () {
 
     // mp4 general
     // it should work almost anywhere ~ except maybe old low-cost android devices and feature phones
-    if (empty($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['hauptsache_video']['formats']['mp4:default'])) {
+    if (empty($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['video']['formats']['mp4:default'])) {
         if (isset($performanceOptions['h264'])) {
-            $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['hauptsache_video']['formats']['mp4:default'] = [
+            $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['video']['formats']['mp4:default'] = [
                 'fileExtension' => 'mp4',
                 'mimeType' => 'video/mp4',
                 'video' => $h264Defaults,
@@ -44,9 +44,9 @@ call_user_func(function () {
 
     // webm video
     // higher efficiency than h264 but lacks support in safari
-    if (empty($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['hauptsache_video']['formats']['webm:default'])) {
+    if (empty($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['video']['formats']['webm:default'])) {
         if (isset($performanceOptions['vp9'])) {
-            $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['hauptsache_video']['formats']['webm:default'] = [
+            $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['video']['formats']['webm:default'] = [
                 'fileExtension' => 'webm',
                 'mimeType' => 'video/webm',
                 'video' => [Preset\VP9Preset::class, $vp9Defaults],
@@ -59,8 +59,8 @@ call_user_func(function () {
     // m4a audio
     // this should be your choice for audio files
     // ~ it is more efficient than mp3 and has nearly the same browser support
-    if (empty($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['hauptsache_video']['formats']['m4a:default'])) {
-        $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['hauptsache_video']['formats']['m4a:default'] = [
+    if (empty($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['video']['formats']['m4a:default'])) {
+        $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['video']['formats']['m4a:default'] = [
             'fileExtension' => 'm4a',
             'mimeType' => 'audio/mp4',
             'audio' => [Preset\AacPreset::class, $aacDefaults],
@@ -71,24 +71,24 @@ call_user_func(function () {
     // this is the default format list used for video
     // the order will be the same as in the final source definition
     // it should reflect which format the browser should choose
-    if (empty($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['hauptsache_video']['default_video_formats'])) {
-        $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['hauptsache_video']['default_video_formats'] = [];
+    if (empty($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['video']['default_video_formats'])) {
+        $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['video']['default_video_formats'] = [];
 
         if (isset($performanceOptions['vp9'])) {
-            $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['hauptsache_video']['default_video_formats']['webm'] = ['priority' => -1];
+            $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['video']['default_video_formats']['webm'] = ['priority' => -1];
         }
 
-        $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['hauptsache_video']['default_video_formats']['mp4'] = [];
+        $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['video']['default_video_formats']['mp4'] = [];
     }
 
-    $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['hauptsache_video']['video_converters'] = [
+    $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['video']['video_converters'] = [
         'LocalFFmpeg' => [Converter\LocalFFmpegConverter::class],
         'CloudConvert' => [Converter\CloudConvertConverter::class, $conf['cloudConvertApiKey'] ?? ''],
     ];
 
-    if (!isset($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['hauptsache_video']['video_converter'])) {
-        $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['hauptsache_video']['video_converter']
-            = $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['hauptsache_video']['video_converters'][$conf['converter']];
+    if (!isset($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['video']['video_converter'])) {
+        $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['video']['video_converter']
+            = $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['video']['video_converters'][$conf['converter']];
     }
 
     // TODO double check this list
@@ -98,43 +98,43 @@ call_user_func(function () {
     $GLOBALS['TYPO3_CONF_VARS']['SYS']['mediafile_ext'] = \TYPO3\CMS\Core\Utility\GeneralUtility::uniqueList($GLOBALS['TYPO3_CONF_VARS']['SYS']['mediafile_ext']);
 
     $GLOBALS['TYPO3_CONF_VARS']['SYS']['fal']['processingTaskTypes']['Video.CropScale']
-        = \Hn\HauptsacheVideo\Processing\VideoProcessingTask::class;
-    $GLOBALS['TYPO3_CONF_VARS']['FE']['eID_include']['hauptsache_video']
-        = \Hn\HauptsacheVideo\Processing\VideoProcessingEid::class . '::process';
+        = \Hn\Video\Processing\VideoProcessingTask::class;
+    $GLOBALS['TYPO3_CONF_VARS']['FE']['eID_include']['video']
+        = \Hn\Video\Processing\VideoProcessingEid::class . '::process';
 
     $dispatcher = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Extbase\SignalSlot\Dispatcher::class);
 
     $dispatcher->connect(
         \TYPO3\CMS\Core\Resource\ResourceStorage::class,
         \TYPO3\CMS\Core\Resource\Service\FileProcessingService::SIGNAL_PreFileProcess,
-        \Hn\HauptsacheVideo\Slot\FileProcessingServiceSlot::class,
+        \Hn\Video\Slot\FileProcessingServiceSlot::class,
         'preFileProcess'
     );
 
     $dispatcher->connect(
         \TYPO3\CMS\Core\Resource\Index\MetaDataRepository::class,
         'recordPostRetrieval',
-        \Hn\HauptsacheVideo\Slot\MetaDataRepositorySlot::class,
+        \Hn\Video\Slot\MetaDataRepositorySlot::class,
         'recordPostRetrieval'
     );
 
     \TYPO3\CMS\Core\Resource\Rendering\RendererRegistry::getInstance()
-        ->registerRendererClass(\Hn\HauptsacheVideo\Rendering\VideoTagRenderer::class);
+        ->registerRendererClass(\Hn\Video\Rendering\VideoTagRenderer::class);
 
     \TYPO3\CMS\Core\Resource\Index\ExtractorRegistry::getInstance()
-        ->registerExtractionService(\Hn\HauptsacheVideo\VideoMetadataExtractor::class);
+        ->registerExtractionService(\Hn\Video\VideoMetadataExtractor::class);
 
     if (TYPO3_MODE === 'BE') {
         $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['extbase']['commandControllers'][] =
-            \Hn\HauptsacheVideo\Command\VideoCommandController::class;
+            \Hn\Video\Command\VideoCommandController::class;
     }
 
-    if (empty($GLOBALS['TYPO3_CONF_VARS']['LOG']['Hn']['HauptsacheVideo'])) {
+    if (empty($GLOBALS['TYPO3_CONF_VARS']['LOG']['Hn']['Video'])) {
         $isDev = \TYPO3\CMS\Core\Utility\GeneralUtility::getApplicationContext()->isDevelopment();
-        $GLOBALS['TYPO3_CONF_VARS']['LOG']['Hn']['HauptsacheVideo']['writerConfiguration'] = [
+        $GLOBALS['TYPO3_CONF_VARS']['LOG']['Hn']['Video']['writerConfiguration'] = [
             $isDev ? \TYPO3\CMS\Core\Log\LogLevel::DEBUG : \TYPO3\CMS\Core\Log\LogLevel::INFO => [
                 \TYPO3\CMS\Core\Log\Writer\FileWriter::class => [
-                    'logFile' => 'typo3temp/logs/hauptsache_video.log',
+                    'logFile' => 'typo3temp/logs/video.log',
                 ],
             ],
         ];
@@ -142,22 +142,22 @@ call_user_func(function () {
 
     if (!empty($conf['testElement'])) {
         \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addPageTSConfig(<<<PageTSConfig
-mod.wizards.newContentElement.wizardItems.special.elements.hauptsache_video {
+mod.wizards.newContentElement.wizardItems.special.elements.video {
     iconIdentifier = content-media
-    title = hauptsache_video testing utility
+    title = video testing utility
     description = This elements helps you find the right options for video compression.
     tt_content_defValues {
-        CType = hauptsache_video
+        CType = video
     }
 }
-mod.wizards.newContentElement.wizardItems.special.show := addToList(hauptsache_video)
+mod.wizards.newContentElement.wizardItems.special.show := addToList(video)
 PageTSConfig
         );
 
         \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addTypoScriptSetup(<<<TypoScript
-tt_content.hauptsache_video = USER
-tt_content.hauptsache_video.userFunc = Hn\HauptsacheVideo\TestContentElement->render
-tt_content.hauptsache_video.configurations.data = flexform:pi_flexform:settings.options
+tt_content.video = USER
+tt_content.video.userFunc = Hn\Video\TestContentElement->render
+tt_content.video.configurations.data = flexform:pi_flexform:settings.options
 TypoScript
         );
     };

@@ -1,6 +1,6 @@
 <?php
 
-namespace Hn\HauptsacheVideo\Preset;
+namespace Hn\Video\Preset;
 
 
 class AacPreset extends AbstractAudioPreset
@@ -19,7 +19,7 @@ class AacPreset extends AbstractAudioPreset
      *
      * @see https://hydrogenaud.io/index.php/topic,95989.0.html
      * @see https://wiki.hydrogenaud.io/index.php?title=Fraunhofer_FDK_AAC#Bitrate_Modes
-     * @see \Hn\HauptsacheVideo\Preset\AacPreset::getFdkVbrValue
+     * @see \Hn\Video\Preset\AacPreset::getFdkVbrValue
      */
     private const FDK_VBR_MAPPING = [
         ['aac_low', 72, 5],

@@ -1,6 +1,6 @@
 <?php
 
-namespace Hn\HauptsacheVideo\Converter;
+namespace Hn\Video\Converter;
 
 
 use GuzzleHttp\Exception\RequestException;
@@ -8,23 +8,23 @@ use GuzzleHttp\Exception\ServerException;
 use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Promise\RejectedPromise;
 use GuzzleHttp\Psr7\Response;
-use function GuzzleHttp\Psr7\try_fopen;
-use function GuzzleHttp\Psr7\uri_for;
 use GuzzleHttp\Psr7\UriResolver;
-use Hn\HauptsacheVideo\Exception\ConversionException;
-use Hn\HauptsacheVideo\FormatRepository;
-use Hn\HauptsacheVideo\Processing\VideoProcessingEid;
-use Hn\HauptsacheVideo\Processing\VideoProcessingTask;
+use Hn\Video\Exception\ConversionException;
+use Hn\Video\FormatRepository;
+use Hn\Video\Processing\VideoProcessingEid;
+use Hn\Video\Processing\VideoProcessingTask;
 use Psr\Http\Message\UriInterface;
 use Psr\Log\LoggerInterface;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Locking;
 use TYPO3\CMS\Core\Log\LogManager;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use function GuzzleHttp\Psr7\try_fopen;
+use function GuzzleHttp\Psr7\uri_for;
 
 class CloudConvertConverter extends AbstractVideoConverter
 {
-    const DB_TABLE = 'tx_hauptsachevideo_cloudconvert_process';
+    const DB_TABLE = 'tx_video_cloudconvert_process';
 
     /**
      * @var \GuzzleHttp\Client
@@ -70,7 +70,7 @@ class CloudConvertConverter extends AbstractVideoConverter
             'base_uri' => 'https://api.cloudconvert.com/',
             'timeout' => 5.0,
             'headers' => [
-                'User-Agent' => 'hauptsache_video typo3 extension',
+                'User-Agent' => 'video typo3 extension',
                 'Authorization' => 'Bearer ' . $apiKey,
             ],
         ]);

@@ -1,10 +1,9 @@
 <?php
 
-namespace Hn\HauptsacheVideo\Processing;
+namespace Hn\Video\Processing;
 
 
-use Hn\HauptsacheVideo\Converter\VideoConverterInterface;
-use Hn\HauptsacheVideo\Exception\ConversionException;
+use Hn\Video\Converter\VideoConverterInterface;
 use Psr\Log\LoggerInterface;
 use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Core\Log\LogManager;
@@ -39,7 +38,7 @@ class VideoProcessor implements ProcessorInterface
      *
      * For some reason the image processing is hardcoded into the core.
      * @see \TYPO3\CMS\Core\Resource\Service\FileProcessingService::processFile
-     * @see \Hn\HauptsacheVideo\Slot\FileProcessingServiceSlot::preFileProcess
+     * @see \Hn\Video\Slot\FileProcessingServiceSlot::preFileProcess
      *
      * @param TaskInterface $task
      */
@@ -120,7 +119,7 @@ class VideoProcessor implements ProcessorInterface
 
     protected function getConverter(): VideoConverterInterface
     {
-        $videoConverter = $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['hauptsache_video']['video_converter'];
+        $videoConverter = $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['video']['video_converter'];
         if ($videoConverter instanceof VideoConverterInterface) {
             return $videoConverter;
         }

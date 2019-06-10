@@ -1,9 +1,9 @@
 <?php
 
-namespace Hn\HauptsacheVideo\Converter;
+namespace Hn\Video\Converter;
 
-use Hn\HauptsacheVideo\Exception\ConversionException;
-use Hn\HauptsacheVideo\Processing\VideoProcessingTask;
+use Hn\Video\Exception\ConversionException;
+use Hn\Video\Processing\VideoProcessingTask;
 
 interface VideoConverterInterface
 {

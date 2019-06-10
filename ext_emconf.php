@@ -1,8 +1,8 @@
 <?php
 
 $EM_CONF[$_EXTKEY] = [
-    'title' => 'hauptsache video',
-    'description' => 'Convert videos in typo3',
+    'title' => 'video',
+    'description' => 'videos in typo3',
     'category' => 'fe',
     'author' => 'Marco Pfeiffer',
     'author_email' => 'marco@hauptsache.net',
@@ -16,12 +16,12 @@ $EM_CONF[$_EXTKEY] = [
     'clearCacheOnLoad' => true,
     'autoload' => [
         'psr-4' => [
-            'Hn\\HauptsacheVideo\\' => 'Classes',
+            'Hn\\Video\\' => 'Classes',
         ],
     ],
     'autoload-dev' => [
         'psr-4' => [
-            'Hn\\HauptsacheVideo\\Tests\\' => 'Tests',
+            'Hn\\Video\\Tests\\' => 'Tests',
         ],
     ],
 ];

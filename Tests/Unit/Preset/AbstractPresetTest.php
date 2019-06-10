@@ -1,10 +1,10 @@
 <?php
 
-namespace Hn\HauptsacheVideo\Tests\Unit\Preset;
+namespace Hn\Video\Tests\Unit\Preset;
 
 
-use Hn\HauptsacheVideo\Preset\AbstractCompressiblePreset;
-use Hn\HauptsacheVideo\Tests\Unit\UnitTestCase;
+use Hn\Video\Preset\AbstractCompressiblePreset;
+use Hn\Video\Tests\Unit\UnitTestCase;
 use PHPUnit\Framework\MockObject\MockObject;
 
 class AbstractPresetTest extends UnitTestCase

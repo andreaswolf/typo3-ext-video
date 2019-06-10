@@ -1,10 +1,10 @@
 <?php
 
-namespace Hn\HauptsacheVideo\Converter;
+namespace Hn\Video\Converter;
 
 
-use Hn\HauptsacheVideo\FormatRepository;
-use Hn\HauptsacheVideo\Processing\VideoProcessingTask;
+use Hn\Video\FormatRepository;
+use Hn\Video\Processing\VideoProcessingTask;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 abstract class AbstractVideoConverter implements VideoConverterInterface

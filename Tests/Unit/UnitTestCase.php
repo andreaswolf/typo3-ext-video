@@ -1,6 +1,6 @@
 <?php
 
-namespace Hn\HauptsacheVideo\Tests\Unit;
+namespace Hn\Video\Tests\Unit;
 
 
 use PHPUnit\Framework\MockObject\MockObject;
