@@ -3,6 +3,7 @@
 namespace Hn\Video\Tests\Functional;
 
 
+use Hn\Video\Converter\NoopConverter;
 use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
 use TYPO3\CMS\Core\Resource\DuplicationBehavior;
 use TYPO3\CMS\Core\Resource\File;
@@ -41,12 +42,14 @@ abstract class FunctionalTestCase extends \Nimut\TestingFramework\TestCase\Funct
 
         $this->resourceStorage = $this->storageRepository->findByUid(1);
         $this->file = $this->resourceStorage->addFile(
-            __DIR__ . '/../Resources/File.mp4',
+            __DIR__ . '/../Fixtures/test.mp4',
             $this->resourceStorage->getRootLevelFolder(),
             'File.mp4',
             DuplicationBehavior::REPLACE,
             false
         );
+
+        $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['video']['video_converter'] = [NoopConverter::class];
     }
 
     protected function tearDown()

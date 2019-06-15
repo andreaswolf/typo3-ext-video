@@ -6,6 +6,8 @@ namespace Hn\Video\Rendering;
 use Hn\Video\FormatRepository;
 use Hn\Video\TypeUtility;
 use TYPO3\CMS\Core\Resource;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\SignalSlot\Dispatcher;
 
 class VideoTagRenderer implements Resource\Rendering\FileRendererInterface
 {
@@ -64,41 +66,44 @@ class VideoTagRenderer implements Resource\Rendering\FileRendererInterface
             $height = min($height, $width * $file->getProperty('height') / $file->getProperty('width'));
         }
 
-        $attributes[] = 'width="' . round($width) . '"';
-        $attributes[] = 'height="' . round($height) . '"';
+        $attributes['width'] = 'width="' . round($width) . '"';
+        $attributes['height'] = 'height="' . round($height) . '"';
 
-        if ($options['passive'] ?? false) {
-            $options += [
-                'controls' => false,
-                'autoplay' => true,
-                'muted' => true,
-                'loop' => true,
-            ];
+        $autoplay = $options['autoplay'] ?? $file->getProperty('autoplay') ?? 0;
+        self::dispatch('autoplay', [&$autoplay], func_get_args());
+
+        if ($autoplay > 0) {
+            $attributes['autoplay'] = 'autoplay';
         }
 
-        if ($options['controls'] ?? true) {
-            $attributes[] = 'controls';
+        if ($options['muted'] ?? $autoplay > 0) {
+            $attributes['muted'] = 'muted';
         }
 
-        if ($options['autoplay'] ?? false) {
-            $attributes[] = 'autoplay';
+        if ($options['loop'] ?? $autoplay > 1) {
+            $attributes['loop'] = 'loop';
         }
 
-        if ($options['muted'] ?? $options['autoplay'] ?? false) {
-            $attributes[] = 'muted';
+        if ($options['controls'] ?? $autoplay < 3) {
+            $attributes['controls'] = 'controls';
         }
 
-        if ($options['loop'] ?? false) {
-            $attributes[] = 'loop';
+        if ($options['inline'] ?? $options['playsinline'] ?? $autoplay >= 3) {
+            $attributes['playsinline'] = 'playsinline';
         }
 
-        if ($options['inline'] ?? $options['playsinline'] ?? false) {
-            $attributes[] = 'webkit-playsinline';
-            $attributes[] = 'playsinline';
+        foreach ($this->getAttributes() as $key) {
+            if (!empty($options[$key])) {
+                $attributes[$key] = $key . '="' . htmlspecialchars($options[$key]) . '"';
+            }
         }
 
         $sources = $this->buildSources($file, $options, $usedPathsRelativeToCurrentScript);
-        return sprintf('<video %s>%s</video>', implode(' ', $attributes), implode('', $sources));
+        self::dispatch('beforeTag', [&$attributes, &$sources], func_get_args());
+        $tag = sprintf('<video %s>%s</video>', implode(' ', $attributes), implode('', $sources));
+        self::dispatch('afterTag', [&$tag, $attributes, $sources], func_get_args());
+
+        return $tag;
     }
 
     protected function buildSources(Resource\FileInterface $file, array $options, $usedPathsRelativeToCurrentScript): array
@@ -126,6 +131,7 @@ class VideoTagRenderer implements Resource\Rendering\FileRendererInterface
         $sources = [];
 
         $formats = $options['formats'] ?? $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['video']['default_video_formats'];
+        self::dispatch('formats', [&$formats], func_get_args());
         foreach ($formats as $formatKey => $formatOptions) {
             $sourceOptions = FormatRepository::normalizeOptions(array_replace(
                 $options,
@@ -146,5 +152,34 @@ class VideoTagRenderer implements Resource\Rendering\FileRendererInterface
         }
 
         return $sources;
+    }
+
+    /**
+     * @return array
+     */
+    protected function getAttributes(): array
+    {
+        return [
+            'class',
+            'dir',
+            'id',
+            'lang',
+            'style',
+            'title',
+            'accesskey',
+            'tabindex',
+            'onclick',
+            'controlsList',
+            'preload'
+        ];
+    }
+
+    private static function dispatch(string $name, array $arguments, array ...$furtherArguments)
+    {
+        if (!empty($furtherArguments)) {
+            $arguments = array_merge($arguments, ...$furtherArguments);
+        }
+
+        GeneralUtility::makeInstance(Dispatcher::class)->dispatch(__CLASS__, $name, $arguments);
     }
 }
