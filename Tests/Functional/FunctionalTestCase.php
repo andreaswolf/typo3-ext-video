@@ -7,6 +7,7 @@ use Hn\Video\Converter\NoopConverter;
 use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
 use TYPO3\CMS\Core\Resource\DuplicationBehavior;
 use TYPO3\CMS\Core\Resource\File;
+use TYPO3\CMS\Core\Resource\Folder;
 use TYPO3\CMS\Core\Resource\ResourceStorage;
 use TYPO3\CMS\Core\Resource\StorageRepository;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -54,6 +55,13 @@ abstract class FunctionalTestCase extends \Nimut\TestingFramework\TestCase\Funct
 
     protected function tearDown()
     {
+        // delete processed files after the test to avoid collisions with the next test
+        foreach ($this->resourceStorage->getProcessingFolders() as $processingFolder) {
+            foreach ($processingFolder->getFiles(0, 0, Folder::FILTER_MODE_NO_FILTERS, true) as $file) {
+                $this->assertTrue($file->delete(), "there was a processed file that could not be deleted");
+            }
+        }
+
         GeneralUtility::purgeInstances();
         unset($GLOBALS['BE_USER']);
         parent::tearDown();
