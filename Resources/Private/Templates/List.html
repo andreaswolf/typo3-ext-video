@@ -1,0 +1,44 @@
+<html xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+      xmlns:c="http://typo3.org/ns/TYPO3/CMS/Core/ViewHelpers"
+      data-namespace-typo3-fluid="true">
+
+<f:layout name="Default"/>
+
+<f:section name="Main">
+    <table class="table">
+        <thead>
+            <tr>
+                <th style="width: 12em">date</th>
+                <th style="width: 5em">status</th>
+                <th>file</th>
+                <th>configuration</th>
+                <th style="width: 10em"></th>
+            </tr>
+        </thead>
+        <tbody>
+            <f:for each="{tasks}" as="task">
+                <tr>
+                    <td>{task.crdate -> f:format.date(format: 'l d. M Y H:i:s')}</td>
+                    <td>{task.status}</td>
+                    <td>{task.file_identifier}</td>
+                    <td>
+                        <dl class="dl-horizontal" style="margin: 0">
+                            <f:for each="{task.configuration}" as="configuration" key="key">
+                                <dt>{key}</dt>
+                                <dd>{configuration -> f:format.json()}</dd>
+                            </f:for>
+                        </dl>
+                    </td>
+                    <td>
+                        <a href="#" class="btn btn-default" title="Info"
+                           onclick="top.TYPO3.InfoWindow.showItem('_FILE', {task.file_combi_ident -> f:format.json()});return false;">
+                            <c:icon identifier="actions-document-info" />
+                        </a>
+                    </td>
+                </tr>
+            </f:for>
+        </tbody>
+    </table>
+</f:section>
+
+</html>

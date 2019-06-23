@@ -40,13 +40,14 @@ class VideoTaskRepository implements SingletonInterface
             'configuration' => serialize($task->getConfiguration()),
             'status' => $task->getStatus(),
             'priority' => $task->getPriority(),
+            'tstamp' => time(),
         ];
 
         if ($this->tasks->contains($task)) {
             $id = $this->tasks->offsetGet($task);
             $this->connection->update(self::TABLE_NAME, $values, ['uid' => $id]);
         } else {
-            $this->connection->insert(self::TABLE_NAME, $values);
+            $this->connection->insert(self::TABLE_NAME, $values + ['crdate' => $values['tstamp']]);
             $id = $this->connection->lastInsertId(self::TABLE_NAME);
             $this->tasks->attach($task, $id);
         }
