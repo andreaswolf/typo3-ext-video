@@ -34,9 +34,10 @@ class TaskController extends ActionController
 
         $statement = $qb->execute();
         $generator = function () use ($statement) {
-            $row = $statement->fetch();
-            $row['configuration'] = unserialize($row['configuration']);
-            yield $row;
+            while ($row = $statement->fetch()) {
+                $row['configuration'] = unserialize($row['configuration']);
+                yield $row;
+            }
         };
 
         $this->view->assignMultiple([
