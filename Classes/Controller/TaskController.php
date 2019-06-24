@@ -26,11 +26,12 @@ class TaskController extends ActionController
             "CONCAT({$qb->quoteIdentifier('file.storage')}, ':', {$qb->quoteIdentifier('file.identifier')}) AS file_combi_ident"
         );
         $qb->addSelect(
+            'file.uid AS file_uid',
             'file.identifier AS file_identifier',
             'file.name AS file_name',
             'task.status'
         );
-        $qb->orderBy('file.uid', 'DESC');
+        $qb->orderBy('task.uid', 'DESC');
 
         $statement = $qb->execute();
         $generator = function () use ($statement) {

@@ -36,11 +36,12 @@ class VideoTaskRepository implements SingletonInterface
     public function store(VideoProcessingTask $task)
     {
         $values = [
+            'tstamp' => time(),
             'file' => $task->getSourceFile()->getUid(),
             'configuration' => serialize($task->getConfiguration()),
             'status' => $task->getStatus(),
+            'progress' => json_encode($task->getProgressSteps(), JSON_UNESCAPED_SLASHES),
             'priority' => $task->getPriority(),
-            'tstamp' => time(),
         ];
 
         if ($this->tasks->contains($task)) {
@@ -60,9 +61,7 @@ class VideoTaskRepository implements SingletonInterface
     {
         $qb = $this->connection->createQueryBuilder();
         $qb->from(self::TABLE_NAME, 'task');
-        $qb->select('task.uid', 'task.file', 'task.configuration', 'task.status');
-        $qb->addOrderBy('task.priority', 'desc');
-        $qb->addOrderBy('task.uid', 'asc');
+        $qb->select('task.uid', 'task.file', 'task.configuration', 'task.status', 'task.progress');
         return $qb;
     }
 
@@ -73,12 +72,24 @@ class VideoTaskRepository implements SingletonInterface
      */
     public function findByTask(TaskInterface $task): ?VideoProcessingTask
     {
-        $qb = $this->createQueryBuilder();
+        return $this->findByFile($task->getSourceFile()->getUid(), $task->getConfiguration());
+    }
 
-        $qb->setParameter('file', $task->getSourceFile()->getUid());
+    /**
+     * @param int $file
+     * @param array $configuration
+     *
+     * @return VideoProcessingTask|null
+     */
+    public function findByFile(int $file, array $configuration): ?VideoProcessingTask
+    {
+        $qb = $this->createQueryBuilder();
+        $qb->orderBy('task.uid', 'desc');
+
+        $qb->setParameter('file', $file);
         $qb->andWhere($qb->expr()->eq('task.file', ':file'));
 
-        $qb->setParameter('configuration', serialize($task->getConfiguration()));
+        $qb->setParameter('configuration', serialize($configuration));
         $qb->andWhere($qb->expr()->eq('task.configuration', ':configuration'));
 
         $qb->setMaxResults(1);
@@ -110,6 +121,7 @@ class VideoTaskRepository implements SingletonInterface
         }
 
         $task->setStatus($row['status']);
+        $task->setProgressSteps(json_decode($row['progress'], true) ?: []);
 
         $this->tasks->attach($task, $row['uid']);
         return $task;
@@ -125,6 +137,8 @@ class VideoTaskRepository implements SingletonInterface
     public function findByStatus(string $status): array
     {
         $qb = $this->createQueryBuilder();
+        $qb->addOrderBy('task.priority', 'desc');
+        $qb->addOrderBy('task.uid', 'asc');
 
         $qb->setParameter('status', $status);
         $qb->andWhere($qb->expr()->eq('task.status', ':status'));

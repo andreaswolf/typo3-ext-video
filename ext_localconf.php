@@ -99,8 +99,10 @@ call_user_func(function () {
 
     $GLOBALS['TYPO3_CONF_VARS']['SYS']['fal']['processingTaskTypes']['Video.CropScale']
         = \Hn\Video\Processing\VideoProcessingTask::class;
-    $GLOBALS['TYPO3_CONF_VARS']['FE']['eID_include']['video']
+    $GLOBALS['TYPO3_CONF_VARS']['FE']['eID_include'][\Hn\Video\Processing\VideoProcessingEid::EID]
         = \Hn\Video\Processing\VideoProcessingEid::class . '::process';
+    $GLOBALS['TYPO3_CONF_VARS']['FE']['eID_include'][\Hn\Video\ViewHelpers\ProgressEid::EID]
+        = \Hn\Video\ViewHelpers\ProgressEid::class . '::render';
 
     $dispatcher = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Extbase\SignalSlot\Dispatcher::class);
 

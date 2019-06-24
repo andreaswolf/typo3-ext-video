@@ -7,6 +7,7 @@ CREATE TABLE `tx_video_task`
     `file`          int(11)        NOT NULL,
     `configuration` varbinary(767) NOT NULL,
     `status`        varchar(15)    NOT NULL DEFAULT 'new',
+    `progress`      json                    DEFAULT NULL,
     `priority`      int(11)        NOT NULL DEFAULT '0',
     PRIMARY KEY (`uid`),
     KEY `task` (`file`, `configuration`, `status`),

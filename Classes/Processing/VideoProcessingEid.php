@@ -3,6 +3,7 @@
 namespace Hn\Video\Processing;
 
 
+use function GuzzleHttp\Psr7\build_query;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use TYPO3\CMS\Core\Error\Http\BadRequestException;
@@ -14,6 +15,8 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  */
 class VideoProcessingEid
 {
+    const EID = 'tx_video_process';
+
     public static function getKeys(): array
     {
         $keys = [
@@ -54,6 +57,10 @@ class VideoProcessingEid
 
     public static function getUrl()
     {
-        return 'index.php?eID=video&key=' . urlencode(self::getKeys()[0]);
+        return rtrim(GeneralUtility::getIndpEnv('TYPO3_SITE_URL'), '/')
+            . '/index.php?' . build_query([
+                'eID' => self::EID,
+                'key' => self::getKeys()[0],
+            ]);
     }
 }
