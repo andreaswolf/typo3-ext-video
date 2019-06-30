@@ -21,38 +21,24 @@ class ProgressViewHelper extends AbstractViewHelper
     {
         parent::initializeArguments();
         $this->registerArgument('file', 'int', 'File', true);
-        $this->registerArgument('configuration', 'array', 'Task configuration', true);
+        $this->registerArgument('configurations', 'array', 'Task configurations', true);
     }
 
     public static function renderStatic(array $arguments, \Closure $renderChildrenClosure, RenderingContextInterface $renderingContext)
     {
-        return static::renderHtml($arguments['file'], $arguments['configuration']);
+        return static::renderHtml($arguments['file'], $arguments['configurations']);
     }
 
-    public static function renderHtml(int $file, array $configuration)
+    public static function renderHtml(int $file, array $configurations)
     {
-        $task = GeneralUtility::makeInstance(VideoTaskRepository::class)->findByFile($file, $configuration);
-        if ($task->getLastProgress() <= 0) {
-            return '';
-        }
-
         $id = 'tx_video_progress_' . self::$counter++;
-        $attributes = ['id="' . $id . '"'];
-        $parameters = ProgressEid::parameters($task);
-        $parameters['updateUrl'] = ProgressEid::getUrl($file, $configuration);
-        foreach ($parameters as $key => $value) {
-            $attributeName = "data-" . strtolower(preg_replace('#[A-Z]#', '-\0', $key));
-            $attributeValue = '"' . htmlspecialchars($value) . '"';
-            $attributes[] = "$attributeName=$attributeValue";
-        }
+        $attributes = [
+            'id="' . $id . '"',
+            'data-update-url="' . htmlspecialchars(ProgressEid::getUrl($file, ...$configurations)) . '"',
+        ];
 
         $content = '<code ' . implode(' ', $attributes) . '>';
-        if ($task->getLastProgress() >= 1.0) {
-            $content .= '100.0%';
-            $content .= '</code>';
-        } else {
-            $content .= '<script>' . self::renderJavaScript($id) . '</script>';
-        }
+        $content .= '<script>' . self::renderJavaScript($id) . '</script>';
 
         return $content;
     }
@@ -68,16 +54,18 @@ class ProgressViewHelper extends AbstractViewHelper
         p = 0.0, r = 0, s = 0,
         updateProperties = function (o) {
             p = Number(o.progress);
-            r = Number(o.remaining);
+            r = Number(o.remaining) || Infinity;
             s = Number(o.lastUpdate);
         },
         lastContent = element.textContent,
         updateTimeout = 0,
-        requestProperties = function () {
+        requestProperties = function (callback) {
+            clearTimeout(updateTimeout);
             var xhr = new XMLHttpRequest();
             xhr.onload = function () {
                 updateProperties(JSON.parse(xhr.responseText));
                 updateTimeout = setTimeout(requestProperties, $pollingInterval);
+                callback && callback();
             };
             xhr.open('GET', element.dataset.updateUrl, true);
             xhr.send();
@@ -98,7 +86,8 @@ class ProgressViewHelper extends AbstractViewHelper
             }
             
             if (progress < 1.0) {
-                setTimeout(render, Math.max(100, r / (1.0 - p) / 1000));
+                var milliseconds = r / (1.0 - p) / 1000;
+                setTimeout(render, Math.max(100, Math.min(1000, milliseconds)));
             } else {
                 clearTimeout(updateTimeout);
                 setTimeout(function () {
@@ -110,9 +99,7 @@ class ProgressViewHelper extends AbstractViewHelper
             }
         }
     ;
-    updateProperties(element.dataset);
-    setTimeout(render, 0);
-    updateTimeout = setTimeout(requestProperties, $pollingInterval);
+    requestProperties(render);
 })();
 JavaScript;
 

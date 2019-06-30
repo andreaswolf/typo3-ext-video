@@ -10,6 +10,7 @@ use Hn\Video\Processing\VideoProcessor;
 use Hn\Video\Processing\VideoTaskRepository;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use TYPO3\CMS\Core\Error\Http\BadRequestException;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class ProgressEid
@@ -21,13 +22,24 @@ class ProgressEid
         $queryParams = $request->getQueryParams();
 
         $file = $queryParams['file'];
-        $configuration = unserialize($queryParams['configuration']);
-        $task = GeneralUtility::makeInstance(VideoTaskRepository::class)->findByFile($file, $configuration);
+        $configurations = unserialize($queryParams['configurations']);
+        if (empty($configurations)) {
+            throw new BadRequestException("At least one configuration must be given.");
+        }
 
-        // get the newest information
-        VideoProcessor::getConverter()->update($task);
+        /** @var VideoProcessingTask $highestTask */
+        $highestTask = null;
+        $videoTaskRepository = GeneralUtility::makeInstance(VideoTaskRepository::class);
+        foreach ($configurations as $configuration) {
+            $task = $videoTaskRepository->findByFile($file, $configuration);
+            // get the newest information
+            VideoProcessor::getConverter()->update($task);
+            if ($highestTask === null || $highestTask->getLastProgress() < $task->getLastProgress()) {
+                $highestTask = $task;
+            }
+        }
 
-        $content = json_encode(self::parameters($task), JSON_UNESCAPED_SLASHES);
+        $content = json_encode(self::parameters($highestTask), JSON_UNESCAPED_SLASHES);
         return $response->withBody(stream_for($content));
     }
 
@@ -41,13 +53,13 @@ class ProgressEid
         ];
     }
 
-    public static function getUrl(int $file, array $configuration)
+    public static function getUrl(int $file, array ...$configurations)
     {
         return rtrim(GeneralUtility::getIndpEnv('TYPO3_SITE_URL'), '/')
             . '/index.php?' . build_query([
                 'eID' => self::EID,
                 'file' => $file,
-                'configuration' => serialize($configuration),
+                'configurations' => serialize($configurations),
             ]);
     }
 }

@@ -25,7 +25,7 @@
                     <td style="text-align: right">
                         {task.status}<br />
                         <f:if condition="{task.status} == 'new'">
-                            {video:progress(file: task.file_uid, configuration: task.configuration) -> f:format.raw()}
+                            {video:progress(file: task.file_uid, configurations: '{0: task.configuration}') -> f:format.raw()}
                         </f:if>
                     </td>
                     <td>

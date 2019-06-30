@@ -5,6 +5,7 @@ namespace Hn\Video\Rendering;
 
 use Hn\Video\FormatRepository;
 use Hn\Video\TypeUtility;
+use Hn\Video\ViewHelpers\ProgressViewHelper;
 use TYPO3\CMS\Core\Resource;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\SignalSlot\Dispatcher;
@@ -100,8 +101,15 @@ class VideoTagRenderer implements Resource\Rendering\FileRendererInterface
 
         $sources = $this->buildSources($file, $options, $usedPathsRelativeToCurrentScript);
         self::dispatch('beforeTag', [&$attributes, &$sources], func_get_args());
-        $tag = sprintf('<video %s>%s</video>', implode(' ', $attributes), implode('', $sources));
-        self::dispatch('afterTag', [&$tag, $attributes, $sources], func_get_args());
+
+        if (empty($sources)) {
+            $sources[] = ProgressViewHelper::renderHtml($file->getUid(), $this->getConfigurations($options));
+            $tag = sprintf('<div %s>%s</div>', implode(' ', $attributes), implode('', $sources));
+            self::dispatch('afterProgressTag', [&$tag, $attributes, $sources], func_get_args());
+        } else {
+            $tag = sprintf('<video %s>%s</video>', implode(' ', $attributes), implode('', $sources));
+            self::dispatch('afterTag', [&$tag, $attributes, $sources], func_get_args());
+        }
 
         return $tag;
     }
@@ -130,16 +138,9 @@ class VideoTagRenderer implements Resource\Rendering\FileRendererInterface
 
         $sources = [];
 
-        $formats = $options['formats'] ?? $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['video']['default_video_formats'];
-        self::dispatch('formats', [&$formats], func_get_args());
-        foreach ($formats as $formatKey => $formatOptions) {
-            $sourceOptions = FormatRepository::normalizeOptions(array_replace(
-                $options,
-                ['format' => $formatKey],
-                $formatOptions
-            ));
-
-            $video = $file->process('Video.CropScale', $sourceOptions);
+        $configurations = $this->getConfigurations($options);
+        foreach ($configurations as $configuration) {
+            $video = $file->process('Video.CropScale', $configuration);
             if (!$video->exists()) {
                 continue;
             }
@@ -152,6 +153,28 @@ class VideoTagRenderer implements Resource\Rendering\FileRendererInterface
         }
 
         return $sources;
+    }
+
+    /**
+     * @param array $options
+     *
+     * @return array
+     */
+    protected function getConfigurations(array $options): array
+    {
+        $formats = $options['formats'] ?? $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['video']['default_video_formats'];
+        self::dispatch('formats', [&$formats], func_get_args());
+
+        $configurations = [];
+        foreach ($formats as $formatKey => $formatOptions) {
+            $configurations[] = FormatRepository::normalizeOptions(array_replace(
+                $options,
+                ['format' => $formatKey],
+                $formatOptions
+            ));
+        }
+
+        return $configurations;
     }
 
     /**
