@@ -157,13 +157,13 @@ class CloudConvertConverter extends AbstractVideoConverter
     {
         // throttle the update process
         $time = $_SERVER['REQUEST_TIME'] ?? time();
-        if ($task->getLastUpdate() + ProgressViewHelper::POLLING_INTERVAL >= $time) {
+        if ($task->getLastUpdate() + ProgressViewHelper::POLLING_INTERVAL > $time) {
             return;
         }
 
         // there is nothing that blocks too long
         // and typo3 excepts a timeout of 240 seconds which should be enough to download even bigger videos
-        // if it isn't that i need to add a flag to prevent the download from running within the frontend request
+        // if it isn't than i need to add a flag to prevent the download from running within the frontend request
         $this->process($task);
     }
 
