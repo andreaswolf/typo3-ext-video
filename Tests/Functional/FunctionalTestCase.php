@@ -16,6 +16,10 @@ use TYPO3\CMS\Extbase\Persistence\Generic\PersistenceManager;
 
 abstract class FunctionalTestCase extends \Nimut\TestingFramework\TestCase\FunctionalTestCase
 {
+    protected $coreExtensionsToLoad = [
+        'recordlist',
+    ];
+
     protected $testExtensionsToLoad = [
         'typo3conf/ext/video',
     ];
