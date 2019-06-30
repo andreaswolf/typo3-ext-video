@@ -101,23 +101,23 @@ class VideoProcessingTask extends AbstractTask
         return $this->getConfiguration()['priority'] ?? 0;
     }
 
-    public function addProgressStep(float $progress, int $timestamp = null): int
+    public function addProgressStep(float $progress, float $timestamp = null): int
     {
         if ($timestamp === null) {
-            $timestamp = time();
+            $timestamp = microtime(true);
         }
+
+        $newEntry = [
+            'timestamp' => $timestamp,
+            'progress' => round($progress, 5),
+        ];
 
         // put the new entry at the position
         $i = count($this->progress);
         while (true) {
             if (--$i < 0 || $this->progress[$i]['timestamp'] <= $timestamp) {
                 $insertionIndex = $i + 1;
-                array_splice($this->progress, $insertionIndex, 0, [
-                    [
-                        'timestamp' => $timestamp,
-                        'progress' => round($progress, 5),
-                    ],
-                ]);
+                array_splice($this->progress, $insertionIndex, 0, [$newEntry]);
                 return $insertionIndex;
             }
         }
