@@ -8,7 +8,9 @@ $EM_CONF[$_EXTKEY] = [
     'author_email' => 'marco@hauptsache.net',
     'author_company' => 'hauptsache.net',
     'constraints' => [
-        'depends' => [],
+        'depends' => [
+            'typo3' => '8.7.10-9.5.99',
+        ],
         'conflicts' => [],
         'suggests' => [],
     ],

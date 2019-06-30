@@ -11,7 +11,7 @@ definitions:
 
 pipelines:
   default:
-    - parallel:
+    - parallel: &test-parallel
         - step:
             name: TYPO3 8.7 (low) PHP 7.1
             image: chialab/php:7.1
@@ -20,7 +20,7 @@ pipelines:
             services:
               - mysql
             script:
-              - composer require typo3/cms-core:^8.7.10 --no-interaction --update-with-all-dependencies --prefer-lowest
+              - composer require typo3/cms-core:~8.7.10 --no-interaction --update-with-all-dependencies --prefer-lowest
               - export typo3DatabaseName=test typo3DatabaseHost=127.0.0.1 typo3DatabaseUsername=root typo3DatabasePassword=password
               - composer test:unit -- --log-junit test-reports/unit.xml
               - composer test:functional -- --log-junit test-reports/functional.xml
@@ -32,7 +32,7 @@ pipelines:
             services:
               - mysql
             script:
-              - composer require typo3/cms-core:^8.7.10 --no-interaction --update-with-all-dependencies
+              - composer require typo3/cms-core:~8.7.10 --no-interaction --update-with-all-dependencies
               - export typo3DatabaseName=test typo3DatabaseHost=127.0.0.1 typo3DatabaseUsername=root typo3DatabasePassword=password
               - composer test:unit -- --log-junit test-reports/unit.xml
               - composer test:functional -- --log-junit test-reports/functional.xml
@@ -44,19 +44,31 @@ pipelines:
             services:
               - mysql
             script:
-              - composer require typo3/cms-core:9.5.* --no-interaction --update-with-all-dependencies --prefer-lowest
+              - composer require typo3/cms-core:~9.5.5 --no-interaction --update-with-all-dependencies --prefer-lowest
               - export typo3DatabaseName=test typo3DatabaseHost=127.0.0.1 typo3DatabaseUsername=root typo3DatabasePassword=password
               - composer test:unit -- --log-junit test-reports/unit.xml
               - composer test:functional -- --log-junit test-reports/functional.xml
         - step:
-            name: TYPO3 9.5 (high) PHP 7.2
-            image: chialab/php:7.2
+            name: TYPO3 9.5 (high) PHP 7.3
+            image: chialab/php:7.3
             caches:
               - composer
             services:
               - mysql
             script:
-              - composer require typo3/cms-core:9.5.* --no-interaction --update-with-all-dependencies
+              - composer require typo3/cms-core:~9.5.5 --no-interaction --update-with-all-dependencies
               - export typo3DatabaseName=test typo3DatabaseHost=127.0.0.1 typo3DatabaseUsername=root typo3DatabasePassword=password
               - composer test:unit -- --log-junit test-reports/unit.xml
               - composer test:functional -- --log-junit test-reports/functional.xml
+  tags:
+    v*:
+      - parallel: *test-parallel
+      - step:
+          name: Push to TER
+          deployment: Production
+          image: chialab/php:7.1
+          caches:
+            - composer
+          script:
+            - composer global require helhum/ter-client:~0.1.0
+            - ~/.composer/vendor/bin/ter-client upload Intl ./ -u${TER_USERNAME} -p${TER_PASSWORD} -m"$(git tag -l -n1000 $BITBUCKET_TAG|awk '{$1=""; print}')"
