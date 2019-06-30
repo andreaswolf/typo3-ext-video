@@ -31,7 +31,7 @@ class VideoTagRendererTest extends FunctionalTestCase
         $view = new StandaloneView();
         $view->setTemplatePathAndFilename(__DIR__ . '/../../Fixtures/Media.html');
         $view->assign('file', $this->file);
-        $view->assign('options', $options);
+        $view->assign('options', $options + ['progress' => false]);
         $this->assertEquals(
             $videoTag . '</video>',
             trim($view->render())

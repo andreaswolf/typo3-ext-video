@@ -12,7 +12,15 @@ class VideoProcessingEidTest extends UnitTestCase
     protected function setUp()
     {
         parent::setUp();
-        GeneralUtility::setIndpEnv('TYPO3_SITE_URL', '/');
+        if (function_exists('GeneralUtility::setIndpEnv')) {
+            GeneralUtility::setIndpEnv('TYPO3_SITE_URL', '/');
+        } else {
+            $indpEnvCacheProperty = new \ReflectionProperty(GeneralUtility::class, 'indpEnvCache');
+            $indpEnvCacheProperty->setAccessible(true);
+            $indpEnvCache = $indpEnvCacheProperty->getValue(null);
+            $indpEnvCache['TYPO3_SITE_URL'] = '/';
+            $indpEnvCacheProperty->setValue(null, $indpEnvCache);
+        }
     }
 
     protected function tearDown()
