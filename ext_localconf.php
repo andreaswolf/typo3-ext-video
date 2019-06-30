@@ -18,11 +18,11 @@ call_user_func(function () {
     $performanceOptions = [
         // @formatter:off
         'h264' => ['ultrafast', 'medium', 'slow', 'veryslow', 'slow', 'veryslow'][$conf['preset'] ?? 2],
-        'vp0' =>  [ null      ,  null   ,  null ,  null     ,  2    ,  1        ][$conf['preset'] ?? 2],
+        'vp9' =>  [ null      ,  null   ,  null ,  null     ,  2    ,  1        ][$conf['preset'] ?? 2],
         // @formatter:on
     ];
 
-    $h264Defaults = [Preset\H264Preset::class, ['preset' => $performanceOptions['h264']]];
+    $h264Defaults = ['preset' => $performanceOptions['h264']];
     $aacDefaults = ['fdkAvailable' => !empty($conf['fdkAvailable']) || ($conf['converter'] ?? '') === 'CloudConvert'];
     $mp4Defaults = ['-movflags', '+faststart', '-map_metadata', '-1', '-f', 'mp4'];
     $vp9Defaults = ['speed' => $performanceOptions['vp9']];
@@ -35,7 +35,7 @@ call_user_func(function () {
             $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['video']['formats']['mp4:default'] = [
                 'fileExtension' => 'mp4',
                 'mimeType' => 'video/mp4',
-                'video' => $h264Defaults,
+                'video' => [Preset\H264Preset::class, $h264Defaults],
                 'audio' => [Preset\AacPreset::class, $aacDefaults],
                 'additionalParameters' => $mp4Defaults,
             ];
