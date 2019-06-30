@@ -1,8 +1,13 @@
 {
     "name": "hn/video",
-    "description": "Video transcoding in typo3",
+    "description": "Automatic conversion of videos within typo3 using local ffmpeg or cloudconvert.",
+    "keywords": ["video", "html5", "typo3", "conversion", "ffmpeg", "cloudconvert"],
     "type": "typo3-cms-extension",
     "license": "GPL-2.0-or-later",
+    "support": {
+        "issues": "https://bitbucket.org/hauptsachenet/video/issues?status=new&status=open",
+        "source": "https://bitbucket.org/hauptsachenet/video/src"
+    },
     "authors": [
         {
             "name": "Marco Pfeiffer",
@@ -14,6 +19,7 @@
     "require": {
         "php": "^7.1",
         "ext-json": "*",
+        "guzzlehttp/guzzle": "^6.3",
         "james-heinrich/getid3": "^1.9.16",
         "typo3/cms-core": "~8.7.10 || ~9.5.5"
     },
