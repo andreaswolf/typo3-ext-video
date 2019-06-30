@@ -6,6 +6,7 @@ namespace Hn\Video\ViewHelpers;
 use function GuzzleHttp\Psr7\build_query;
 use function GuzzleHttp\Psr7\stream_for;
 use Hn\Video\Processing\VideoProcessingTask;
+use Hn\Video\Processing\VideoProcessor;
 use Hn\Video\Processing\VideoTaskRepository;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -22,6 +23,9 @@ class ProgressEid
         $file = $queryParams['file'];
         $configuration = unserialize($queryParams['configuration']);
         $task = GeneralUtility::makeInstance(VideoTaskRepository::class)->findByFile($file, $configuration);
+
+        // get the newest information
+        VideoProcessor::getConverter()->update($task);
 
         $content = json_encode(self::parameters($task), JSON_UNESCAPED_SLASHES);
         return $response->withBody(stream_for($content));

@@ -10,6 +10,8 @@ use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
 
 class ProgressViewHelper extends AbstractViewHelper
 {
+    const POLLING_INTERVAL = 15;
+    const MAX_PREDICTED_PROGRESS = 20;
     private static $counter = 0;
 
     protected $escapeChildren = false;
@@ -58,8 +60,8 @@ class ProgressViewHelper extends AbstractViewHelper
     private static function renderJavaScript(string $id)
     {
         $jsonId = json_encode($id, JSON_UNESCAPED_SLASHES);
-        $pollingInterval = json_encode(15 * 1000, JSON_UNESCAPED_SLASHES);
-        $maxPredictedProgress = json_encode(20 * 1000, JSON_UNESCAPED_SLASHES);
+        $pollingInterval = json_encode(self::POLLING_INTERVAL * 1000, JSON_UNESCAPED_SLASHES);
+        $maxPredictedProgress = json_encode(self::MAX_PREDICTED_PROGRESS * 1000, JSON_UNESCAPED_SLASHES);
         $script = <<<JavaScript
 (function () {
     var element = document.getElementById($jsonId),

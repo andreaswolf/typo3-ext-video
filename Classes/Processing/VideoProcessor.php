@@ -117,7 +117,7 @@ class VideoProcessor implements ProcessorInterface
         GeneralUtility::makeInstance(VideoTaskRepository::class)->store($task);
     }
 
-    protected function getConverter(): VideoConverterInterface
+    public static function getConverter(): VideoConverterInterface
     {
         $videoConverter = $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['video']['video_converter'];
         if ($videoConverter instanceof VideoConverterInterface) {

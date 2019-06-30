@@ -395,6 +395,8 @@ class CloudConvertConverterTest extends UnitTestCase
 
         $this->converter->process($task);
         $this->assertFalse($task->isExecuted());
+        $this->assertCount(1, $task->getProgressSteps());
+        $this->assertEquals(CloudConvertConverter::PROGRESS_RANGES['convert']['input'][0], $task->getLastProgress());
     }
 
     public function testDownload()
@@ -463,14 +465,15 @@ class CloudConvertConverterTest extends UnitTestCase
             ['convert', ['command' => $command], ['uid' => 2, 'status' => serialize(['step' => 'convert'] + $startResponse), 'failed' => '0']]
         );
 
-        $this->lock->expects($this->exactly(1))->method('acquire')->willReturn(true);
-        $this->lock->expects($this->exactly(1))->method('release')->willReturn(true);
+        $this->lock->expects($this->exactly(2))->method('acquire')->willReturn(true);
+        $this->lock->expects($this->exactly(2))->method('release')->willReturn(true);
 
         $this->processedFile->expects($this->once())->method('setName')->withAnyParameters();
         $this->processedFile->expects($this->once())->method('updateProperties')->withAnyParameters();
         $this->processedFile->expects($this->once())->method('updateWithLocalFile')->withAnyParameters();
 
         $this->converter->process($task);
+        $this->assertEquals(1.0, $task->getLastProgress());
         $this->assertTrue($task->isExecuted());
         $this->assertTrue($task->isSuccessful());
     }

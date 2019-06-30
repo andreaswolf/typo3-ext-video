@@ -169,7 +169,7 @@ class VideoProcessingTask extends AbstractTask
     public function getLastUpdate(): int
     {
         if (empty($this->progress)) {
-            return 0.0;
+            return 0;
         }
 
         return end($this->progress)['timestamp'];

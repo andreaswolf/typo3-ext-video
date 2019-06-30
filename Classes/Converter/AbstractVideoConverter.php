@@ -28,4 +28,8 @@ abstract class AbstractVideoConverter implements VideoConverterInterface
         $processedFile->updateWithLocalFile($tempFilename);
         $task->setExecuted(true);
     }
+
+    public function update(VideoProcessingTask $task): void
+    {
+    }
 }

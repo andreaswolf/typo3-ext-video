@@ -13,6 +13,8 @@ use Hn\Video\Exception\ConversionException;
 use Hn\Video\FormatRepository;
 use Hn\Video\Processing\VideoProcessingEid;
 use Hn\Video\Processing\VideoProcessingTask;
+use Hn\Video\Processing\VideoTaskRepository;
+use Hn\Video\ViewHelpers\ProgressViewHelper;
 use Psr\Http\Message\UriInterface;
 use Psr\Log\LoggerInterface;
 use TYPO3\CMS\Core\Database\ConnectionPool;
@@ -25,6 +27,30 @@ use function GuzzleHttp\Psr7\uri_for;
 class CloudConvertConverter extends AbstractVideoConverter
 {
     const DB_TABLE = 'tx_video_cloudconvert_process';
+
+    const LOCKING_STRATEGY = Locking\LockingStrategyInterface::LOCK_CAPABILITY_EXCLUSIVE
+    | Locking\LockingStrategyInterface::LOCK_CAPABILITY_NOBLOCK;
+
+    const MODE_INFO = 'info';
+    const MODE_CONVERT = 'convert';
+
+    // define the progress ranges for the different stages of the conversion
+    const PROGRESS_RANGES = [
+        self::MODE_INFO => [
+            'input' => [0.0, 0.1],
+            'wait' => [0.1, 0.1],
+            'convert' => [0.1, 0.1],
+            'output' => [0.1, 0.1],
+            'finished' => [0.1, 0.1],
+        ],
+        self::MODE_CONVERT => [
+            'input' => [0.1, 0.2],
+            'wait' => [0.2, 0.2],
+            'convert' => [0.2, 0.8],
+            'output' => [0.9, 1.0],
+            'finished' => [1.0, 1.0],
+        ],
+    ];
 
     /**
      * @var \GuzzleHttp\Client
@@ -127,6 +153,20 @@ class CloudConvertConverter extends AbstractVideoConverter
         }
     }
 
+    public function update(VideoProcessingTask $task): void
+    {
+        // throttle the update process
+        $time = $_SERVER['REQUEST_TIME'] ?? time();
+        if ($task->getLastUpdate() + ProgressViewHelper::POLLING_INTERVAL >= $time) {
+            return;
+        }
+
+        // there is nothing that blocks too long
+        // and typo3 excepts a timeout of 240 seconds which should be enough to download even bigger videos
+        // if it isn't that i need to add a flag to prevent the download from running within the frontend request
+        $this->process($task);
+    }
+
     public function process(VideoProcessingTask $task): void
     {
         $formatRepository = GeneralUtility::makeInstance(FormatRepository::class);
@@ -148,7 +188,7 @@ class CloudConvertConverter extends AbstractVideoConverter
             escapeshellarg('{OUTPUTFILE}') => '{OUTPUTFILE}',
         ]);
 
-        $result = $this->pollProcess($task, 'convert', ["command" => $command]);
+        $result = $this->pollProcess($task, self::MODE_CONVERT, ["command" => $command]);
         $this->logger->debug('polled for convert', ['result' => $result, 'command' => $command]);
         if ($result === null) {
             return;
@@ -158,11 +198,12 @@ class CloudConvertConverter extends AbstractVideoConverter
             return;
         }
 
+        // prevent 2 processes from downloading the file
+        if (!$lock = $this->acquireLock($result['output']['url'])) {
+            return;
+        }
+
         // actually download the file
-        // TODO i need to make sure only one request is doing this at a time
-        // but adding a lock here would leave me with the strange situation
-        // in which i can't easily access the file some other process downloaded.
-        // i should just make sure process creates a lock and be done with it
         $tempFilename = GeneralUtility::tempnam('video');
         try {
             $this->guzzle->get($result['output']['url'], [
@@ -173,12 +214,13 @@ class CloudConvertConverter extends AbstractVideoConverter
             $this->finishTask($task, $tempFilename, $info['streams']);
         } finally {
             GeneralUtility::unlink_tempfile($tempFilename);
+            $lock->release();
         }
     }
 
     public function getInfo(VideoProcessingTask $task): ?array
     {
-        $result = $this->pollProcess($task, 'info');
+        $result = $this->pollProcess($task, self::MODE_INFO);
         if ($result['step'] !== 'finished' || !isset($result['info'])) {
             return null;
         }
@@ -234,27 +276,12 @@ class CloudConvertConverter extends AbstractVideoConverter
 
         // TODO check expired
 
-        try {
-            $identifier = $task->getSourceFile()->getSha1() . $mode . sha1($serializedOptions);
-            $lockMode = Locking\LockingStrategyInterface::LOCK_CAPABILITY_EXCLUSIVE | Locking\LockingStrategyInterface::LOCK_CAPABILITY_NOBLOCK;
-            $lock = $this->lockFactory->createLocker($identifier, $lockMode);
-            if (!$lock->acquire($lockMode)) {
-                $this->logger->debug('lock not acquired', $context);
-                // if another process is working on this conversion than just stop right here
-                return null;
-            }
-
-            // TODO handle edge case in which the lock could be aquired just after the last process finished
-            // this would result in us creating another process which we don't want
-
-        } catch (Locking\Exception $e) {
-            // it seems that the noblock implementation is not really tested
-            // passing noblock to acquire will not block on supported platforms
-            // and will block on unsuported platforms while throwing this exception afterwards
-            // i simply ignore this problem for now and don't do anything without a lock
-            $this->logger->notice('ignored locking exception', ['exception' => $e]);
+        $identifier = $task->getSourceFile()->getSha1() . $mode . sha1($serializedOptions);
+        if (!$lock = $this->acquireLock($identifier)) {
             return null;
         }
+
+        // TODO handle edge case in which the lock could be aquired just after the last process finished
 
         $processContext = ['mode' => $mode, 'options' => $converteroptions] + $context;
         if (isset($info['status'])) {
@@ -266,10 +293,11 @@ class CloudConvertConverter extends AbstractVideoConverter
             $promise = $this->createCloudConvertProcess($task, $mode, $converteroptions);
         }
 
-        $promise->then(function (array $response) {
+        $promise->then(function (array $response) use ($task, $mode) {
             // https://cloudconvert.com/api/conversions#status
             // TODO test this step check
             if (in_array($response['step'], ['input', 'wait', 'convert', 'output', 'finished'])) {
+                $this->updateProgressInformation($task, $mode, $response);
                 return $response;
             }
 
@@ -349,7 +377,7 @@ class CloudConvertConverter extends AbstractVideoConverter
 
         $createOptions['inputformat'] = $task->getSourceFile()->getExtension();
 
-        if ($mode === 'convert') {
+        if ($mode === self::MODE_CONVERT) {
             $createOptions['outputformat'] = $task->getTargetFileExtension();
             $startOptions['outputformat'] = $task->getTargetFileExtension();
             $startOptions['converteroptions'] = $converteroptions;
@@ -421,5 +449,40 @@ class CloudConvertConverter extends AbstractVideoConverter
     protected function updateCloudConvertProcess(string $processUrl): PromiseInterface
     {
         return $this->request('get', $processUrl);
+    }
+
+    protected function updateProgressInformation(VideoProcessingTask $task, string $mode, array $response)
+    {
+        $range = self::PROGRESS_RANGES[$mode][$response['step']] ?? null;
+        if (!$range) {
+            return;
+        }
+
+        $progress = (floatval($response['percent']) ?: 0.0) / 100;
+        $totalProgress = $range[0] + ($range[1] - $range[0]) * $progress;
+        $task->addProgressStep($totalProgress);
+
+        $videoTaskRepository = GeneralUtility::makeInstance(VideoTaskRepository::class);
+        $videoTaskRepository->store($task);
+    }
+
+    private function acquireLock(string $identifier): ?Locking\LockingStrategyInterface
+    {
+        try {
+            $lock = $this->lockFactory->createLocker($identifier, self::LOCKING_STRATEGY);
+            if (!$lock->acquire(self::LOCKING_STRATEGY)) {
+                $this->logger->debug('lock not acquired');
+                return null;
+            }
+
+            return $lock;
+        } catch (Locking\Exception $e) {
+            // it seems that the noblock implementation is not really tested
+            // passing noblock to acquire will not block on supported platforms
+            // and will block on unsuported platforms while throwing this exception afterwards
+            // i simply ignore this problem for now and don't do anything without a lock
+            $this->logger->notice('ignored locking exception', ['exception' => $e]);
+            return null;
+        }
     }
 }
