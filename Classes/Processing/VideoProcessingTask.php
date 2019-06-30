@@ -152,7 +152,7 @@ class VideoProcessingTask extends AbstractTask
     public function getEstimatedRemainingTime(): float
     {
         if (count($this->progress) < 2) {
-            return 0;
+            return 60 * 60 * 24;
         }
 
         // TODO more steps should be taken into consideration to reduce variance
