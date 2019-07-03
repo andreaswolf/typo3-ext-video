@@ -61,7 +61,7 @@ class H264PresetTest extends AbstractVideoPresetTest
 
     public function testMaxBitrate()
     {
-        $this->preset->setLevel(31);
+        $this->preset->setLevel('3.1');
         $mapping = [
             '0.0' => 750,
             '0.3' => 1400,
@@ -79,9 +79,19 @@ class H264PresetTest extends AbstractVideoPresetTest
         $this->assertEquals($mapping, $result, '', 100);
     }
 
+    public function testIntLevel()
+    {
+        $this->preset->setLevel('4.0');
+        $this->assertSame('4.0', $this->preset->getLevel());
+        $this->assertSame(40, $this->preset->getIntLevel());
+        $this->preset->setLevel('1.0');
+        $this->assertSame('1.0', $this->preset->getLevel());
+        $this->assertSame(10, $this->preset->getIntLevel());
+    }
+
     public function testDimensions()
     {
-        $this->preset->setLevel(31);
+        $this->preset->setLevel('3.1');
         for ($x = 1444; $x < 2560; $x += 16) {
             $dimensions = $this->preset->getDimensions(['width' => $x, 'height' => '1080']);
             $this->assertLessThanOrEqual(
@@ -108,7 +118,7 @@ class H264PresetTest extends AbstractVideoPresetTest
         $this->assertEquals('avc1.42E01E', $this->preset->getMimeCodecParameter([]));
 
         $this->preset->setProfile('high');
-        $this->preset->setLevel(40);
+        $this->preset->setLevel('4.0');
         $this->assertEquals('avc1.640028', $this->preset->getMimeCodecParameter([]));
     }
 

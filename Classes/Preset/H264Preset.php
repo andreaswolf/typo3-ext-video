@@ -16,36 +16,36 @@ class H264Preset extends AbstractVideoPreset
      * @see https://en.wikipedia.org/wiki/H.264/MPEG-4_AVC#Levels
      */
     private const LEVEL_DEFINITION = [
-        10 => [99, 1485, 64], // eg. 128×96@30 176×144@15
-        11 => [396, 3000, 192], // eg. 176×144@30 352×288@7.5
-        12 => [396, 6000, 384], // eg. 176×144@60 352×288@15
-        13 => [396, 11880, 768], // eg. 352×288@30
+        '1.0' => [99, 1485, 64], // eg. 128×96@30 176×144@15
+        '1.1' => [396, 3000, 192], // eg. 176×144@30 352×288@7.5
+        '1.2' => [396, 6000, 384], // eg. 176×144@60 352×288@15
+        '1.3' => [396, 11880, 768], // eg. 352×288@30
 
-        20 => [396, 11880, 2000], // eg. 352×288@30
-        21 => [792, 19800, 4000], // eg. 352×480@30 352×576@25
-        22 => [1620, 20250, 4000], // eg. 352×480@30 720×576@12.5
+        '2.0' => [396, 11880, 2000], // eg. 352×288@30
+        '2.1' => [792, 19800, 4000], // eg. 352×480@30 352×576@25
+        '2.2' => [1620, 20250, 4000], // eg. 352×480@30 720×576@12.5
 
-        30 => [1620, 40500, 10000], // eg. 720×480@30
-        31 => [3600, 108000, 14000], // eg. 1280×720@30
-        32 => [6120, 216000, 14000], // eg. 1280×720@60
+        '3.0' => [1620, 40500, 10000], // eg. 720×480@30
+        '3.1' => [3600, 108000, 14000], // eg. 1280×720@30
+        '3.2' => [6120, 216000, 14000], // eg. 1280×720@60
 
-        40 => [8192, 245760, 20000], // eg. 1920x1080@30
-        41 => [8192, 245760, 50000], // eg. 1920x1080@30 but with higher bitrate
-        42 => [8704, 522240, 50000], // eg. 1920x1080@60
+        '4.0' => [8192, 245760, 20000], // eg. 1920x1080@30
+        '4.1' => [8192, 245760, 50000], // eg. 1920x1080@30 but with higher bitrate
+        '4.2' => [8704, 522240, 50000], // eg. 1920x1080@60
 
         // please be *very* careful when using anything below this comment
         // and be sure to suggest youtube or vimeo over and over again before caving ...
 
-        50 => [22080, 589824, 135000], // eg. 2560×1920@30
-        51 => [36864, 983040, 240000], // eg. 4096×2048@30
-        52 => [36864, 2073600, 240000], // eg. 4096×2160@60
+        '5.0' => [22080, 589824, 135000], // eg. 2560×1920@30
+        '5.1' => [36864, 983040, 240000], // eg. 4096×2048@30
+        '5.2' => [36864, 2073600, 240000], // eg. 4096×2160@60
 
         // levels below this line are fairly new and may not be interpreted as valid
         // and even if they are, most hardware decoders won't be able to play them
 
-        60 => [139264, 4177920, 240000], // eg. 8192×4320@30
-        61 => [139264, 8355840, 480000], // eg. 8192×4320@60
-        62 => [139264, 16711680, 800000], // eg. 8192×4320@120
+        '6.0' => [139264, 4177920, 240000], // eg. 8192×4320@30
+        '6.1' => [139264, 8355840, 480000], // eg. 8192×4320@60
+        '6.2' => [139264, 16711680, 800000], // eg. 8192×4320@120
     ];
 
     /**
@@ -88,7 +88,7 @@ class H264Preset extends AbstractVideoPreset
     /**
      * @see H264Preset::$preset
      */
-    public const PERFORMANCE_PRESETS = [
+    private const PERFORMANCE_PRESETS = [
         'ultrafast',
         'veryfast',
         'faster',
@@ -112,7 +112,7 @@ class H264Preset extends AbstractVideoPreset
      * @var int
      * @see https://en.wikipedia.org/wiki/H.264/MPEG-4_AVC#Levels
      */
-    private $level = 30;
+    private $level = '3.0';
 
     /**
      * The performance preset.
@@ -137,7 +137,7 @@ class H264Preset extends AbstractVideoPreset
     {
         $requiresTranscoding = $this->requiresTranscoding($sourceStream);
         $profile = $requiresTranscoding ? $this->getProfile() : strtolower($sourceStream['profile']);
-        $level = $requiresTranscoding ? $this->getLevel() : $sourceStream['level'];
+        $level = $requiresTranscoding ? $this->getIntLevel() : $sourceStream['level'];
 
         return sprintf(
             'avc1.%04s%02s',
@@ -270,7 +270,7 @@ class H264Preset extends AbstractVideoPreset
             return true;
         }
 
-        if (!isset($sourceStream['level']) || $sourceStream['level'] > $this->getLevel() || $sourceStream['level'] < 10) {
+        if (!isset($sourceStream['level']) || $sourceStream['level'] > $this->getIntLevel() || $sourceStream['level'] < 10) {
             return true;
         }
 
@@ -284,7 +284,7 @@ class H264Preset extends AbstractVideoPreset
         array_push($parameters, '-c:v', 'libx264');
         array_push($parameters, '-preset:v', $this->getPreset());
         array_push($parameters, '-profile:v', $this->getProfile());
-        array_push($parameters, '-level:v', $this->getLevel());
+        array_push($parameters, '-level:v', $this->getIntLevel());
         array_push($parameters, '-crf:v', (string)round($this->getCrf($sourceStream), 2));
 
         $bitrate = $this->getTargetBitrate($sourceStream);
@@ -298,7 +298,7 @@ class H264Preset extends AbstractVideoPreset
     public function getProfile(): string
     {
         if ($this->profile === null) {
-            return $this->getLevel() >= 40 ? 'high' : 'main';
+            return $this->getLevel() >= 4.0 ? 'high' : 'main';
         }
 
         return $this->profile;
@@ -321,13 +321,27 @@ class H264Preset extends AbstractVideoPreset
 
     public function setLevel(string $level): void
     {
-        $level = strtr($level, ['.' => '']);
         if (!isset(self::LEVEL_DEFINITION[$level])) {
             $possibleLevels = implode(', ', array_keys(self::LEVEL_DEFINITION));
             throw new \RuntimeException("Level $level is not defined. Possible levels are: $possibleLevels");
         }
 
         $this->level = $level;
+    }
+
+    /**
+     * h264 has 2 representations of the level.
+     * The normal "3.1" definition and another 30 definition as an integer.
+     * FFmpeg (and other implementations) love the integer implementation which is why this is here.
+     *
+     * I prefer the string/float representation because other codes use it too.
+     * Although level definitions are similar between codecs, they aren't identical.
+     *
+     * @return int
+     */
+    public function getIntLevel(): int
+    {
+        return strtr($this->getLevel(), ['.' => '']);
     }
 
     public function getPreset(): string
