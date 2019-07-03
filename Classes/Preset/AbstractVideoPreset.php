@@ -262,7 +262,7 @@ abstract class AbstractVideoPreset extends AbstractCompressiblePreset
             return true;
         }
 
-        $hasTargetedFramerate = $this->getFramerate($sourceStream) === $sourceStream['avg_frame_rate'];
+        $hasTargetedFramerate = $this->getFramerate($sourceStream) === (string)$sourceStream['avg_frame_rate'];
         if (!$hasTargetedFramerate) {
             return true;
         }
@@ -273,7 +273,7 @@ abstract class AbstractVideoPreset extends AbstractCompressiblePreset
         }
 
         $dimensions = $this->getDimensions($sourceStream);
-        $hasTargetedSize = (int)$sourceStream['width'] !== $dimensions[0] && (int)$sourceStream['height'] === $dimensions[1];
+        $hasTargetedSize = (int)$sourceStream['width'] === $dimensions[0] && (int)$sourceStream['height'] === $dimensions[1];
         if (!$hasTargetedSize) {
             return true;
         }

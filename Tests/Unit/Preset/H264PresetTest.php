@@ -112,4 +112,21 @@ class H264PresetTest extends AbstractVideoPresetTest
         $this->assertEquals('avc1.640028', $this->preset->getMimeCodecParameter([]));
     }
 
+    public function testRequiresTranscoding()
+    {
+        parent::testRequiresTranscoding();
+        $this->assertTrue($this->preset->requiresTranscoding(['width' => 320, 'height' => 240]));
+        $this->assertFalse($this->preset->requiresTranscoding([
+            'codec_name' => $this->preset->getCodecName(),
+            'width' => 320,
+            'height' => 240,
+            'pix_fmt' => 'yuv420p',
+            'avg_frame_rate' => 30,
+            'r_frame_rate' => 30,
+            'bit_rate' => 32,
+            'level' => 30,
+            'profile' => 'main'
+        ]));
+    }
+
 }
