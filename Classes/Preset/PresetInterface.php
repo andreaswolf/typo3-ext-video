@@ -7,12 +7,12 @@ namespace Hn\Video\Preset;
 interface PresetInterface
 {
     /**
-     * This can be implemented to change options of this preset.
+     * The constructor must accept an array of options.
      * These options may be specific to the preset.
      *
      * @param array $options
      */
-    public function setOptions(array $options): void;
+    public function __construct(array $options = []);
 
     /**
      * This method must return you ffmpeg parameters for the stream this preset is targeting.

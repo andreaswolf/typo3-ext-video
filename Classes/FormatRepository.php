@@ -53,14 +53,16 @@ class FormatRepository implements SingletonInterface
                 }
             }
 
-            $preset = GeneralUtility::makeInstance(...$definition[$steamType]);
+            $presetOptions = array_replace(
+                $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['video']['defaults'][$definition[$steamType][0]] ?? [],
+                $definition[$steamType][1] ?? [],
+                $options[$steamType] ?? []
+            );
+
+            $preset = GeneralUtility::makeInstance($definition[$steamType][0], $presetOptions);
             if (!$preset instanceof PresetInterface) {
                 $type = is_object($preset) ? get_class($preset) : gettype($preset);
                 throw new \RuntimeException("Expected " . PresetInterface::class . ", got $type");
-            }
-
-            if (isset($options[$steamType])) {
-                $preset->setOptions($options[$steamType]);
             }
 
             $result[$steamType] = [

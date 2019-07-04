@@ -34,34 +34,136 @@ TYPO3 already handles image compression (at least sometimes). So wouldn't it be 
   
 ## Configuration
 
-By default, you'll get a level 3.0 h264 video stream (a 480p video stream) with an aac-lc audio stream.
-This configuration ensures maximum compatibility but you might want higher quality or even lower quality.
+To understand the the configuration, you'll need to know some basics first.
+There are 3 levels:
 
-The configuration is based on configurable presets for each stream.
-You can configure formats in `$GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['video']['formats']['{format-name}']`
-and the default format is defined in `$GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['video']['default_video_formats']`.
+1. the *format*: eg. mp4 or webm.
+   The format defines what the file is supposed to be, which streams are in it, what mime type it is
+   and format specific ffmpeg parameters. The streams are the interesting part.
+2. the stream *preset*: which defines an audio or video stream. Examples: `H264Preset` and `AacPreset`.
+   Presets are classes which define how the ffmpeg command will look like.
+   They are fairly complex but can create your own ones if you need a specific format that i haven't created.
+   But most likely you want to configure the existing presets.
+3. *preset configuration*: Is a simple array which maps onto the setters of the Preset.
+   There you can tune compatibility, resolution, framerate and quality.
+   This is what you are most likely interested in.
 
-### change format defaults
 
-Let's say 480p isn't enough for you and you want to upgrade to 720p (level 3.1).
-You can do this in multiple places.
-
-#### create or modify a format globally
+### The format definition
 
 ```php
-$GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['video']['formats']['mp4:default'] = [
+$GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['video']['formats']['mp4'] = [
     'fileExtension' => 'mp4',
     'mimeType' => 'video/mp4',
-    'video' => [Preset\H264Preset::class, ['level' => 31]], // here is the important part
-    'audio' => [Preset\AacPreset::class, []],
+    'video' => [Preset\H264Preset::class],
+    'audio' => [Preset\AacPreset::class],
     'additionalParameters' => ['-movflags', '+faststart', '-map_metadata', '-1', '-f', 'mp4'],
 ];
 ```
 
-#### adhoc while rendering
+That is the default format definition of the mp4 video container. A format definition consists of these parts:
+
+- `fileExtension` which simply defines what file extension the resulting file must have.
+  While the default format definitions use the file extension also as the identifier, yours don't have to.
+- `mimeType` for the `<source type="">`. Although a codec extension will be added.
+- `video` defines a *preset* for the video stream. Omit or set to null if your format does not require/support video.
+  You can add a second argument with options which will be passed to the constructor
+  (if not overridden in other places).
+- `audio` defines a *preset* for the audio stream. Omit or set to null if your format does not require/support audio.
+- `subtitle` defines a *preset* for the subtitle stream. There are none implemented by default but the option is there.
+- `data` defines a *preset* for the data stream. There are none implemented by default but the option is there.
+- `additionalParameters` is an array of parameters that are added to the ffmpeg command
+
+You can configure formats in `$GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['video']['formats']['{format-name}']`.
+There is a list of formats that is used by default.
+It is defined in `$GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['video']['default_video_formats']` and looks like this:
+
+```php
+$GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['video']['default_video_formats'] = [
+    // 'webm' => [], // this format is by default disabled but can be enabled in ext_conf.
+    'mp4' => [],
+    
+    // you can even pass options to the presets within here
+    'mp4' => ['level' => '4.0']
+    // in this case i increate the compatibility level to 4.0 which allows full-hd.
+    // read more about that in the preset configuration.
+];
+```
+
+The other way of using the format is ad-hoc within the media view helper.
 
 ```html
-<f:media file="{file}" additionalConfig="{formats: {mp4: {level: 31}}}" />
+<f:media file="{file}" additionalConfig="{formats: {mp4: {}}}" />
+<!-- you can pass preset options here as well -->
+<f:media file="{file}" additionalConfig="{formats: {mp4: {video: {quality: 0.6, width: 400, height: 400, crop: 1}}}}" />
+```
+
+### The preset
+
+The presets are classes which define how a stream is handled.
+You probably want to understand the basic concept of them
+because it'll make it easier to understand the preset configuration.
+
+- `PresetInterface` is the base and explains what you need.
+  A minimal preset would just define `getParameters`
+  which must return an array of ffmpeg arguments like `['-c:v', 'libx264']`.
+  The preset configuration is simply passed as an array to the constructor.
+  A result of `ffprobe` is passed as an argument to `getParameters`
+  so that decisions can be implemented based on the source material.
+- `AbstractPreset` is a base implementation that handles options by searching a setter method for them.
+  So that the option `quality` is passed as `setQuality`.
+- `AbstractCompressiblePreset` sits on top of the `AbstractPreset` and adds a 2 concepts
+  - an abstraction over the quality using a value `> 0.0` and `<= 1.0` which should roughly equal jpeg's options
+  - the "this stream does not need to be touched" so that a stream with equal or lower quality doesn't get re-encoded
+- `AbstractVideoPreset` and `AbstractAudioPreset` start to go into specifics of the stream type.
+  The video preset handles framerate, video resolution and cropping.
+  The audio preset handles channels and sample rates.
+  If you want/need to implement eg. H265 support, you probably want to extend one of those.
+- `AacPreset`, `H264Preset`, `OpusPreset`, `VP9Preset` are the concrete implementations of formats.
+  Use them as example implementations if you need to.
+
+### The preset configuration
+
+These configurations allow you in multiple places to tweak the streams within a video/file.
+
+You can define add them globally for a specific stream type:
+```php
+$GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['video']['defaults'][\Hn\Video\Preset\H264Preset::class]['quality'] = 0.6;
+$GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['video']['defaults'][\Hn\Video\Preset\AacPreset::class]['quality'] = 1.0;
+```
+
+You can define them within the format definition itself:
+
+```php
+$GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['video']['formats']['mp4'] = [
+    'fileExtension' => 'mp4',
+    'mimeType' => 'video/mp4',
+    'video' => [Preset\H264Preset::class, ['quality' => 0.6]],
+    'audio' => [Preset\AacPreset::class, ['quality' => 1.0]],
+    'additionalParameters' => ['-movflags', '+faststart', '-map_metadata', '-1', '-f', 'mp4'],
+];
+```
+
+You can define them on the default set of formats used. Here you target them by there type eg. video, audio:
+```php
+$GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['video']['default_video_formats']['mp4'] = [
+    'video' => ['quality' => 0.6],
+    'audio' => ['quality' => 1.0]
+];
+```
+
+And you can define them within the media view helper similar to the definition above.
+Note that by defining the `formats` key, the `default_video_formats` configurations is overridden. 
+
+```html
+<f:media file="{file}" additionalConfig="{formats: {mp4: {video: {quality: 0.6}, audio: {quality: 1.0}}}}" />
+```
+
+You can also define them within the view helper without overriding the format list
+but you should limit yourself to common options like `width`, `height`, `quality` and `framerate` if you do that.
+
+```html
+<f:media file="{file}" additionalConfig="{video: {quality: 0.6}, audio: {quality: 1.0}}" />
 ```
 
 ## Run the tests
