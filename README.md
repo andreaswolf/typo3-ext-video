@@ -131,8 +131,8 @@ because it'll make it easier to understand the preset configuration.
 - `AbstractPreset` is a base implementation that handles options by searching a setter method for them.
   So that the option `quality` is passed as `setQuality`.
 - `AbstractCompressiblePreset` sits on top of the `AbstractPreset` and adds a 2 concepts
-  - an abstraction over the quality using a value `> 0.0` and `<= 1.0` which should roughly equal jpeg's options
-  - the "this stream does not need to be touched" so that a stream with equal or lower quality doesn't get re-encoded
+    - an abstraction over the quality using a value `> 0.0` and `<= 1.0` which should roughly equal jpeg's options
+    - the "this stream does not need to be touched" so that a stream with equal or lower quality doesn't get re-encoded
 - `AbstractVideoPreset` and `AbstractAudioPreset` start to go into specifics of the stream type.
   The video preset handles framerate, video resolution and cropping.
   The audio preset handles channels and sample rates.
