@@ -42,6 +42,7 @@ These options are read using TYPO3 9's `ExtensionConfiguration` class so if you 
 you can also define these options programmatically in you `AdditionalConfiguration.php` like in this example:
 
 ```php
+<?php
 if (getenv('CLOUDCONVERT_APIKEY')) {
     $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['video']['converter'] = 'CloudConvert';
     $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['video']['cloudConvertApiKey'] = getenv('CLOUDCONVERT_APIKEY');
@@ -68,11 +69,12 @@ There are 3 levels:
 ### The format definition
 
 ```php
+<?php
 $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['video']['formats']['mp4'] = [
     'fileExtension' => 'mp4',
     'mimeType' => 'video/mp4',
-    'video' => [Preset\H264Preset::class],
-    'audio' => [Preset\AacPreset::class],
+    'video' => [\Hn\Video\Preset\H264Preset::class],
+    'audio' => [\Hn\Video\Preset\AacPreset::class],
     'additionalParameters' => ['-movflags', '+faststart', '-map_metadata', '-1', '-f', 'mp4'],
 ];
 ```
@@ -144,6 +146,7 @@ These configurations allow you in multiple places to tweak the streams within a 
 
 You can define add them globally for a specific stream type:
 ```php
+<?php
 $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['video']['defaults'][\Hn\Video\Preset\H264Preset::class]['quality'] = 0.6;
 $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['video']['defaults'][\Hn\Video\Preset\AacPreset::class]['quality'] = 1.0;
 ```
@@ -151,17 +154,19 @@ $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['video']['defaults'][\Hn\Video\Preset\Aac
 You can define them within the format definition itself:
 
 ```php
+<?php
 $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['video']['formats']['mp4'] = [
     'fileExtension' => 'mp4',
     'mimeType' => 'video/mp4',
-    'video' => [Preset\H264Preset::class, ['quality' => 0.6]],
-    'audio' => [Preset\AacPreset::class, ['quality' => 1.0]],
+    'video' => [\Hn\Video\Preset\H264Preset::class, ['quality' => 0.6]],
+    'audio' => [\Hn\Video\Preset\AacPreset::class, ['quality' => 1.0]],
     'additionalParameters' => ['-movflags', '+faststart', '-map_metadata', '-1', '-f', 'mp4'],
 ];
 ```
 
 You can define them on the default set of formats used. Here you target them by there type eg. video, audio:
 ```php
+<?php
 $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['video']['default_video_formats']['mp4'] = [
     'video' => ['quality' => 0.6],
     'audio' => ['quality' => 1.0]
