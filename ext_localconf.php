@@ -22,15 +22,27 @@ call_user_func(function () {
         // @formatter:on
     ];
 
-
     // these are global defaults for the different presets
     // if you want to change all h264 streams, defaults is your way
     $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['video']['defaults'] = array_replace_recursive(
         [
-            Preset\H264Preset::class => ['preset' => $performanceOptions['h264']],
-            Preset\VP9Preset::class => ['speed' => $performanceOptions['vp9']],
-            Preset\AacPreset::class => ['fdkAvailable' => !empty($conf['fdkAvailable']) || ($conf['converter'] ?? '') === 'CloudConvert'],
-            Preset\OpusPreset::class => [],
+            Preset\H264Preset::class => [
+                'preset' => $performanceOptions['h264'],
+                'level' => $conf['level'] ?? '3.1',
+                'quality' => $conf['videoQuality'] ?? 0.8,
+            ],
+            Preset\VP9Preset::class => [
+                'speed' => $performanceOptions['vp9'],
+                'level' => $conf['level'] ?? '3.1',
+                'quality' => $conf['videoQuality'] ?? 0.8,
+            ],
+            Preset\AacPreset::class => [
+                'fdkAvailable' => !empty($conf['fdkAvailable']) || ($conf['converter'] ?? '') === 'CloudConvert',
+                'quality' => $conf['audioQuality'] ?? 0.8,
+            ],
+            Preset\OpusPreset::class => [
+                'quality' => $conf['audioQuality'] ?? 0.8,
+            ],
         ],
         $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['video']['defaults'] ?? []
     );

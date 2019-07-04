@@ -1,14 +1,23 @@
-# cat=basic; type=options[LocalFFmpeg,CloudConvert]; label=Converter:Define how videos should be converted. LocalFFmpeg requires you to have ffmpeg installed on your webserver. CloudConvert requires an api key and isn't free if you convert a lot of videos but will keep the load off of your webserver.
+# cat=platform; type=options[LocalFFmpeg,CloudConvert]; label=Converter:Define how videos should be converted. LocalFFmpeg requires you to have ffmpeg installed on your webserver. CloudConvert requires an api key and isn't free if you convert a lot of videos but will keep the load off of your webserver.
 converter = LocalFFmpeg
 
-# cat=basic; type=string; label=CloudConvert Api-Key:If you want to use CloudConvert than you'll need to define this.
+# cat=platform; type=string; label=CloudConvert Api-Key:If you want to use CloudConvert than you'll need to define this.
 cloudConvertApiKey =
 
-# cat=basic; type=boolean; label=FDK AAC available:Enable this if your local ffmpeg instance can encode using libfdk_aac. This encoder creates noticeably better audio quality especially at lower bitrates. This options is ignored if CloudConvert is used since they have fdk available and not using it would be a waste.
+# cat=platform; type=boolean; label=FDK AAC available:Enable this if your local ffmpeg instance can encode using libfdk_aac. This encoder creates noticeably better audio quality especially at lower bitrates. This options is ignored if CloudConvert is used since they have fdk available and not using it would be a waste.
 fdkAvailable = 0
 
-# cat=basic; type=boolean; label=Enable test element:This will add a content element to your instance with which you can easily test different video settings
+# cat=platform; type=boolean; label=Enable test element:This will add a content element to your instance with which you can easily test different video settings
 testElement = 0
 
-# cat=basic; type=options[h264:ultrafast (for testing)=0,h264:medium=1,h264:slow (default)=2,h264:veryslow=3,vp9:speed-2 h264:slow (very good)=4,vp9:speed-1 h264:veryslow (if conversion time does not matter to you)=5]; label=Performance Preset:Quickly change the tradeof between conversion speed and quality/size.
+# cat=quality; type=options[h264:ultrafast (for testing)=0,h264:medium=1,h264:slow (default)=2,h264:veryslow=3,vp9:speed-2，h264:slow (very good)=4,vp9:speed-1，h264:veryslow (if conversion time does not matter to you)=5]; label=Performance Preset:Quickly change the tradeof between conversion speed and quality/size. VP9 may take a very long time to encode but saves bandwith and increases quality at the same time. However it may not be tested as much as h264 and lacks browser support in IE and Safari.
 preset = 2
+
+# cat=quality; type=options[3.0: ~480p (saves bandwith and maximises compatibility)=3.0,3.1: ~720p (recommended tradeof between size，fidelity and compatibility)=3.1,4.0: ~1080p (looks good but may create problems for people with lower bandwith)=4.0]; label=Decoder level:Here you can define how complex video streams are supposed to get.
+level = 3.1
+
+# cat=quality; type=options[50%=0.5,60% (if you need to save bandwith this might still be ok)=0.6,70%=0.7,80% (recommended)=0.8,90%=0.9,100%=1.0]; label=Video Quality:Defines the video quality. It is roughly based on the jpeg quality metric.
+videoQuality = 0.8
+
+# cat=quality; type=options[50% ~60 kbit/s=0.5,60% ~80 kbit/s=0.6,70% ~102 kbit/s=0.7,80% ~128 kbit/s (recommended)=0.8,90% ~158 kbit/s=0.9,100% ~192 kbit/s=1.0]; label=Audio Quality:Defines the audio quality. The bitrate example a rough estimate on the aac bitrate which is just for orientation purposes since the actual bitrate is variable. The aac preset might resort to aac-he when the bitrate is <= 80 kbit/s so lower qualities might not sound as bad as you think if fdk is available. webm/vp9 video will use opus audio which is also better than you'd expect at low bitrates.
+audioQuality = 0.8

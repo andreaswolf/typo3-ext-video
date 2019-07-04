@@ -30,9 +30,25 @@ TYPO3 already handles image compression (at least sometimes). So wouldn't it be 
   This command will run the conversion if you use local `ffmpeg`.
   If you use CloudConvert, this command is technically not required since everything can be handled though callbacks
   but it will increase the accuracy of the progress information and act as a fallback if the callbacks
-  don't come though for whatever reason. 
+  don't come though for whatever reason.
   
-## Configuration
+## Simple Configuration
+
+There are some basic configuration options within the ext_conf which you can set though the TYPO3 backend globally.
+You can configure which encoder to use (local ffmpeg or cloud convert) and some basic quality settings there.
+Definitely take a look into them.
+
+These options are read using TYPO3 9's `ExtensionConfiguration` class so if you use TYPO3 9,
+you can also define these options programmatically in you `AdditionalConfiguration.php` like in this example:
+
+```php
+if (getenv('CLOUDCONVERT_APIKEY')) {
+    $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['video']['converter'] = 'CloudConvert';
+    $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['video']['cloudConvertApiKey'] = getenv('CLOUDCONVERT_APIKEY');
+}
+```
+  
+## In-Depth Configuration
 
 To understand the the configuration, you'll need to know some basics first.
 There are 3 levels:
