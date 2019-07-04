@@ -144,7 +144,7 @@ because it'll make it easier to understand the preset configuration.
 
 These configurations allow you in multiple places to tweak the streams within a video/file.
 
-You can define add them globally for a specific stream type:
+You can define them globally for a specific stream type:
 ```php
 <?php
 $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['video']['defaults'][\Hn\Video\Preset\H264Preset::class]['quality'] = 0.6;
