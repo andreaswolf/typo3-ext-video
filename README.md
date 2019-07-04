@@ -15,7 +15,7 @@ TYPO3 already handles image compression (at least sometimes). So wouldn't it be 
 
 ## How does it work
 
-- It starts with a new `FileRenderer` which can simply be used through the `<f:media>` view helper.
+- It starts with a new `FileRenderer` which automatically kicks in if you use the `<f:media>` view helper.
 - This renderer will go through the normal TYPO3 file processing pipeline using a new `Video.CropScale` task.
 - Videos are then processed either by the `ffmpeg` command or by [CloudConvert](https://cloudconvert.com).
 - During processing, the `FileRenderer` will render a simple progress percentage.
