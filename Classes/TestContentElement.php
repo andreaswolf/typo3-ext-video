@@ -3,6 +3,7 @@
 namespace Hn\Video;
 
 
+use Hn\Video\ViewHelpers\ProgressViewHelper;
 use TYPO3\CMS\Core\Resource\FileInterface;
 use TYPO3\CMS\Core\Resource\FileReference;
 use TYPO3\CMS\Core\Resource\Rendering\RendererRegistry;
@@ -67,6 +68,7 @@ class TestContentElement
                     $content .= $renderer->render($processedFile, 0, 0, $configuration);
                 } else {
                     $content .= "<div>file is still processing</div>";
+                    $content .= ProgressViewHelper::renderHtml($file->getUid(), [$configuration]);
                 }
 
                 $content .= '</figure>';
