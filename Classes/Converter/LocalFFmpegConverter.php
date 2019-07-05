@@ -32,7 +32,10 @@ class LocalFFmpegConverter extends AbstractVideoConverter
         $localFile = $task->getSourceFile()->getForLocalProcessing(false);
         $info = $this->ffprobe($localFile);
         $streams = $info['streams'] ?? [];
+
         $duration = $info['format']['duration'] ?? 3600.0;
+        $duration = $duration - $task->getConfiguration()['start'] ?? 0;
+        $duration = min($duration, $task->getConfiguration()['duration'] ?? INF);
 
         $tempFilename = GeneralUtility::tempnam('video');
         try {
