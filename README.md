@@ -35,8 +35,11 @@ TYPO3 already handles image compression (at least sometimes). So wouldn't it be 
 ## Simple Configuration
 
 There are some basic configuration options within the ext_conf which you can set though the TYPO3 backend globally.
-You can configure which encoder to use (local ffmpeg or cloud convert) and some basic quality settings there.
-Definitely take a look into them.
+
+- how to use ffmpeg (CloudConvert or ffmpeg command)
+- choose between performance presets like h264 slow, veryslow and if you want to also encode vp9
+- change the codec level to change resolution, filesize and compatibility
+- decide on video/audio compression using an easy percentage value that's similar to the jpeg quality percentage
 
 These options are read using TYPO3 9's `ExtensionConfiguration` class so if you use TYPO3 9,
 you can also define these options programmatically in you `AdditionalConfiguration.php` like in this example:
