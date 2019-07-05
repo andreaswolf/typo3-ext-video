@@ -13,7 +13,7 @@ if (TYPO3_MODE === 'BE') {
         'mod1',         // Name of the module
         '',             // Position of the module
         array(          // Allowed controller action combinations
-            'Task' => 'list',
+            'Task' => 'list, delete',
         ),
         array(          // Additional configuration
             'access'    => 'user,group',

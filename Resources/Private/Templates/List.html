@@ -40,10 +40,20 @@
                         </dl>
                     </td>
                     <td>
-                        <a href="#" class="btn btn-default" title="Info"
-                           onclick="top.TYPO3.InfoWindow.showItem('_FILE', {task.file_combi_ident -> f:format.json()});return false;">
-                            <c:icon identifier="actions-document-info" />
-                        </a>
+                        <div class="btn-group">
+                            <a href="#" class="btn btn-default" title="Info"
+                               onclick="top.TYPO3.InfoWindow.showItem('_FILE', {task.file_combi_ident -> f:format.json()});return false;">
+                                <c:icon identifier="actions-document-info" />
+                            </a>
+                            <f:if condition="{task.status} == 'new' || {task.status} == 'failed' && {task.lastUpdate} == 0">
+                                <f:form action="delete" class="btn-group">
+                                    <f:form.hidden name="task" value="{task.uid}" />
+                                    <button class="btn btn-default" title="Delete">
+                                        <c:icon identifier="actions-edit-delete" />
+                                    </button>
+                                </f:form>
+                            </f:if>
+                        </div>
                     </td>
                 </tr>
             </f:for>

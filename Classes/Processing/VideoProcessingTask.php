@@ -4,7 +4,6 @@ namespace Hn\Video\Processing;
 
 
 use Hn\Video\FormatRepository;
-use PhpParser\Node\Expr\AssignOp\Mod;
 use TYPO3\CMS\Core\Resource\Processing\AbstractTask;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -16,6 +15,11 @@ class VideoProcessingTask extends AbstractTask
     const STATUS_NEW = 'new';
     const STATUS_FINISHED = 'finished';
     const STATUS_FAILED = 'failed';
+
+    /**
+     * @var int|null
+     */
+    protected $uid = null;
 
     /**
      * @var string
@@ -130,16 +134,6 @@ class VideoProcessingTask extends AbstractTask
         return $this->progress;
     }
 
-    /**
-     * @param array $progress
-     *
-     * @internal this method does no validation and is meant for deserialization.
-     */
-    public function setProgressSteps(array $progress): void
-    {
-        $this->progress = $progress;
-    }
-
     public function getLastProgress(): float
     {
         if (empty($this->progress)) {
@@ -173,5 +167,21 @@ class VideoProcessingTask extends AbstractTask
         }
 
         return end($this->progress)['timestamp'];
+    }
+
+    public function getUid(): ?int
+    {
+        return $this->uid;
+    }
+
+    /**
+     * @param array $row
+     * @internal this method is meant for deserialization
+     */
+    public function setDatabaseRow(array $row)
+    {
+        $this->uid = $row['uid'];
+        $this->setStatus($row['status']);
+        $this->progress = json_decode($row['progress'], true) ?: [];
     }
 }

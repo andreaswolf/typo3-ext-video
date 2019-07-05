@@ -22,15 +22,14 @@ class VideoTaskRepository implements SingletonInterface
     private $connection;
 
     /**
-     * @var \SplObjectStorage
+     * @var VideoProcessingTask[]
      */
-    private $tasks;
+    private $tasks = [];
 
     public function __construct()
     {
         $connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
         $this->connection = $connectionPool->getConnectionForTable(self::TABLE_NAME);
-        $this->tasks = new \SplObjectStorage();
     }
 
     public function store(VideoProcessingTask $task)
@@ -44,13 +43,13 @@ class VideoTaskRepository implements SingletonInterface
             'priority' => $task->getPriority(),
         ];
 
-        if ($this->tasks->contains($task)) {
-            $id = $this->tasks->offsetGet($task);
-            $this->connection->update(self::TABLE_NAME, $values, ['uid' => $id]);
+        if ($task->getUid() !== null && $this->tasks[$task->getUid()] === $task) {
+            $this->connection->update(self::TABLE_NAME, $values, ['uid' => $task->getUid()]);
         } else {
             $this->connection->insert(self::TABLE_NAME, $values + ['crdate' => $values['tstamp']]);
             $id = $this->connection->lastInsertId(self::TABLE_NAME);
-            $this->tasks->attach($task, $id);
+            $task->setDatabaseRow($values + ['uid' => $id]);
+            $this->tasks[$id] = $task;
         }
     }
 
@@ -101,30 +100,23 @@ class VideoTaskRepository implements SingletonInterface
         return $this->serializeTask($row);
     }
 
-    protected function serializeTask(array $row): VideoProcessingTask
+    /**
+     * @param int $uid
+     *
+     * @return VideoProcessingTask|null
+     */
+    public function findByUid(int $uid): ?VideoProcessingTask
     {
-        foreach ($this->tasks as $task) {
-            if ($this->tasks[$task] === $row['uid']) {
-                return $task;
-            }
+        $qb = $this->createQueryBuilder();
+        $qb->andWhere($qb->expr()->eq('task.uid', $qb->createNamedParameter($uid, Connection::PARAM_INT)));
+
+        $qb->setMaxResults(1);
+        $row = $qb->execute()->fetch();
+        if (!$row) {
+            return null;
         }
 
-        $file = ResourceFactory::getInstance()->getFileObject($row['file']);
-        $configuration = unserialize($row['configuration']);
-
-        $repository = GeneralUtility::makeInstance(ProcessedFileRepository::class);
-        $processedFile = $repository->findOneByOriginalFileAndTaskTypeAndConfiguration($file, 'Video.CropScale', $configuration);
-        $task = $processedFile->getTask();
-        if (!$task instanceof VideoProcessingTask) {
-            $type = is_object($task) ? get_class($task) : gettype($task);
-            throw new \RuntimeException("Expected " . VideoProcessingTask::class . ", got $type");
-        }
-
-        $task->setStatus($row['status']);
-        $task->setProgressSteps(json_decode($row['progress'], true) ?: []);
-
-        $this->tasks->attach($task, $row['uid']);
-        return $task;
+        return $this->serializeTask($row);
     }
 
     /**
@@ -147,4 +139,50 @@ class VideoTaskRepository implements SingletonInterface
         return array_map([$this, 'serializeTask'], $rows);
     }
 
+    protected function serializeTask(array $row): VideoProcessingTask
+    {
+        if (isset($this->tasks[$row['uid']])) {
+            $this->tasks[$row['uid']]->setDatabaseRow($row);
+            return $this->tasks[$row['uid']];
+        }
+
+        $file = ResourceFactory::getInstance()->getFileObject($row['file']);
+        $configuration = unserialize($row['configuration']);
+
+        $repository = GeneralUtility::makeInstance(ProcessedFileRepository::class);
+        $processedFile = $repository->findOneByOriginalFileAndTaskTypeAndConfiguration($file, 'Video.CropScale', $configuration);
+        $task = $processedFile->getTask();
+        if (!$task instanceof VideoProcessingTask) {
+            $type = is_object($task) ? get_class($task) : gettype($task);
+            throw new \RuntimeException("Expected " . VideoProcessingTask::class . ", got $type");
+        }
+
+        $task->setDatabaseRow($row);
+        $this->tasks[$row['uid']] = $task;
+        return $task;
+    }
+
+    /**
+     * @param VideoProcessingTask $task
+     *
+     * @return bool
+     */
+    public function delete(VideoProcessingTask $task): bool
+    {
+        if ($task->getUid() === null || !isset($this->tasks[$task->getUid()])) {
+            return false;
+        }
+
+        $qb = $this->connection->createQueryBuilder();
+        $qb->delete(self::TABLE_NAME);
+        $qb->where($qb->expr()->eq('uid', $qb->createNamedParameter($task->getUid(), Connection::PARAM_INT)));
+
+        $success = $qb->execute() > 0;
+        if ($success) {
+            unset($this->tasks[$task->getUid()]);
+            return true;
+        } else {
+            return false;
+        }
+    }
 }

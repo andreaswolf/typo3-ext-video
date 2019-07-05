@@ -3,7 +3,9 @@
 namespace Hn\Video\Controller;
 
 
+use Hn\Video\Processing\VideoTaskRepository;
 use TYPO3\CMS\Core\Database\ConnectionPool;
+use TYPO3\CMS\Core\Messaging\AbstractMessage;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 
@@ -44,5 +46,24 @@ class TaskController extends ActionController
         $this->view->assignMultiple([
             'tasks' => $generator(),
         ]);
+    }
+
+    public function deleteAction(int $task)
+    {
+        $videoTaskRepository = GeneralUtility::makeInstance(VideoTaskRepository::class);
+        $task = $videoTaskRepository->findByUid($task);
+        if (!$task) {
+            $this->addFlashMessage("Task wasn't found", AbstractMessage::ERROR);
+            $this->redirect('list');
+        }
+
+        $success = $videoTaskRepository->delete($task);
+        if ($success) {
+            $this->addFlashMessage("Task was deleted", AbstractMessage::OK);
+        } else {
+            $this->addFlashMessage("Unknown error while deleting the task", AbstractMessage::ERROR);
+        }
+
+        $this->redirect('list');
     }
 }
