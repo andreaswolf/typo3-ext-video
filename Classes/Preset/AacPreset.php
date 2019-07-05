@@ -73,10 +73,10 @@ class AacPreset extends AbstractAudioPreset
      * Here some examples of the bitrate using different quality settings (with fdk available)
      * - 100% = 192 kbit/s the highest android recommends
      * - 80% = 128 kbit/s default ~ usually a safe bet and the quality youtube uses
-     * - 60% = 80 kbit/s
+     * - 60% = 80 kbit/s at this point HE-AAC will be used which might be a compatibility consideration
      * - 56% = 72 kbit/s this is the bitrate DAB+ uses with HE-AAC
      * - 50% = 60 kbit/s
-     * - 42% = 48 kbit/s the lowest recommended bitrate for HE-AAC ~ after this it'll start to sound really bad
+     * - 42% = 48 kbit/s the lowest recommended bitrate i'd even consider ~ after this it'll start to sound really bad
      * - 30% = 32 kbit/s
      * - 0% = 16 kbit/s
      *
