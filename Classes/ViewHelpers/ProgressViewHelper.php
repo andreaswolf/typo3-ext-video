@@ -84,7 +84,7 @@ class ProgressViewHelper extends AbstractViewHelper
             'data-update-url="' . htmlspecialchars(ProgressEid::getUrl(...$uids)) . '"',
         ];
 
-        $content = '<code ' . implode(' ', $attributes) . '>';
+        $content = '<code ' . implode(' ', $attributes) . '></code>';
         $content .= '<script>' . self::renderJavaScript($id) . '</script>';
 
         return $content;
