@@ -68,10 +68,10 @@ class TestContentElement
                     $content .= $renderer->render($processedFile, 0, 0, $configuration);
                 } else {
                     $content .= "<div>file is still processing</div>";
-                    $content .= ProgressViewHelper::renderHtml($file->getUid(), [$configuration]);
+                    $content .= ProgressViewHelper::renderHtml($processedFile);
                 }
 
-                $content .= '</figure>';
+                $content .= "</figure>\n";
             }
         }
 

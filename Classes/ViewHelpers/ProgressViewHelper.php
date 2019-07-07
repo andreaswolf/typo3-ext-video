@@ -3,7 +3,9 @@
 namespace Hn\Video\ViewHelpers;
 
 
+use Hn\Video\Processing\VideoProcessingTask;
 use Hn\Video\Processing\VideoTaskRepository;
+use TYPO3\CMS\Core\Resource\ProcessedFile;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3Fluid\Fluid\Core\Rendering\RenderingContextInterface;
 use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
@@ -20,21 +22,66 @@ class ProgressViewHelper extends AbstractViewHelper
     public function initializeArguments()
     {
         parent::initializeArguments();
-        $this->registerArgument('file', 'int', 'File', true);
-        $this->registerArgument('configurations', 'array', 'Task configurations', true);
+        $this->registerArgument('subject', 'mixed', "one or multiple task id's or proccessed files.", true);
     }
 
     public static function renderStatic(array $arguments, \Closure $renderChildrenClosure, RenderingContextInterface $renderingContext)
     {
-        return static::renderHtml($arguments['file'], $arguments['configurations']);
+        return static::renderHtml($arguments['subject']);
     }
 
-    public static function renderHtml(int $file, array $configurations)
+    /**
+     * @param mixed $argument A task id or an array of task ids, tasks or processed files.
+     *
+     * @return string
+     */
+    public static function renderHtml($argument)
     {
+        if ($argument instanceof \Iterator) {
+            $argument = iterator_to_array($argument);
+        }
+
+        if (!is_array($argument)) {
+            $argument = $argument !== null ? [$argument] : [];
+        }
+
+        if (empty($argument)) {
+            return '';
+        }
+
+        $uids = [];
+        foreach ($argument as $item) {
+
+            if (is_numeric($item)) {
+                $uids[] = intval($item);
+                continue;
+            }
+
+            if ($item instanceof ProcessedFile) {
+                $item = $item->getTask();
+            }
+
+            if ($item instanceof VideoProcessingTask) {
+                if (!$item->getUid()) {
+                    $item = GeneralUtility::makeInstance(VideoTaskRepository::class)->findByTask($item);
+                }
+
+                if ($item->getUid()) {
+                    $uids[] = $item->getUid();
+                    continue;
+                } else {
+                    throw new \RuntimeException("The given VideoProcessingTask has no id. You must start the process first.");
+                }
+            }
+
+            $type = is_object($item) ? get_class($item) : gettype($item);
+            throw new \RuntimeException("Got unknown $type as a task identifier.");
+        }
+
         $id = 'tx_video_progress_' . self::$counter++;
         $attributes = [
             'id="' . $id . '"',
-            'data-update-url="' . htmlspecialchars(ProgressEid::getUrl($file, ...$configurations)) . '"',
+            'data-update-url="' . htmlspecialchars(ProgressEid::getUrl(...$uids)) . '"',
         ];
 
         $content = '<code ' . implode(' ', $attributes) . '>';

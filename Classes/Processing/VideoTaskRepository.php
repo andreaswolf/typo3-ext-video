@@ -71,6 +71,10 @@ class VideoTaskRepository implements SingletonInterface
      */
     public function findByTask(TaskInterface $task): ?VideoProcessingTask
     {
+        if ($task instanceof VideoProcessingTask && $task->getUid() && isset($this->tasks[$task->getUid()])) {
+            return $this->tasks[$task->getUid()];
+        }
+
         return $this->findByFile($task->getSourceFile()->getUid(), $task->getConfiguration());
     }
 

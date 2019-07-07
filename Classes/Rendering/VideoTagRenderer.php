@@ -99,11 +99,11 @@ class VideoTagRenderer implements Resource\Rendering\FileRendererInterface
             }
         }
 
-        $sources = $this->buildSources($file, $options, $usedPathsRelativeToCurrentScript);
+        [$sources, $videos] = $this->buildSources($file, $options, $usedPathsRelativeToCurrentScript);
         self::dispatch('beforeTag', [&$attributes, &$sources], func_get_args());
 
         if (empty($sources) && $options['progress'] ?? true) {
-            $sources[] = ProgressViewHelper::renderHtml($file->getUid(), $this->getConfigurations($options));
+            $sources[] = ProgressViewHelper::renderHtml($videos);
             $tag = sprintf('<div %s>%s</div>', implode(' ', $attributes), implode('', $sources));
             self::dispatch('afterProgressTag', [&$tag, $attributes, $sources], func_get_args());
         } else {
@@ -119,11 +119,14 @@ class VideoTagRenderer implements Resource\Rendering\FileRendererInterface
         // do not process a processed file
         if ($file instanceof Resource\ProcessedFile) {
             return [
-                sprintf(
-                    '<source src="%s" type="%s" />',
-                    htmlspecialchars($file->getPublicUrl($usedPathsRelativeToCurrentScript)),
-                    htmlspecialchars($file->getMimeType())
-                ),
+                [
+                    sprintf(
+                        '<source src="%s" type="%s" />',
+                        htmlspecialchars($file->getPublicUrl($usedPathsRelativeToCurrentScript)),
+                        htmlspecialchars($file->getMimeType())
+                    ),
+                ],
+                [],
             ];
         }
 
@@ -137,10 +140,11 @@ class VideoTagRenderer implements Resource\Rendering\FileRendererInterface
         }
 
         $sources = [];
+        $videos = [];
 
         $configurations = $this->getConfigurations($options);
         foreach ($configurations as $configuration) {
-            $video = $file->process('Video.CropScale', $configuration);
+            $videos[] = $video = $file->process('Video.CropScale', $configuration);
             if (!$video->exists()) {
                 continue;
             }
@@ -152,7 +156,7 @@ class VideoTagRenderer implements Resource\Rendering\FileRendererInterface
             );
         }
 
-        return $sources;
+        return [$sources, $videos];
     }
 
     /**

@@ -21,17 +21,17 @@ class ProgressEid
     {
         $queryParams = $request->getQueryParams();
 
-        $file = $queryParams['file'];
-        $configurations = unserialize($queryParams['configurations']);
-        if (empty($configurations)) {
-            throw new BadRequestException("At least one configuration must be given.");
+        $uids = $queryParams['uids'];
+        if (empty($uids)) {
+            throw new BadRequestException("At least one uid must be given.");
         }
 
         /** @var VideoProcessingTask $highestTask */
         $highestTask = null;
         $videoTaskRepository = GeneralUtility::makeInstance(VideoTaskRepository::class);
-        foreach ($configurations as $configuration) {
-            $task = $videoTaskRepository->findByFile($file, $configuration);
+        foreach ((array)$uids as $uid) {
+            $task = $videoTaskRepository->findByUid($uid);
+
             // get the newest information
             VideoProcessor::getConverter()->update($task);
             if ($highestTask === null || $highestTask->getLastProgress() < $task->getLastProgress()) {
@@ -53,13 +53,9 @@ class ProgressEid
         ];
     }
 
-    public static function getUrl(int $file, array ...$configurations)
+    public static function getUrl(int ...$uids)
     {
         return rtrim(GeneralUtility::getIndpEnv('TYPO3_SITE_URL'), '/')
-            . '/index.php?' . build_query([
-                'eID' => self::EID,
-                'file' => $file,
-                'configurations' => serialize($configurations),
-            ]);
+            . '/index.php?' . build_query(['eID' => self::EID, 'uids' => $uids]);
     }
 }
