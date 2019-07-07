@@ -57,11 +57,17 @@ class TaskController extends ActionController
             $this->redirect('list');
         }
 
-        $success = $videoTaskRepository->delete($task);
-        if ($success) {
-            $this->addFlashMessage("Task was deleted", AbstractMessage::OK);
+        $targetFile = $task->getTargetFile();
+        if (!$targetFile->usesOriginalFile() && $targetFile->delete()) {
+            $this->addFlashMessage("Processed file {$targetFile->getName()} was deleted.", AbstractMessage::OK);
         } else {
-            $this->addFlashMessage("Unknown error while deleting the task", AbstractMessage::ERROR);
+            $this->addFlashMessage("The associated processed file {$targetFile->getName()} could not be deleted.", AbstractMessage::ERROR);
+        }
+
+        if ($videoTaskRepository->delete($task)) {
+            $this->addFlashMessage("Task was deleted.", AbstractMessage::OK);
+        } else {
+            $this->addFlashMessage("Unknown error while deleting the task.", AbstractMessage::ERROR);
         }
 
         $this->redirect('list');

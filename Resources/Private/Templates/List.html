@@ -9,7 +9,7 @@
     <table class="table">
         <thead>
             <tr>
-                <th style="width: 12em">create date</th>
+                <th style="width: 13em">create date</th>
                 <th style="width: 6em">status</th>
                 <th>file</th>
                 <th>configuration</th>
@@ -20,12 +20,13 @@
             <f:for each="{tasks}" as="task">
                 <tr>
                     <td>
-                        {task.crdate -> f:format.date(format: 'l d. M Y H:i:s')}
+                        {task.crdate -> f:format.date(format: 'l d. M Y')}<br>
+                        {task.crdate -> f:format.date(format: 'H:i:s')}
                     </td>
                     <td style="text-align: right">
                         {task.status}<br />
                         <f:if condition="{task.status} == 'new'">
-                            {video:progress(file: task.file_uid, configurations: '{0: task.configuration}') -> f:format.raw()}
+                            <video:progress subject="{task.uid}" />
                         </f:if>
                     </td>
                     <td>
@@ -45,7 +46,10 @@
                                onclick="top.TYPO3.InfoWindow.showItem('_FILE', {task.file_combi_ident -> f:format.json()});return false;">
                                 <c:icon identifier="actions-document-info" />
                             </a>
-                            <f:if condition="{task.status} == 'new' || {task.status} == 'failed' && {task.lastUpdate} == 0">
+                            <f:variable name="isNew" value="{f:if(condition: '{task.status} == \'new\' && {task.lastUpdate} == 0', then: 1)}"/>
+                            <f:variable name="isFailed" value="{f:if(condition: '{task.status} == \'failed\'', then: 1)}"/>
+                            <f:variable name="isFinished" value="{f:if(condition: '{task.status} == \'finished\'', then: 1)}"/>
+                            <f:if condition="{isNew} || {isFailed} || {isFinished}">
                                 <f:form action="delete" class="btn-group">
                                     <f:form.hidden name="task" value="{task.uid}" />
                                     <button class="btn btn-default" title="Delete">
