@@ -107,6 +107,10 @@ class VideoProcessingTask extends AbstractTask
 
     public function addProgressStep(float $progress, float $timestamp = null): int
     {
+        if ($progress < 0.0 || $progress > 1.0) {
+            throw new \OutOfRangeException("Progress must be between 0 and 1, got $progress.");
+        }
+
         if ($timestamp === null) {
             $timestamp = microtime(true);
         }
@@ -154,6 +158,9 @@ class VideoProcessingTask extends AbstractTask
         $timespan = $steps[1]['timestamp'] - $steps[0]['timestamp'];
         $progressSpan = $steps[1]['progress'] - $steps[0]['progress'];
         $remainingProgress = 1 - $steps[1]['progress'];
+        if ($remainingProgress <= 0.0) {
+            return 0.0;
+        }
 
         $remainingTime = $timespan / ($progressSpan / $remainingProgress);
         // secretly add a bit so that the estimate is actually too high ~ better correct down than up
