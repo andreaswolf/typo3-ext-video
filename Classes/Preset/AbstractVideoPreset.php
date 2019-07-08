@@ -36,6 +36,14 @@ abstract class AbstractVideoPreset extends AbstractCompressiblePreset
      */
     private $crop = false;
 
+    /**
+     * The scaling algorithm to use.
+     *
+     * @see https://ffmpeg.org/ffmpeg-scaler.html
+     * @var string
+     */
+    private $scalingAlgorithm = 'bicubic';
+
     protected function getPixelFormat(): string
     {
         // most players don't support other pixel formats
@@ -121,6 +129,16 @@ abstract class AbstractVideoPreset extends AbstractCompressiblePreset
     public function setCrop(bool $crop): void
     {
         $this->crop = $crop;
+    }
+
+    public function getScalingAlgorithm(): string
+    {
+        return $this->scalingAlgorithm;
+    }
+
+    public function setScalingAlgorithm(string $scalingAlgorithm): void
+    {
+        $this->scalingAlgorithm = $scalingAlgorithm;
     }
 
     /**
@@ -301,6 +319,7 @@ abstract class AbstractVideoPreset extends AbstractCompressiblePreset
         $parameters = [];
 
         array_push($parameters, '-pix_fmt', $this->getPixelFormat());
+        array_push($parameters, '-sws_flags', $this->getScalingAlgorithm());
 
         $filters = $this->getFilters($sourceStream);
         if (!empty($filters)) {

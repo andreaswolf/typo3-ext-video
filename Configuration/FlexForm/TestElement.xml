@@ -46,6 +46,10 @@
                                             <numIndex index="0">webm quality 100%, 80%, 60%, 40%, 20%, 0%</numIndex>
                                             <numIndex index="1">{"format": "webm", "start": 60, "duration": 60, "video": {"quality": %1.0,0.8,0.6,0.4,0.2,0.0%}, "audio": {"quality": %1.0,0.8,0.6,0.4,0.2,0.0%}}</numIndex>
                                         </numIndex>
+                                        <numIndex index="30" type="array">
+                                            <numIndex index="0">bilinear vs bicublin vs bicubic vs lanczos vs area</numIndex>
+                                            <numIndex index="1">{"start": 60, "duration": 60, "video": {"scalingAlgorithm": "%bilinear,bicublin,bicubic,lanczos,area%"}}</numIndex>
+                                        </numIndex>
                                     </items>
                                 </valuePicker>
                             </config>

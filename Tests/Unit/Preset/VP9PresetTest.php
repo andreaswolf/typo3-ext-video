@@ -17,6 +17,8 @@ class VP9PresetTest extends AbstractVideoPresetTest
         $this->assertEquals([
             '-pix_fmt',
             'yuv420p',
+            '-sws_flags',
+            'bicubic',
             '-vf',
             'fps=30,scale=988:556',
             '-c:v',

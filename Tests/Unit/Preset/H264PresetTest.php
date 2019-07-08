@@ -20,6 +20,8 @@ class H264PresetTest extends AbstractVideoPresetTest
         $this->assertEquals([
             '-pix_fmt',
             'yuv420p',
+            '-sws_flags',
+            'bicubic',
             '-vf',
             'fps=30,scale=768:432',
             '-c:v',
