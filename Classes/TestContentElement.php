@@ -3,6 +3,8 @@
 namespace Hn\Video;
 
 
+use Hn\Video\Processing\VideoProcessingTask;
+use Hn\Video\Processing\VideoTaskRepository;
 use Hn\Video\ViewHelpers\ProgressViewHelper;
 use TYPO3\CMS\Core\Resource\FileInterface;
 use TYPO3\CMS\Core\Resource\FileReference;
@@ -51,7 +53,7 @@ class TestContentElement
 
                 $configuration = FormatRepository::normalizeOptions($configuration);
                 $processedFile = $file->process('Video.CropScale', $configuration);
-
+                $task = GeneralUtility::makeInstance(VideoTaskRepository::class)->findByFile($file->getUid(), $configuration);
                 $json = json_encode($configuration, JSON_UNESCAPED_SLASHES);
                 $content .= '<div><code>' . htmlspecialchars($json) . '</code></div>';
 
@@ -61,8 +63,13 @@ class TestContentElement
                         $content .= "<div><code>ffmpeg -i {input-file} $command {output-file}</code></div>";
                     }
 
-                    $size = round($processedFile->getSize() / 1024) . ' kB';
+                    $size = GeneralUtility::formatSize($processedFile->getSize());
                     $content .= "<div>size: $size</div>";
+
+                    if ($task instanceof VideoProcessingTask) {
+                        $duration = $task->getProcessingDuration() . ' s';
+                        $content .= "<div>processing duration: $duration</div>";
+                    }
 
                     $renderer = RendererRegistry::getInstance()->getRenderer($processedFile);
                     $content .= $renderer->render($processedFile, 0, 0, $configuration);

@@ -176,6 +176,16 @@ class VideoProcessingTask extends AbstractTask
         return end($this->progress)['timestamp'];
     }
 
+    public function getProcessingDuration(): float
+    {
+        $progressSteps = $this->getProgressSteps();
+        if (count($progressSteps) < 2) {
+            return 0;
+        }
+
+        return end($progressSteps)['timestamp'] - reset($progressSteps)['timestamp'];
+    }
+
     public function getUid(): ?int
     {
         return $this->uid;
