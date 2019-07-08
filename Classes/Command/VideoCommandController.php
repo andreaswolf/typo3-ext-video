@@ -43,6 +43,7 @@ class VideoCommandController extends CommandController
                 $this->outputLine("Abort because of the timeout ($timeout minutes).");
                 break;
             }
+            $this->output->progressAdvance();
         }
         $this->output->progressFinish();
     }
