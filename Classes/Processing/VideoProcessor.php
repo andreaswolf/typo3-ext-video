@@ -109,7 +109,7 @@ class VideoProcessor implements ProcessorInterface
             $logger->critical($e->getMessage());
 
             $task->setExecuted(false);
-            if (GeneralUtility::getApplicationContext()->isDevelopment()) {
+            if (!GeneralUtility::getApplicationContext()->isProduction()) {
                 throw new \RuntimeException('doProcessTask failed', 0, $e); // let them know
             }
         }
