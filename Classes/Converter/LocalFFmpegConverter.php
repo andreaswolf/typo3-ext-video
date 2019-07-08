@@ -45,9 +45,15 @@ class LocalFFmpegConverter extends AbstractVideoConverter
             $ffmpegCommand = $formatRepository->buildParameterString($localFile, $tempFilename, $task->getConfiguration(), $streams);
             $progress = $this->ffmpeg($ffmpegCommand);
             foreach ($progress as $time) {
-                $task->addProgressStep($time / $duration);
+                $progress = $time / $duration;
+                if ($progress > 1.0) {
+                    continue;
+                }
+
+                $task->addProgressStep($progress);
                 $videoTaskRepository->store($task);
             }
+
             // make the progress bar end
             $task->addProgressStep(1.0);
             $videoTaskRepository->store($task);
@@ -134,7 +140,7 @@ class LocalFFmpegConverter extends AbstractVideoConverter
                 yield $matches[1] * 3600 + $matches[2] * 60 + $matches[3] + $matches[4] / 100;
             }
         }
-        $logger->debug('ffprobe result', ['output' => $output]);
+        $logger->debug('ffmpeg result', ['output' => $output]);
 
         // because updating referenced values in unit tests is hard, null is also checked here
         $returnValue = $process->getReturn();
