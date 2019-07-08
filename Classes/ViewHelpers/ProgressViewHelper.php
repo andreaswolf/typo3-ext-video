@@ -137,12 +137,14 @@ class ProgressViewHelper extends AbstractViewHelper
                 setTimeout(render, Math.max(100, Math.min(1000, milliseconds)));
             } else {
                 clearTimeout(updateTimeout);
-                setTimeout(function () {
-                    if (!window.video_is_reloading) {
-                        location.reload();
-                        window.video_is_reloading = true;
-                    }
-                }, 5000);
+                if (s + 20000 > Date.now()) {
+                    setTimeout(function () {
+                        if (!window.video_is_reloading) {
+                            location.reload();
+                            window.video_is_reloading = true;
+                        }
+                    }, 5000);
+                }
             }
         }
     ;
