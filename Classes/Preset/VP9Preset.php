@@ -8,7 +8,7 @@ use TYPO3\CMS\Core\Utility\MathUtility;
 class VP9Preset extends AbstractVideoPreset
 {
     /**
-     * Defines the limits of the different h264 levels.
+     * Defines the limits of the different vp9 levels.
      * 0. luma samples per frame
      * 1. luma samples per second
      * 2. max dimensions

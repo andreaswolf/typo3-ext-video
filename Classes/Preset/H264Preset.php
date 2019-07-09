@@ -117,10 +117,6 @@ class H264Preset extends AbstractVideoPreset
     /**
      * The performance preset.
      *
-     * I decided to be boring and go with medium here.
-     * Going in either direction had diminishing returns in speed or quality.
-     * If encode time does not really matter to you go with slower or veryslow.
-     *
      * @var string
      * @see H264Preset::PERFORMANCE_PRESETS
      * @see http://dev.beandog.org/x264_preset_reference.html
@@ -219,6 +215,7 @@ class H264Preset extends AbstractVideoPreset
     /**
      * Calculates the bitrate in kbit/s.
      * The equation is somewhat arbitrary and build by try&error to target specific bitrates at 80% quality.
+     * Note that this preset uses this as -maxrate and the actual bitrate will be lower due to the crf value.
      *
      * @param array $sourceStream
      *

@@ -28,7 +28,7 @@ class AacPreset extends AbstractAudioPreset
         ['aac_low', 40, 2],
         ['aac_low', 32, 1],
         ['aac_he', 36, 3],
-        ['aac_he', 32, 2],
+        ['aac_he', 30, 2], // actually 32 but i wanted to use it at 50% quality
         ['aac_he', 18, 1],
     ];
 
