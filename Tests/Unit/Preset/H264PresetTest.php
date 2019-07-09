@@ -109,6 +109,22 @@ class H264PresetTest extends AbstractVideoPresetTest
         }
     }
 
+    public function test16by9Dimensions()
+    {
+        $source = ['width' => 3840, 'height' => 2160];
+
+        $this->preset->setLevel('2.0');
+        $this->assertEquals([416, 234], $this->preset->getDimensions($source));
+        $this->preset->setLevel('2.1');
+        $this->assertEquals([540, 304], $this->preset->getDimensions($source));
+        $this->preset->setLevel('3.0');
+        $this->assertEquals([768, 432], $this->preset->getDimensions($source));
+        $this->preset->setLevel('3.1');
+        $this->assertEquals([1280, 720], $this->preset->getDimensions($source));
+        $this->preset->setLevel('4.0');
+        $this->assertEquals([1920, 1080], $this->preset->getDimensions($source));
+    }
+
     public function testGetMimeCodecParameter()
     {
         $this->assertEquals('avc1.4D401E', $this->preset->getMimeCodecParameter([]));
