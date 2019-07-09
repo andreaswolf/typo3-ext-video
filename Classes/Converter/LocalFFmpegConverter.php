@@ -145,7 +145,7 @@ class LocalFFmpegConverter extends AbstractVideoConverter
         // because updating referenced values in unit tests is hard, null is also checked here
         $returnValue = $process->getReturn();
         if ($returnValue !== 0) {
-            throw new ConversionException("Bad return value ($returnValue): $commandStr");
+            throw new ConversionException("Bad return value ($returnValue): $commandStr\n$output");
         }
     }
 }
