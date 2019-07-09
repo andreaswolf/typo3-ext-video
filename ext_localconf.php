@@ -27,12 +27,12 @@ call_user_func(function () {
     $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['video']['defaults'] = array_replace_recursive(
         [
             Preset\H264Preset::class => [
-                'preset' => $performanceOptions['h264'],
+                'preset' => $performanceOptions['h264'] ?? 'slow',
                 'level' => $conf['level'] ?? '3.1',
                 'quality' => $conf['videoQuality'] ?? 0.8,
             ],
             Preset\VP9Preset::class => [
-                'speed' => $performanceOptions['vp9'],
+                'speed' => $performanceOptions['vp9'] ?? 2,
                 'level' => $conf['level'] ?? '3.1',
                 'quality' => $conf['videoQuality'] ?? 0.8,
             ],
@@ -50,29 +50,25 @@ call_user_func(function () {
     // mp4 general
     // it should work almost anywhere ~ except maybe old low-cost android devices and feature phones
     if (empty($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['video']['formats']['mp4'])) {
-        if (isset($performanceOptions['h264'])) {
-            $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['video']['formats']['mp4'] = [
-                'fileExtension' => 'mp4',
-                'mimeType' => 'video/mp4',
-                'video' => [Preset\H264Preset::class],
-                'audio' => [Preset\AacPreset::class],
-                'additionalParameters' => ['-movflags', '+faststart', '-map_metadata', '-1', '-f', 'mp4'],
-            ];
-        }
+        $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['video']['formats']['mp4'] = [
+            'fileExtension' => 'mp4',
+            'mimeType' => 'video/mp4',
+            'video' => [Preset\H264Preset::class],
+            'audio' => [Preset\AacPreset::class],
+            'additionalParameters' => ['-movflags', '+faststart', '-map_metadata', '-1', '-f', 'mp4'],
+        ];
     }
 
     // webm video
     // higher efficiency than h264 but lacks support in safari
     if (empty($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['video']['formats']['webm'])) {
-        if (isset($performanceOptions['vp9'])) {
-            $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['video']['formats']['webm'] = [
-                'fileExtension' => 'webm',
-                'mimeType' => 'video/webm',
-                'video' => [Preset\VP9Preset::class],
-                'audio' => [Preset\OpusPreset::class],
-                'additionalParameters' => ['-map_metadata', '-1', '-f', 'webm'],
-            ];
-        }
+        $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['video']['formats']['webm'] = [
+            'fileExtension' => 'webm',
+            'mimeType' => 'video/webm',
+            'video' => [Preset\VP9Preset::class],
+            'audio' => [Preset\OpusPreset::class],
+            'additionalParameters' => ['-map_metadata', '-1', '-f', 'webm'],
+        ];
     }
 
     // m4a audio
