@@ -40,7 +40,9 @@ class ProgressEid
         }
 
         $content = json_encode(self::parameters($highestTask), JSON_UNESCAPED_SLASHES);
-        return $response->withBody(stream_for($content));
+        return $response
+            ->withHeader('Content-Type', 'application/json')
+            ->withBody(stream_for($content));
     }
 
     public static function parameters(VideoProcessingTask $task)
