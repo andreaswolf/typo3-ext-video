@@ -16,6 +16,12 @@ class VideoTaskRepositoryTest extends FunctionalTestCase
      */
     private $repository;
 
+    protected function setUp()
+    {
+        parent::setUp();
+        $this->repository = GeneralUtility::makeInstance(VideoTaskRepository::class);
+    }
+
     public function testStore()
     {
         $this->assertTaskCount(0);
@@ -58,9 +64,12 @@ class VideoTaskRepositoryTest extends FunctionalTestCase
         $this->assertSame($storedTask2, $storedTask);
     }
 
-    protected function setUp()
+    public function testPriority()
     {
-        parent::setUp();
-        $this->repository = GeneralUtility::makeInstance(VideoTaskRepository::class);
+        $this->repository->store($low = (new ProcessedFile($this->file, 'Video.CropScale', ['format' => 'webm']))->getTask());
+        $this->repository->store($high = (new ProcessedFile($this->file, 'Video.CropScale', ['format' => 'mp4']))->getTask());
+
+        $tasks = $this->repository->findByStatus(VideoProcessingTask::STATUS_NEW);
+        $this->assertEquals([$high->getUid(), $low->getUid()], [$tasks[0]->getUid(), $tasks[1]->getUid()]);
     }
 }

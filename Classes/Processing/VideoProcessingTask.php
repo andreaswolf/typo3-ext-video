@@ -102,7 +102,17 @@ class VideoProcessingTask extends AbstractTask
 
     public function getPriority(): int
     {
-        return $this->getConfiguration()['priority'] ?? 0;
+        if (isset($this->getConfiguration()['priority'])) {
+            return $this->getConfiguration()['priority'];
+        }
+
+        $formatRepository = GeneralUtility::makeInstance(FormatRepository::class);
+        $definition = $formatRepository->findFormatDefinition($this->getConfiguration());
+        if (isset($definition['priority'])) {
+            return $definition['priority'];
+        }
+
+        return 0;
     }
 
     public function addProgressStep(float $progress, float $timestamp = null): int

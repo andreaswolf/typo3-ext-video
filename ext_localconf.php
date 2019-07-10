@@ -68,6 +68,7 @@ call_user_func(function () {
             'video' => [Preset\VP9Preset::class],
             'audio' => [Preset\OpusPreset::class],
             'additionalParameters' => ['-map_metadata', '-1', '-f', 'webm'],
+            'priority' => -10,
         ];
     }
 
