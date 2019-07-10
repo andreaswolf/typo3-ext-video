@@ -13,6 +13,15 @@ This extension adds video conversion/compression capability to TYPO3.
 There are valid reasons to host videos yourself but correct video compression isn't too easy.
 TYPO3 already handles image compression (at least sometimes). So wouldn't it be awesome if videos are managed too?  
 
+## Features
+
+- **integrates seamlessly** though a FileRenderer into every element using the media api
+- automatically convert videos into easily **streamable formats**
+- **custom dimensions** and cropping for specific use cases like background videos or animated thumbnails 
+- **backend module** with overview over all processed videos
+- live updating **progress information** as a placeholder and in the dashboard until the video is processed
+- **caching aware**: the cache of the page with the video will be cleared as soon as the processing is done
+
 ## How does it work
 
 - It starts with a new `FileRenderer` which automatically kicks in if you use the `<f:media>` view helper.
