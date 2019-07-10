@@ -16,7 +16,7 @@ TYPO3 already handles image compression (at least sometimes). So wouldn't it be 
 ## Features
 
 - **integrates seamlessly** though a FileRenderer into every element that uses typo3's `<f:media>` view helper
-- automatically convert videos into easily **streamable formats**
+- automatically converts many video formats like mov and mkv into browser friendly formats like **mp4** and **webm**
 - **custom dimensions** and cropping for specific use cases like background videos or animated thumbnails 
 - **backend module** with overview over all processed videos
 - live updating **progress information** as a placeholder and in the dashboard until the video is processed
