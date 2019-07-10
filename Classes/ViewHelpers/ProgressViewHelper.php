@@ -98,11 +98,13 @@ class ProgressViewHelper extends AbstractViewHelper
         $script = <<<JavaScript
 (function () {
     var element = document.getElementById($jsonId),
-        p = 0.0, r = 0, s = 0,
+        latestProgress = 0.0,
+        remaining = 0,
+        lastUpdate = 0,
         updateProperties = function (o) {
-            p = Number(o.progress);
-            r = Number(o.remaining) || Infinity;
-            s = Number(o.lastUpdate);
+            latestProgress = Number(o.progress);
+            remainingTime = Number(o.remaining) || Infinity;
+            lastUpdate = Number(o.lastUpdate);
         },
         lastContent = element.textContent,
         updateTimeout = 0,
@@ -125,19 +127,19 @@ class ProgressViewHelper extends AbstractViewHelper
             }
         
             // calculate the progress until it should be finished
-            var progress = Math.min(1.0, Math.min($maxPredictedProgress, Date.now() - s) / r),
-                newContent = ((p + (1.0 - p) * progress) * 100).toFixed(1) + '%';
+            var progress = Math.min(1.0, Math.min($maxPredictedProgress, Date.now() - lastUpdate) / remainingTime),
+                newContent = ((latestProgress + (1.0 - latestProgress) * progress) * 100).toFixed(1) + '%';
             if (lastContent !== newContent) {
                 element.textContent = newContent;
                 lastContent = newContent;
             }
             
             if (progress < 1.0) {
-                var milliseconds = r / (1.0 - p) / 1000;
+                var milliseconds = remainingTime / (1.0 - latestProgress) / 1000;
                 setTimeout(render, Math.max(100, Math.min(1000, milliseconds)));
             } else {
                 clearTimeout(updateTimeout);
-                if (s + 20000 > Date.now()) {
+                if (document.hasFocus() && lastUpdate + 20000 > Date.now()) {
                     setTimeout(function () {
                         if (!window.video_is_reloading) {
                             location.reload();
