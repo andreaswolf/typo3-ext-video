@@ -230,5 +230,6 @@ Here is a list of available commands:
 - automatic poster generation, probably even multiple posters with the capability to select one
 - an interface to cut videos (it's already possible, just not though the interface)
 - multiple resolutions with something like [MPEG-DASH](https://en.wikipedia.org/wiki/Dynamic_Adaptive_Streaming_over_HTTP)
+- optionally process files within the fileadmin to reduce project footprint
 
 [CloudConvert]: https://cloudconvert.com
