@@ -101,10 +101,15 @@ That is the default format definition of the mp4 video container. A format defin
 - `video` defines a *preset* for the video stream. Omit or set to null if your format does not require/support video.
   You can add a second argument with options which will be passed to the constructor
   (if not overridden in other places).
-- `audio` defines a *preset* for the audio stream. Omit or set to null if your format does not require/support audio.
-- `subtitle` defines a *preset* for the subtitle stream. There are none implemented by default but the option is there.
-- `data` defines a *preset* for the data stream. There are none implemented by default but the option is there.
+- `audio` defines a *preset* for the audio stream.
+  Omit or set to null if your format does not require/support audio.
+- `subtitle` defines a *preset* for the subtitle stream.
+  There are none implemented by default but the option is there.
+- `data` defines a *preset* for the data stream.
+  There are none implemented by default but the option is there.
 - `additionalParameters` is an array of parameters that are added to the ffmpeg command
+- `priority` an integer by which the created tasks are sorted.
+  This is used to defer the webm format compared to mp4 since the mp4 will be done much more quickly.
 
 You can configure formats in `$GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['video']['formats']['{format-name}']`.
 There is a list of formats that is used by default.
