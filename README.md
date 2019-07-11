@@ -34,14 +34,16 @@ TYPO3 already handles image compression (at least sometimes). So wouldn't it be 
 
 ## How to install
 
-- install the extension
-- either make sure that ffmpeg is available
-  or configure a [CloudConvert] api key in the extension settings
-- make sure that the `video:process` command is run regularly.
+- Install the extension using `composer require hn/video`.
+- Either make sure that ffmpeg is available
+  or configure a [CloudConvert] api key in the extension settings.
+- Make sure that the `video:process` command is run regularly.
   This command will run the conversion if you use local `ffmpeg`.
   If you use CloudConvert, this command is technically not required since everything can be handled though callbacks
   but it will increase the accuracy of the progress information and act as a fallback if the callbacks
   don't come though for whatever reason.
+- Check that the php configurations `upload_max_filesize` and `post_max_size` are large enough.
+  I would recommend at least 1GB. If you use CloudConvert for free then that is also the max size they allow you.
   
 ## Simple Configuration
 
