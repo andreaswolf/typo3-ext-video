@@ -362,6 +362,8 @@ class CloudConvertConverter extends AbstractVideoConverter
             }
         );
 
+        // i originally intended for requests to run while the rest of the page is rendering
+        // it turned out that guzzle does not work like that so here i am: waiting for the promises to resolve
         return $promise->wait();
     }
 
