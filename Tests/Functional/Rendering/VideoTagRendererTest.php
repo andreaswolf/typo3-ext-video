@@ -17,8 +17,8 @@ class VideoTagRendererTest extends FunctionalTestCase
     {
         return [
             ['<video width="1280" height="720" controls>', []],
-            ['<video width="1280" height="720" autoplay muted controls>', ['autoplay' => 1]],
-            ['<video width="1280" height="720" autoplay muted loop controls>', ['autoplay' => 2]],
+            ['<video width="1280" height="720" autoplay muted controls playsinline>', ['autoplay' => 1]],
+            ['<video width="1280" height="720" autoplay muted loop controls playsinline>', ['autoplay' => 2]],
             ['<video width="1280" height="720" autoplay muted loop playsinline>', ['autoplay' => 3]],
         ];
     }

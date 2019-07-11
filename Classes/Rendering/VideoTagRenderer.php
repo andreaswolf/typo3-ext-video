@@ -70,7 +70,7 @@ class VideoTagRenderer implements Resource\Rendering\FileRendererInterface
         $attributes['width'] = 'width="' . round($width) . '"';
         $attributes['height'] = 'height="' . round($height) . '"';
 
-        $autoplay = $options['autoplay'] ?? $file->getProperty('autoplay') ?? 0;
+        $autoplay = intval($options['autoplay'] ?? $file->getProperty('autoplay'));
         self::dispatch('autoplay', [&$autoplay], func_get_args());
 
         if ($autoplay > 0) {
@@ -89,7 +89,7 @@ class VideoTagRenderer implements Resource\Rendering\FileRendererInterface
             $attributes['controls'] = 'controls';
         }
 
-        if ($options['inline'] ?? $options['playsinline'] ?? $autoplay >= 3) {
+        if ($options['playsinline'] ?? $autoplay >= 1) {
             $attributes['playsinline'] = 'playsinline';
         }
 
