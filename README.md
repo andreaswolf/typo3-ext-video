@@ -231,7 +231,12 @@ Here is a list of available commands:
 
 - automatic poster generation, probably even multiple posters with the capability to select one
 - an interface to cut videos (it's already possible, just not though the interface)
-- multiple resolutions with something like [MPEG-DASH](https://en.wikipedia.org/wiki/Dynamic_Adaptive_Streaming_over_HTTP)
+- multiple resolutions (adaptive streaming) with something like [HLS] or [MPEG-DASH]
+  although i'm not sure about either [HLS royalties] nor [DASH royalties].
 - optionally process files within the fileadmin to reduce project footprint
 
 [CloudConvert]: https://cloudconvert.com
+[HLS]: https://developer.apple.com/streaming/
+[MPEG-DASH]: https://en.wikipedia.org/wiki/Dynamic_Adaptive_Streaming_over_HTTP
+[HLS royalties]: http://www.overdigital.com/2012/04/17/the-hidden-licensing-costs-of-hls-video-playback/
+[DASH royalties]: https://www.streamingmedia.com/Articles/ReadArticle.aspx?ArticleID=114903
