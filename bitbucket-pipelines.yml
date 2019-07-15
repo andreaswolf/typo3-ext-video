@@ -71,4 +71,4 @@ pipelines:
             - composer
           script:
             - composer global require helhum/ter-client:~0.1.0
-            - ~/.composer/vendor/bin/ter-client upload Intl ./ -u${TER_USERNAME} -p${TER_PASSWORD} -m"$(git tag -l -n1000 $BITBUCKET_TAG|awk '{$1=""; print}')"
+            - ~/.composer/vendor/bin/ter-client upload video ./ -u${TER_USERNAME} -p${TER_PASSWORD} -m"$(git tag -l --format='%(contents)' $BITBUCKET_TAG)"
