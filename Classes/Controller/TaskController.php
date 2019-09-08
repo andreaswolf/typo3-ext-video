@@ -4,6 +4,7 @@ namespace Hn\Video\Controller;
 
 
 use Hn\Video\Processing\VideoTaskRepository;
+use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Messaging\AbstractMessage;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -57,11 +58,13 @@ class TaskController extends ActionController
             $this->redirect('list');
         }
 
-        $targetFile = $task->getTargetFile();
-        if (!$targetFile->usesOriginalFile() && $targetFile->delete()) {
-            $this->addFlashMessage("Processed file {$targetFile->getName()} was deleted.", AbstractMessage::OK);
+        $processedFile = $task->getTargetFile();
+        if (!$processedFile->usesOriginalFile() && $processedFile->delete()) {
+            $cacheManager = GeneralUtility::makeInstance(CacheManager::class);
+            $cacheManager->flushCachesInGroupByTag('pages', "processed_video_{$processedFile->getUid()}");
+            $this->addFlashMessage("Processed file {$processedFile->getName()} was deleted.", AbstractMessage::OK);
         } else {
-            $this->addFlashMessage("The associated processed file {$targetFile->getName()} could not be deleted.", AbstractMessage::ERROR);
+            $this->addFlashMessage("The associated processed file {$processedFile->getName()} could not be deleted.", AbstractMessage::ERROR);
         }
 
         if ($videoTaskRepository->delete($task)) {

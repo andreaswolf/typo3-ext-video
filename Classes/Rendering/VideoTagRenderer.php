@@ -9,6 +9,7 @@ use Hn\Video\ViewHelpers\ProgressViewHelper;
 use TYPO3\CMS\Core\Resource;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\SignalSlot\Dispatcher;
+use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 
 class VideoTagRenderer implements Resource\Rendering\FileRendererInterface
 {
@@ -118,16 +119,17 @@ class VideoTagRenderer implements Resource\Rendering\FileRendererInterface
     {
         // do not process a processed file
         if ($file instanceof Resource\ProcessedFile) {
-            return [
-                [
-                    sprintf(
-                        '<source src="%s" type="%s" />',
-                        htmlspecialchars($file->getPublicUrl($usedPathsRelativeToCurrentScript)),
-                        htmlspecialchars($file->getMimeType())
-                    ),
-                ],
-                [],
-            ];
+            if ($GLOBALS['TSFE'] instanceof TypoScriptFrontendController) {
+                $GLOBALS['TSFE']->addCacheTags(["processed_video_{$file->getUid()}"]);
+            }
+
+            $source = sprintf(
+                '<source src="%s" type="%s" />',
+                htmlspecialchars($file->getPublicUrl($usedPathsRelativeToCurrentScript)),
+                htmlspecialchars($file->getMimeType())
+            );
+
+            return [[$source], [$file]];
         }
 
         if ($file instanceof Resource\FileReference) {
@@ -147,6 +149,10 @@ class VideoTagRenderer implements Resource\Rendering\FileRendererInterface
             $videos[] = $video = $file->process('Video.CropScale', $configuration);
             if (!$video->exists()) {
                 continue;
+            }
+
+            if ($GLOBALS['TSFE'] instanceof TypoScriptFrontendController) {
+                $GLOBALS['TSFE']->addCacheTags(["processed_video_{$video->getUid()}"]);
             }
 
             $sources[] = sprintf(
