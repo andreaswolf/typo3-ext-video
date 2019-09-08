@@ -102,7 +102,7 @@ class VideoTagRenderer implements Resource\Rendering\FileRendererInterface
         [$sources, $videos] = $this->buildSources($file, $options, $usedPathsRelativeToCurrentScript);
         self::dispatch('beforeTag', [&$attributes, &$sources], func_get_args());
 
-        if (empty($sources) && $options['progress'] ?? true) {
+        if (empty($sources) && ($options['progress'] ?? true)) {
             $sources[] = ProgressViewHelper::renderHtml($videos);
             $tag = sprintf('<div %s>%s</div>', implode(' ', $attributes), implode('', $sources));
             self::dispatch('afterProgressTag', [&$tag, $attributes, $sources], func_get_args());
