@@ -3,7 +3,7 @@
 $EM_CONF[$_EXTKEY] = [
     'title' => 'video',
     'version' => '1.0.0',
-    'description' => 'Automatic conversion of videos within typo3 using local ffmpeg or cloudconvert. This extension is requires composer mode.',
+    'description' => 'Automatic conversion of videos within typo3 using local ffmpeg or cloudconvert. This extension requires composer mode.',
     'category' => 'fe',
     'author' => 'Marco Pfeiffer',
     'author_email' => 'marco@hauptsache.net',
