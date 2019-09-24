@@ -1,7 +1,7 @@
 {
     "name": "hn/video",
     "description": "Automatic conversion of videos within typo3 using local ffmpeg or cloudconvert.",
-    "keywords": ["#media","#video","#h264","#vp9","#aac","#mp3","#opus","#gif","#inline","#autoplay","#play","#compress","#compression","#mp4","#webm","#2160p","#1080p","#720p","#480p","#full-hd","#hd","#ffmpeg","#progress","#dashboard","#html5","#process","#crop","#scale","#uhd","#4k","#playsinline","#camera","#controls","#loop","#mute","#muted","#source","#CloudConvert"],
+    "keywords": ["media","video","h264","vp9","aac","mp3","opus","gif","inline","autoplay","play","compress","compression","mp4","webm","2160p","1080p","720p","480p","full-hd","hd","ffmpeg","progress","dashboard","html5","process","crop","scale","uhd","4k","playsinline","camera","controls","loop","mute","muted","source","CloudConvert"],
     "type": "typo3-cms-extension",
     "license": "GPL-2.0-or-later",
     "support": {
