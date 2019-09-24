@@ -34,11 +34,11 @@ class VP9PresetTest extends AbstractVideoPresetTest
             '-crf:v',
             (string)$this->preset->getCrf([]),
             '-maxrate:v',
-            '4068k',
+            '2102k',
             '-b:v',
-            '2712k',
+            '1401k',
             '-minrate:v',
-            '1356k',
+            '701k',
             '-tile-columns:v',
             '1',
             '-threads:v',
@@ -53,9 +53,9 @@ class VP9PresetTest extends AbstractVideoPresetTest
         $mapping = [
             '0.0' => 63,
             '0.2' => 63,
-            '0.4' => 53,
-            '0.6' => 43,
-            '0.8' => 33,
+            '0.4' => 63,
+            '0.6' => 51,
+            '0.8' => 37,
             '1.0' => 23,
         ];
 

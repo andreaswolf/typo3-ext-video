@@ -117,14 +117,14 @@ class VP9Preset extends AbstractVideoPreset
         $pixels = array_product($this->getDimensions($sourceStream));
         $framerate = MathUtility::calculateWithParentheses($this->getFramerate($sourceStream));
         $quality = $this->getBoostedQuality($sourceStream) ** 2 * 0.9 + 0.1;
-        $bitrate = round($pixels ** 0.9 * $framerate ** 0.5 * $quality * 0.005);
+        $bitrate = round($pixels ** 0.85 * $framerate ** 0.5 * $quality * 0.005);
         return min($bitrate, $this->getBitrateLimit());
     }
 
     public function getCrf(array $sourceStream): float
     {
         $max = 23;
-        $min = $max + 10 / 0.2; // +10 every 0.2 for half the bitrate...
+        $min = $max + 14 / 0.2; // +14 every 0.2 for less than half the bitrate (+10 for actually half in my testing but vp9 can take more compared to h264)
         $result = $min + ($max - $min) * $this->getBoostedQuality($sourceStream);
         return min($result, 63); // this formula actually overshoots the minimum quality possible in vp9
     }
