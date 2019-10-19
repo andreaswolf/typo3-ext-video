@@ -64,6 +64,74 @@ if (getenv('CLOUDCONVERT_APIKEY')) {
     $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['video']['cloudConvertApiKey'] = getenv('CLOUDCONVERT_APIKEY');
 }
 ```
+
+## Usage
+
+Just use the `<f:media>` view helper like textmedia does.
+
+```html
+<f:media file="{video}" />
+```
+
+You can change a parameters about the resulting file using the `additionalParameters` attribute.
+
+This is an example of an autoplaying video as you might use it in a stage or a content element as animated image.
+
+```html
+<f:media file="{video}" additionalParameters="{
+    autoplay: 3,
+    duration; 30,
+    video: {quality: 0.6},
+    audio: {disabled: 1}
+}" />
+```
+
+### options
+
+- *autoplay*: 0, 1, 2, 3; these options are also available in the file reference
+  - 0: disables autoplay. (default)
+  - 1: enables autoplay and mutes the video.
+  - 2: like 1 but loops the video.
+  - 3: like 2 but disables controls. This is similar to gif animations.
+- *muted*: false, true; sets the muted attribute and is set by default if autplay is `>= 1`.
+  Note that this won't remove the audio stream from the video since the video can be unmuted using the controls.
+  To actually disable audio set `{audio: {disabled: 1}}`
+- *start*: seconds; a time offset. 
+- *duration*: seconds; the max duration of the video.
+- *video*: array; these options will be passed to the VideoPreset
+  - disabled: false, true; Disables the video stream.
+  - quality: 0.0 - 1.0; Basic Quality abstraction over the video quality.
+    This should be roughly comparable to jpeg settings. The default is 0.8.
+  - maxWidth: null, int; Note that the max video resolution is also limited by the level and by the framerate.
+    When null is used, then either the source video or the level restriction will dictate the result resolution.
+  - maxHeight: null, int; Same comment as maxWidth.
+  - maxFramerate: int; Sets a limit to the framerate. The default is 30.
+    You may need to increase the level in order to sustain acceptable resolutions.
+    The Framerate may be lower to reduce stuttering. Here are a few examples:
+      - if the source has a framerate of 48, then 24 will be used
+      - if the source has a framerate of 50, then 25 will be used
+      - if the source has a framerate of 32, then 30 will be used since dropping down to 16 would be a huge jump
+  - crop: false, true; By default the video keep it's aspect ratio.
+    If this is set the video will be cropped to fill the aspect ratio.
+    Note that the video will never be upscaled.
+  - level: 1.0 - 6.2; The compatibility level of the specific codec.
+    [h264 level] and [VP9 level] are not the same. If you plan to use both codecs, use levels which are similar.
+    Here are my recommendations:
+    - 3.0: the default; ~480p@30, a bit more for VP9
+    - 3.1: ~720p@30 and ~576p@60
+    - 4.0: ~1080p@30 and ~720p@60
+    - 4.1: ~1080p@30 and ~720p@60; ~1080p@60 for VP9
+- *audio*: array; these options will be passed to the AudioPreset
+  - disabled: false, true; Disables the audio stream.
+  - quality: 0.0 - 1.0; Basic Quality abstraction over the video quality.
+- *formats*: array; A map of formats defined as `{[format1]: {video: {}, audio: {}}, [format2]: ... }`.
+  This will override the default formats. The video/audio part are the same as on the root level.
+  Available formats are `mp4` and `webm`. For more information read the in-depth configuration.
+  
+Note that the `width=""` and `height=""` attributes of `<f:media>` are ignored for the encoding process.
+This is to prevent unnecessary transcoding and because you can maximize the video so scaling
+to fit the frame is not always the best idea.
+
   
 ## In-Depth Configuration
 
@@ -79,7 +147,6 @@ There are 3 levels:
    But most likely you want to configure the existing presets.
 3. *preset configuration*: Is a simple array which maps onto the setters of the Preset.
    There you can tune compatibility, resolution, framerate and quality.
-   This is what you are most likely interested in.
 
 
 ### The format definition
@@ -201,8 +268,8 @@ Note that by defining the `formats` key, the `default_video_formats` configurati
 <f:media file="{file}" additionalConfig="{formats: {mp4: {video: {quality: 0.6}, audio: {quality: 1.0}}}}" />
 ```
 
-You can also define them within the view helper without overriding the format list
-but you should limit yourself to common options like `width`, `height`, `quality` and `framerate` if you do that.
+You can also define them within the view helper without overriding the format list.
+Look into the _usage_ section for an easy explanation.
 
 ```html
 <f:media file="{file}" additionalConfig="{video: {quality: 0.6}, audio: {quality: 1.0}}" />
@@ -236,6 +303,8 @@ Here is a list of available commands:
 - optionally process files within the fileadmin to reduce project footprint
 
 [CloudConvert]: https://cloudconvert.com
+[h264 level]: https://de.wikipedia.org/wiki/H.264#Level
+[VP9 level]: https://www.webmproject.org/vp9/levels/#vp9-levels
 [HLS]: https://developer.apple.com/streaming/
 [MPEG-DASH]: https://en.wikipedia.org/wiki/Dynamic_Adaptive_Streaming_over_HTTP
 [HLS royalties]: http://www.overdigital.com/2012/04/17/the-hidden-licensing-costs-of-hls-video-playback/
