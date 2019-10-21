@@ -89,41 +89,41 @@ This is an example of an autoplaying video as you might use it in a stage or a c
 ### options
 
 - *autoplay*: 0, 1, 2, 3; these options are also available in the file reference
-  - 0: disables autoplay. (default)
-  - 1: enables autoplay and mutes the video.
-  - 2: like 1 but loops the video.
-  - 3: like 2 but disables controls. This is similar to gif animations.
+    - 0: disables autoplay. (default)
+    - 1: enables autoplay and mutes the video.
+    - 2: like 1 but loops the video.
+    - 3: like 2 but disables controls. This is similar to gif animations.
 - *muted*: false, true; sets the muted attribute and is set by default if autplay is `>= 1`.
   Note that this won't remove the audio stream from the video since the video can be unmuted using the controls.
   To actually disable audio set `{audio: {disabled: 1}}`
 - *start*: seconds; a time offset. 
 - *duration*: seconds; the max duration of the video.
 - *video*: array; these options will be passed to the VideoPreset
-  - disabled: false, true; Disables the video stream.
-  - quality: 0.0 - 1.0; Basic Quality abstraction over the video quality.
-    This should be roughly comparable to jpeg settings. The default is 0.8.
-  - maxWidth: null, int; Note that the max video resolution is also limited by the level and by the framerate.
+    - disabled: false, true; Disables the video stream.
+    - quality: 0.0 - 1.0; Basic Quality abstraction over the video quality.
+      This should be roughly comparable to jpeg settings. The default is 0.8.
+    - maxWidth: null, int; Note that the max video resolution is also limited by the level and by the framerate.
     When null is used, then either the source video or the level restriction will dictate the result resolution.
-  - maxHeight: null, int; Same comment as maxWidth.
-  - maxFramerate: int; Sets a limit to the framerate. The default is 30.
-    You may need to increase the level in order to sustain acceptable resolutions.
-    The Framerate may be lower to reduce stuttering. Here are a few examples:
-      - if the source has a framerate of 48, then 24 will be used
-      - if the source has a framerate of 50, then 25 will be used
-      - if the source has a framerate of 32, then 30 will be used since dropping down to 16 would be a huge jump
-  - crop: false, true; By default the video keep it's aspect ratio.
-    If this is set the video will be cropped to fill the aspect ratio.
-    Note that the video will never be upscaled.
-  - level: 1.0 - 6.2; The compatibility level of the specific codec.
-    [h264 level] and [VP9 level] are not the same. If you plan to use both codecs, use levels which are similar.
-    Here are my recommendations:
-    - 3.0: the default; ~480p@30, a bit more for VP9
-    - 3.1: ~720p@30 and ~576p@60
-    - 4.0: ~1080p@30 and ~720p@60
-    - 4.1: ~1080p@30 and ~720p@60; ~1080p@60 for VP9
+    - maxHeight: null, int; Same comment as maxWidth.
+    - maxFramerate: int; Sets a limit to the framerate. The default is 30.
+      You may need to increase the level in order to sustain acceptable resolutions.
+      The Framerate may be lower to reduce stuttering. Here are a few examples:
+        - if the source has a framerate of 48, then 24 will be used
+        - if the source has a framerate of 50, then 25 will be used
+        - if the source has a framerate of 32, then 30 will be used since dropping down to 16 would be a huge jump
+    - crop: false, true; By default the video keep it's aspect ratio.
+      If this is set the video will be cropped to fill the aspect ratio.
+      Note that the video will never be upscaled.
+    - level: 1.0 - 6.2; The compatibility level of the specific codec.
+      [h264 level] and [VP9 level] are not the same. If you plan to use both codecs, use levels which are similar.
+      Here are my recommendations:
+        - 3.0: the default; ~480p@30, a bit more for VP9
+        - 3.1: ~720p@30 and ~576p@60
+        - 4.0: ~1080p@30 and ~720p@60
+        - 4.1: ~1080p@30 and ~720p@60; ~1080p@60 for VP9
 - *audio*: array; these options will be passed to the AudioPreset
-  - disabled: false, true; Disables the audio stream.
-  - quality: 0.0 - 1.0; Basic Quality abstraction over the video quality.
+    - disabled: false, true; Disables the audio stream.
+    - quality: 0.0 - 1.0; Basic Quality abstraction over the video quality.
 - *formats*: array; A map of formats defined as `{[format1]: {video: {}, audio: {}}, [format2]: ... }`.
   This will override the default formats. The video/audio part are the same as on the root level.
   Available formats are `mp4` and `webm`. For more information read the in-depth configuration.
