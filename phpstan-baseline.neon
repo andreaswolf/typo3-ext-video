@@ -116,11 +116,6 @@ parameters:
 			path: Classes/Converter/CloudConvertConverter.php
 
 		-
-			message: "#^Cannot access offset 'running' on array\\{command\\: string, pid\\: int, running\\: bool, signaled\\: bool, stopped\\: bool, exitcode\\: int, termsig\\: int, stopsig\\: int\\}\\|false\\.$#"
-			count: 1
-			path: Classes/Converter/LocalCommandRunner.php
-
-		-
 			message: "#^Parameter \\#1 \\$process of function proc_close expects resource, resource\\|false given\\.$#"
 			count: 1
 			path: Classes/Converter/LocalCommandRunner.php
@@ -991,7 +986,7 @@ parameters:
 			path: Tests/Functional/Converter/LocalVideoConverterTest.php
 
 		-
-			message: "#^Parameter \\#1 \\$file of function file_put_contents expects string, string\\|null given\\.$#"
+			message: "#^Parameter \\#1 \\$filename of function file_put_contents expects string, string\\|null given\\.$#"
 			count: 1
 			path: Tests/Functional/Converter/LocalVideoConverterTest.php
 
@@ -1571,12 +1566,7 @@ parameters:
 			path: Tests/Unit/Processing/VideoProcessingEidTest.php
 
 		-
-			message: "#^Parameter \\#1 \\$encoded_string of function parse_str expects string, string\\|false\\|null given\\.$#"
-			count: 1
-			path: Tests/Unit/Processing/VideoProcessingEidTest.php
-
-		-
-			message: "#^Parameter \\#1 \\$object of method ReflectionProperty\\:\\:getValue\\(\\) expects object, null given\\.$#"
+			message: "#^Parameter \\#1 \\$string of function parse_str expects string, string\\|false\\|null given\\.$#"
 			count: 1
 			path: Tests/Unit/Processing/VideoProcessingEidTest.php
 
