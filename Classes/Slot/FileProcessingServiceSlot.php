@@ -2,7 +2,6 @@
 
 namespace Hn\Video\Slot;
 
-
 use TYPO3\CMS\Core\Resource\Driver\DriverInterface;
 use TYPO3\CMS\Core\Resource\FileInterface;
 use TYPO3\CMS\Core\Resource\ProcessedFile;
@@ -17,12 +16,7 @@ class FileProcessingServiceSlot
     protected $videoProcessor;
 
     /**
-     * @param FileProcessingService $fileProcessingService
-     * @param DriverInterface $driver
-     * @param ProcessedFile $processedFile
-     * @param FileInterface $file
      * @param $context
-     * @param array $configuration
      *
      * @see \TYPO3\CMS\Core\Resource\Service\FileProcessingService::processFile
      */

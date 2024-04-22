@@ -2,7 +2,6 @@
 
 namespace Hn\Video;
 
-
 use Hn\Video\Exception\FormatException;
 use Hn\Video\Preset\AbstractVideoPreset;
 use Hn\Video\Preset\PresetInterface;
@@ -16,22 +15,14 @@ class FormatRepository implements SingletonInterface
         $formats = $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['video']['formats'] ?? [];
         $format = $options['format'] ?? 'mp4';
 
-        if (isset($formats[$format])) {
-            return $formats[$format];
-        }
-
-        if (isset($formats["$format:default"])) {
-            return $formats["$format:default"];
-        }
-
-        return null;
+        return $formats[$format] ?? $formats["$format:default"] ?? null;
     }
 
     protected function getPresets(array $options = [], array $sourceStreams = null): array
     {
         $result = [];
 
-        $options = $this->normalizeOptions($options);
+        $options = static::normalizeOptions($options);
         $definition = $this->findFormatDefinition($options);
 
         foreach (['video', 'audio', 'subtitle', 'data'] as $steamType) {
@@ -62,7 +53,7 @@ class FormatRepository implements SingletonInterface
             $preset = GeneralUtility::makeInstance($definition[$steamType][0], $presetOptions);
             if (!$preset instanceof PresetInterface) {
                 $type = is_object($preset) ? get_class($preset) : gettype($preset);
-                throw new \RuntimeException("Expected " . PresetInterface::class . ", got $type");
+                throw new \RuntimeException('Expected ' . PresetInterface::class . ", got $type");
             }
 
             $result[$steamType] = [
@@ -82,8 +73,7 @@ class FormatRepository implements SingletonInterface
 
         $presets = $this->getPresets($options, $sourceStreams);
         if (isset($presets['video']) && $presets['video']['preset'] instanceof AbstractVideoPreset) {
-            $dimensions = $presets['video']['preset']->getDimensions($presets['video']['stream']);
-            list($properties['width'], $properties['height']) = $dimensions;
+            [$properties['width'], $properties['height']] = $presets['video']['preset']->getDimensions($presets['video']['stream']);
         }
 
         return $properties;
@@ -92,10 +82,10 @@ class FormatRepository implements SingletonInterface
     public function buildParameters(?string $input, ?string $output, array $options = [], array $sourceStreams = null): array
     {
         $parameters = [];
-        $options = $this->normalizeOptions($options);
+        $options = static::normalizeOptions($options);
         $definition = $this->findFormatDefinition($options);
         if ($definition === null) {
-            throw new FormatException("No format defintion found for configuration: " . print_r($options, true));
+            throw new FormatException('No format defintion found for configuration: ' . print_r($options, true));
         }
 
         if ($input !== null) {
@@ -140,9 +130,7 @@ class FormatRepository implements SingletonInterface
 
     public function buildParameterString(?string $input, ?string $output, array $options = [], array $sourceStreams = null): string
     {
-        $escapeShellArg = static function ($parameter) {
-            return preg_match('#^[\w:.-]+$#', $parameter) ? $parameter : escapeshellarg($parameter);
-        };
+        $escapeShellArg = static fn ($parameter) => preg_match('#^[\w:.-]+$#', $parameter) ? $parameter : escapeshellarg($parameter);
 
         $parameters = $this->buildParameters($input, $output, $options, $sourceStreams);
         $parameters = array_map($escapeShellArg, $parameters);
@@ -152,15 +140,12 @@ class FormatRepository implements SingletonInterface
     /**
      * Builds the source type parameter.
      *
-     * @param array $options
-     * @param array $sourceStream
      *
-     * @return string
      * @see https://wiki.whatwg.org/wiki/video_type_parameters
      */
     public function buildMimeType(array $options, array $sourceStream = null): string
     {
-        $options = $this->normalizeOptions($options);
+        $options = static::normalizeOptions($options);
         $definition = $this->findFormatDefinition($options);
         if (!isset($definition['mimeType'])) {
             throw new \RuntimeException("A format is missing it's mimeType: " . print_r($definition, true));
@@ -170,7 +155,7 @@ class FormatRepository implements SingletonInterface
 
         $codecs = [];
         /** @var PresetInterface $preset */
-        foreach ($this->getPresets($options, $sourceStream) as list('preset' => $preset)) {
+        foreach ($this->getPresets($options, $sourceStream) as ['preset' => $preset]) {
             $codec = $preset->getMimeCodecParameter($sourceStream ?? []);
             if ($codec !== null) {
                 $codecs[] = $codec;
@@ -192,7 +177,6 @@ class FormatRepository implements SingletonInterface
      *
      * @param array $options
      *
-     * @return array
      * @todo this method must take much more effort to normalize the parameters because unnecessary encodes are horrible
      */
     public static function normalizeOptions(array $options): array

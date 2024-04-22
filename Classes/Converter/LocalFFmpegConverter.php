@@ -2,7 +2,6 @@
 
 namespace Hn\Video\Converter;
 
-
 use Hn\Video\Exception\ConversionException;
 use Hn\Video\FormatRepository;
 use Hn\Video\Processing\VideoProcessingTask;
@@ -23,8 +22,6 @@ class LocalFFmpegConverter extends AbstractVideoConverter
     }
 
     /**
-     * @param VideoProcessingTask $task
-     *
      * @throws ConversionException
      */
     public function process(VideoProcessingTask $task): void
@@ -65,18 +62,15 @@ class LocalFFmpegConverter extends AbstractVideoConverter
     }
 
     /**
-     * @param string $file
-     *
-     * @return array
      * @throws ConversionException
      */
     protected function ffprobe(string $file): array
     {
-        $logger = GeneralUtility::makeInstance(LogManager::class)->getLogger(__CLASS__);
+        $logger = GeneralUtility::makeInstance(LogManager::class)->getLogger(self::class);
 
         $ffprobe = $this->runner->getCommand('ffprobe');
         if (!is_string($ffprobe)) {
-            throw new \RuntimeException("ffprobe not found.");
+            throw new \RuntimeException('ffprobe not found.');
         }
 
         $parameters = ['-v', 'quiet', '-print_format', 'json', '-show_streams', '-show_format', $file];
@@ -107,18 +101,15 @@ class LocalFFmpegConverter extends AbstractVideoConverter
     }
 
     /**
-     * @param string $parameters
-     *
-     * @return \Iterator
      * @throws ConversionException
      */
     protected function ffmpeg(string $parameters): \Iterator
     {
-        $logger = GeneralUtility::makeInstance(LogManager::class)->getLogger(__CLASS__);
+        $logger = GeneralUtility::makeInstance(LogManager::class)->getLogger(self::class);
 
         $ffmpeg = $this->runner->getCommand('ffmpeg');
         if (!is_string($ffmpeg)) {
-            throw new \RuntimeException("ffmpeg not found.");
+            throw new \RuntimeException('ffmpeg not found.');
         }
 
         // if possible run ffmpeg with lower priority
@@ -131,7 +122,7 @@ class LocalFFmpegConverter extends AbstractVideoConverter
         }
 
         $commandStr = "$ffmpeg -loglevel warning -stats $parameters";
-        $logger->notice("run ffmpeg command", ['command' => $commandStr]);
+        $logger->notice('run ffmpeg command', ['command' => $commandStr]);
         $process = $this->runner->run($commandStr);
         $output = '';
         foreach ($process as $line) {

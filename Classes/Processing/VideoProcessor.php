@@ -2,7 +2,6 @@
 
 namespace Hn\Video\Processing;
 
-
 use Hn\Video\Converter\VideoConverterInterface;
 use Psr\Log\LoggerInterface;
 use TYPO3\CMS\Core\Cache\CacheManager;
@@ -18,13 +17,12 @@ class VideoProcessor implements ProcessorInterface
 {
     protected function getLogger(): LoggerInterface
     {
-        return GeneralUtility::makeInstance(LogManager::class)->getLogger(__CLASS__);
+        return GeneralUtility::makeInstance(LogManager::class)->getLogger(self::class);
     }
 
     /**
      * Returns TRUE if this processor can process the given task.
      *
-     * @param TaskInterface $task
      *
      * @return bool
      */
@@ -46,7 +44,7 @@ class VideoProcessor implements ProcessorInterface
     {
         if (!$task instanceof VideoProcessingTask) {
             $type = is_object($task) ? get_class($task) : gettype($task);
-            throw new \InvalidArgumentException("Expected " . VideoProcessingTask::class . ", got $type");
+            throw new \InvalidArgumentException('Expected ' . VideoProcessingTask::class . ", got $type");
         }
 
         if ($task->getTargetFile()->isProcessed()) {
@@ -61,7 +59,7 @@ class VideoProcessor implements ProcessorInterface
         if ($storedTask === null || $storedTask->getStatus() === VideoProcessingTask::STATUS_FINISHED) {
             try {
                 $task->setStatus(VideoProcessingTask::STATUS_NEW);
-                $this->getConverter()->start($task);
+                static::getConverter()->start($task);
                 $this->handleTaskIfDone($task);
             } catch (\Exception $e) {
                 $task->setExecuted(false);
@@ -93,19 +91,19 @@ class VideoProcessor implements ProcessorInterface
     {
         if (!$task instanceof VideoProcessingTask) {
             $type = is_object($task) ? get_class($task) : gettype($task);
-            throw new \InvalidArgumentException("Expected " . VideoProcessingTask::class . ", got $type");
+            throw new \InvalidArgumentException('Expected ' . VideoProcessingTask::class . ", got $type");
         }
 
         if ($task->getStatus() !== VideoProcessingTask::STATUS_NEW) {
-            throw new \RuntimeException("This task is not new.");
+            throw new \RuntimeException('This task is not new.');
         }
 
         try {
-            $converter = $this->getConverter();
+            $converter = static::getConverter();
             $converter->process($task);
             $this->handleTaskIfDone($task);
         } catch (\Exception $e) {
-            $logger = GeneralUtility::makeInstance(LogManager::class)->getLogger(__CLASS__);
+            $logger = GeneralUtility::makeInstance(LogManager::class)->getLogger(self::class);
             $logger->critical($e->getMessage());
 
             $task->setExecuted(false);
@@ -128,8 +126,6 @@ class VideoProcessor implements ProcessorInterface
     }
 
     /**
-     * @param TaskInterface $task
-     *
      * @throws \TYPO3\CMS\Core\Cache\Exception\NoSuchCacheGroupException
      */
     protected function handleTaskIfDone(TaskInterface $task): void

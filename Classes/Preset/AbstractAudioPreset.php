@@ -2,7 +2,6 @@
 
 namespace Hn\Video\Preset;
 
-
 abstract class AbstractAudioPreset extends AbstractCompressiblePreset
 {
     /**
@@ -19,14 +18,12 @@ abstract class AbstractAudioPreset extends AbstractCompressiblePreset
      * - If the source is a 128 kbit/s mp3 than the aac stream will have 128 kbit/s.
      * - If the source is a 64 kbit/s mp3 than the aac stream will have 80 kbit/s.
      */
-    const BITRATE_TOLERANCE = 1.25;
+    public const BITRATE_TOLERANCE = 1.25;
 
     /**
      * Returns the maximum number of channels supported by this preset.
      *
      * This is usually 2.
-     *
-     * @return int
      */
     protected function getMaxChannels(): int
     {
@@ -52,10 +49,8 @@ abstract class AbstractAudioPreset extends AbstractCompressiblePreset
      * and if that also fails the highest one will be chosen.
      *
      * Make sure the first item is your preferred sample rate since it will be used if the source is unknown.
-     *
-     * @return array
      */
-    protected abstract function getSampleRates(): array;
+    abstract protected function getSampleRates(): array;
 
     public function getSampleRate(array $sourceStream): int
     {
@@ -88,17 +83,13 @@ abstract class AbstractAudioPreset extends AbstractCompressiblePreset
 
     /**
      * The expected bitrate per channel in kbit/s.
-     *
-     * @return int
      */
-    protected abstract function getBitratePerChannel(): int;
+    abstract protected function getBitratePerChannel(): int;
 
     /**
      * the target bitrate in kbit/s.
      *
-     * @param array $sourceStream
      *
-     * @return int
      */
     public function getBitrate(array $sourceStream): int
     {
@@ -132,7 +123,7 @@ abstract class AbstractAudioPreset extends AbstractCompressiblePreset
         return false;
     }
 
-    protected abstract function getEncoderParameters(array $sourceStream): array;
+    abstract protected function getEncoderParameters(array $sourceStream): array;
 
     protected function getTranscodingParameters(array $sourceStream): array
     {

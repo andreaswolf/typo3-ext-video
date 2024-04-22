@@ -2,7 +2,7 @@
 
 namespace Hn\Video\Converter;
 
-
+use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Exception\ServerException;
 use GuzzleHttp\Promise\PromiseInterface;
@@ -17,8 +17,11 @@ use Hn\Video\Processing\VideoTaskRepository;
 use Hn\Video\ViewHelpers\ProgressViewHelper;
 use Psr\Http\Message\UriInterface;
 use Psr\Log\LoggerInterface;
+use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
-use TYPO3\CMS\Core\Locking;
+use TYPO3\CMS\Core\Locking\Exception;
+use TYPO3\CMS\Core\Locking\LockFactory;
+use TYPO3\CMS\Core\Locking\LockingStrategyInterface;
 use TYPO3\CMS\Core\Log\LogManager;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use function GuzzleHttp\Psr7\try_fopen;
@@ -26,16 +29,16 @@ use function GuzzleHttp\Psr7\uri_for;
 
 class CloudConvertConverter extends AbstractVideoConverter
 {
-    const DB_TABLE = 'tx_video_cloudconvert_process';
+    public const DB_TABLE = 'tx_video_cloudconvert_process';
 
-    const LOCKING_STRATEGY = Locking\LockingStrategyInterface::LOCK_CAPABILITY_EXCLUSIVE
-    | Locking\LockingStrategyInterface::LOCK_CAPABILITY_NOBLOCK;
+    public const LOCKING_STRATEGY = LockingStrategyInterface::LOCK_CAPABILITY_EXCLUSIVE
+    | LockingStrategyInterface::LOCK_CAPABILITY_NOBLOCK;
 
-    const MODE_INFO = 'info';
-    const MODE_CONVERT = 'convert';
+    public const MODE_INFO = 'info';
+    public const MODE_CONVERT = 'convert';
 
     // define the progress ranges for the different stages of the conversion
-    const PROGRESS_RANGES = [
+    public const PROGRESS_RANGES = [
         self::MODE_INFO => [
             'input' => [0.0, 0.1],
             'wait' => [0.1, 0.1],
@@ -52,25 +55,13 @@ class CloudConvertConverter extends AbstractVideoConverter
         ],
     ];
 
-    /**
-     * @var \GuzzleHttp\Client
-     */
-    private $guzzle;
+    private Client $guzzle;
 
-    /**
-     * @var Locking\LockFactory
-     */
-    private $lockFactory;
+    private LockFactory $lockFactory;
 
-    /**
-     * @var \TYPO3\CMS\Core\Database\Connection
-     */
-    private $db;
+    private Connection $db;
 
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
+    private LoggerInterface $logger;
 
     /**
      * This decides if this typo3 instance is publicly available.
@@ -81,18 +72,15 @@ class CloudConvertConverter extends AbstractVideoConverter
      * if null
      *  - files will be uploaded by php which blocks processes and therefor won't be done during requests.
      *  - polling has to be used to figure out if the process is done
-     *
-     * @var UriInterface|null
      */
-    private $baseUrl = null;
+    private ?UriInterface $baseUrl = null;
 
     /**
-     * @param string $apiKey
      * @param string|null $baseUrl
      */
     public function __construct(string $apiKey)
     {
-        $this->guzzle = GeneralUtility::makeInstance(\GuzzleHttp\Client::class, [
+        $this->guzzle = GeneralUtility::makeInstance(Client::class, [
             'base_uri' => 'https://api.cloudconvert.com/',
             'timeout' => 5.0,
             'headers' => [
@@ -101,9 +89,9 @@ class CloudConvertConverter extends AbstractVideoConverter
             ],
         ]);
 
-        $this->lockFactory = GeneralUtility::makeInstance(Locking\LockFactory::class);
+        $this->lockFactory = GeneralUtility::makeInstance(LockFactory::class);
         $this->db = GeneralUtility::makeInstance(ConnectionPool::class)->getConnectionForTable(self::DB_TABLE);
-        $this->logger = GeneralUtility::makeInstance(LogManager::class)->getLogger(__CLASS__);
+        $this->logger = GeneralUtility::makeInstance(LogManager::class)->getLogger(self::class);
 
         // if we are in a publicly accessible frontend environment than define the base url
         // this allows the implementation to use the "download" way of delivering the video file
@@ -146,10 +134,10 @@ class CloudConvertConverter extends AbstractVideoConverter
 
         // if the instance is public than the process can start immediately.
         if ($this->isPublic()) {
-            $this->logger->notice("got a start signal in public mode.", $context);
+            $this->logger->notice('got a start signal in public mode.', $context);
             $this->process($task);
         } else {
-            $this->logger->notice("got a start signal in private mode.", $context);
+            $this->logger->notice('got a start signal in private mode.', $context);
         }
     }
 
@@ -188,7 +176,7 @@ class CloudConvertConverter extends AbstractVideoConverter
             escapeshellarg('{OUTPUTFILE}') => '{OUTPUTFILE}',
         ]);
 
-        $result = $this->pollProcess($task, self::MODE_CONVERT, ["command" => $command]);
+        $result = $this->pollProcess($task, self::MODE_CONVERT, ['command' => $command]);
         $this->logger->debug('polled for convert', ['result' => $result, 'command' => $command]);
         if ($result === null) {
             return;
@@ -239,17 +227,19 @@ class CloudConvertConverter extends AbstractVideoConverter
         $serializedOptionsLength = strlen($serializedOptions);
         if ($serializedOptionsLength > 767) {
             $msg = "The options passed to create this job were $serializedOptionsLength bytes long.";
-            $msg .= " There is a limit of 767 bytes for the mysql unique key to work. Sorry.";
+            $msg .= ' There is a limit of 767 bytes for the mysql unique key to work. Sorry.';
             throw new \RuntimeException($msg);
         }
 
         $statement = $this->db->select(
             ['uid', 'status', 'failed'],
-            self::DB_TABLE, [
+            self::DB_TABLE,
+            [
             'file' => $task->getSourceFile()->getUid(),
             'mode' => $mode,
             'options' => $serializedOptions,
-        ]);
+        ]
+        );
 
         // TODO make sure not to spam the api with tons of queries... maybe limit to one every 5 seconds
 
@@ -260,7 +250,7 @@ class CloudConvertConverter extends AbstractVideoConverter
         }
 
         if ($info['failed'] ?? false) {
-            throw new ConversionException("Process error: " . json_encode($info), 1554038915);
+            throw new ConversionException('Process error: ' . json_encode($info, JSON_THROW_ON_ERROR), 1_554_038_915);
         }
 
         // do nothing if this task is already done
@@ -358,7 +348,7 @@ class CloudConvertConverter extends AbstractVideoConverter
                     $this->db->insert(self::DB_TABLE, $values + ['crdate' => $_SERVER['REQUEST_TIME']]);
                 }
                 $lock->release();
-                return new RejectedPromise(new ConversionException("Communication Error", 1554565455, $error));
+                return new RejectedPromise(new ConversionException('Communication Error', 1_554_565_455, $error));
             }
         );
 
@@ -468,7 +458,7 @@ class CloudConvertConverter extends AbstractVideoConverter
         $videoTaskRepository->store($task);
     }
 
-    private function acquireLock(string $identifier): ?Locking\LockingStrategyInterface
+    private function acquireLock(string $identifier): ?LockingStrategyInterface
     {
         try {
             $lock = $this->lockFactory->createLocker($identifier, self::LOCKING_STRATEGY);
@@ -478,7 +468,7 @@ class CloudConvertConverter extends AbstractVideoConverter
             }
 
             return $lock;
-        } catch (Locking\Exception $e) {
+        } catch (Exception $e) {
             // it seems that the noblock implementation is not really tested
             // passing noblock to acquire will not block on supported platforms
             // and will block on unsuported platforms while throwing this exception afterwards

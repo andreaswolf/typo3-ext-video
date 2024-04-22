@@ -2,7 +2,6 @@
 
 namespace Hn\Video\Preset;
 
-
 use TYPO3\CMS\Core\Utility\MathUtility;
 
 /**
@@ -13,36 +12,26 @@ abstract class AbstractVideoPreset extends AbstractCompressiblePreset
      * The maximum framerate allowed within this video.
      * Videos must always be encoded with a constant framerate
      * but be sure to reference the source stream to avoid frame duplication.
-     *
-     * @var float
      */
-    private $maxFramerate = 30.0;
+    private float $maxFramerate = 30.0;
 
-    /**
-     * @var int|null
-     */
-    private $maxWidth = null;
+    private ?int $maxWidth = null;
 
-    /**
-     * @var int|null
-     */
-    private $maxHeight = null;
+    private ?int $maxHeight = null;
 
     /**
      * If true than the video will be cropped.
      *
-     * @var bool
      * @todo implement
      */
-    private $crop = false;
+    private bool $crop = false;
 
     /**
      * The scaling algorithm to use.
      *
      * @see https://ffmpeg.org/ffmpeg-scaler.html
-     * @var string
      */
-    private $scalingAlgorithm = 'bicubic';
+    private string $scalingAlgorithm = 'bicubic';
 
     protected function getPixelFormat(): string
     {
@@ -60,7 +49,7 @@ abstract class AbstractVideoPreset extends AbstractCompressiblePreset
     public function setMaxFramerate(float $maxFramerate): void
     {
         if ($maxFramerate <= 0.0) {
-            throw new \RuntimeException("Framerate must be higher than 0.0");
+            throw new \RuntimeException('Framerate must be higher than 0.0');
         }
 
         $this->maxFramerate = $maxFramerate;
@@ -101,7 +90,7 @@ abstract class AbstractVideoPreset extends AbstractCompressiblePreset
     public function setMaxWidth(?int $maxWidth): void
     {
         if ($maxWidth < 8 && $maxWidth !== null) {
-            throw new \RuntimeException("width must be 8 or higher0");
+            throw new \RuntimeException('width must be 8 or higher0');
         }
 
         $this->maxWidth = $maxWidth;
@@ -115,7 +104,7 @@ abstract class AbstractVideoPreset extends AbstractCompressiblePreset
     public function setMaxHeight(?int $maxHeight): void
     {
         if ($maxHeight < 8 && $maxHeight !== null) {
-            throw new \RuntimeException("height must be 8 or higher");
+            throw new \RuntimeException('height must be 8 or higher');
         }
 
         $this->maxHeight = $maxHeight;
@@ -146,8 +135,6 @@ abstract class AbstractVideoPreset extends AbstractCompressiblePreset
      * This is required to get chroma sub-sampling to work.
      *
      * It'll probably be 2.
-     *
-     * @return int
      */
     protected function getDimensionDivisor(): int
     {
@@ -160,8 +147,6 @@ abstract class AbstractVideoPreset extends AbstractCompressiblePreset
      * This method must be modified by implementing presets if there are limitations present by the codec.
      *
      * @param float[] $sourceDimensions
-     *
-     * @return float
      */
     protected function getScaleFactor(array $sourceDimensions): float
     {
@@ -181,7 +166,6 @@ abstract class AbstractVideoPreset extends AbstractCompressiblePreset
     /**
      * Returns the dimensions for the final video.
      *
-     * @param array $sourceStream
      *
      * @return int[]
      */
@@ -189,7 +173,7 @@ abstract class AbstractVideoPreset extends AbstractCompressiblePreset
     {
         if (isset($sourceStream['width']) && isset($sourceStream['height'])) {
             $sourceDimensions = [$sourceStream['width'], $sourceStream['height']];
-        } else if ($this->getMaxWidth() && $this->getMaxHeight()) {
+        } elseif ($this->getMaxWidth() && $this->getMaxHeight()) {
             $sourceDimensions = [$this->getMaxWidth(), $this->getMaxHeight()];
         } else {
             $sourceDimensions = [1280, 720]; // ¯\_(ツ)_/¯
@@ -224,8 +208,6 @@ abstract class AbstractVideoPreset extends AbstractCompressiblePreset
      * If your requested quality was 0.6 than the quality would be quality ~0.65
      *
      * @param array $sourceStream
-     *
-     * @return float
      */
     public function getBoostedQuality(array $sourceStream): float
     {
@@ -254,10 +236,8 @@ abstract class AbstractVideoPreset extends AbstractCompressiblePreset
      * but in general you can think of it as the maximum average bitrate.
      *
      * @param array $sourceStream
-     *
-     * @return int
      */
-    public abstract function getTargetBitrate(array $sourceStream): int;
+    abstract public function getTargetBitrate(array $sourceStream): int;
 
     public function requiresTranscoding(array $sourceStream): bool
     {
@@ -308,11 +288,9 @@ abstract class AbstractVideoPreset extends AbstractCompressiblePreset
     /**
      * The parameters specific to this encoder like bitrate.
      *
-     * @param array $sourceStream
      *
-     * @return array
      */
-    protected abstract function getEncoderParameters(array $sourceStream): array;
+    abstract protected function getEncoderParameters(array $sourceStream): array;
 
     protected function getTranscodingParameters(array $sourceStream): array
     {

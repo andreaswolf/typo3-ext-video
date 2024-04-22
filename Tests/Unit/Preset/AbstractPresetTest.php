@@ -2,7 +2,6 @@
 
 namespace Hn\Video\Tests\Unit\Preset;
 
-
 use Hn\Video\Preset\AbstractCompressiblePreset;
 use Hn\Video\Tests\Unit\UnitTestCase;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -22,7 +21,7 @@ class AbstractPresetTest extends UnitTestCase
         return $this->getMockForAbstractClass(AbstractCompressiblePreset::class);
     }
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->preset = $this->createPreset();
@@ -32,23 +31,19 @@ class AbstractPresetTest extends UnitTestCase
     {
         foreach (range(0.0, 1.0, 0.1) as $quality) {
             $this->preset->setQuality($quality);
-            $this->assertEquals($quality, $this->preset->getQuality());
+            $this->assertEqualsWithDelta($quality, $this->preset->getQuality(), 0.001);
         }
     }
 
-    /**
-     * @expectedException \RuntimeException
-     */
     public function testQualityTooHigh()
     {
+        $this->expectException(\RuntimeException::class);
         $this->preset->setQuality(1.1);
     }
 
-    /**
-     * @expectedException \RuntimeException
-     */
     public function testQualityTooLow()
     {
+        $this->expectException(\RuntimeException::class);
         $this->preset->setQuality(-0.1);
     }
 

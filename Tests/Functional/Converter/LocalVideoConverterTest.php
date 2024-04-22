@@ -2,7 +2,6 @@
 
 namespace Hn\Video\Tests\Functional\Converter;
 
-
 use Hn\Video\Converter\LocalCommandRunner;
 use Hn\Video\Converter\LocalFFmpegConverter;
 use Hn\Video\Tests\Functional\FunctionalTestCase;
@@ -16,7 +15,7 @@ class LocalVideoConverterTest extends FunctionalTestCase
     /** @var LocalCommandRunner|MockObject */
     protected $commandRunner;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -33,7 +32,7 @@ class LocalVideoConverterTest extends FunctionalTestCase
             ->willReturnOnConsecutiveCalls('/usr/local/bin/ffprobe', '/usr/local/bin/ffmpeg', '/usr/bin/nice');
         $this->commandRunner->expects($this->exactly(2))->method('run')
             ->willReturnCallback(function ($command) use (&$calls) {
-                $parameters = str_getcsv($command, " ", "'");
+                $parameters = str_getcsv($command, ' ', "'");
                 switch ($calls++) {
                     case 0:
                         $this->assertEquals('/usr/local/bin/ffprobe', reset($parameters));
@@ -49,7 +48,7 @@ class LocalVideoConverterTest extends FunctionalTestCase
                         $this->assertEquals('/usr/bin/nice', $parameters[0]);
                         $this->assertEquals('/usr/local/bin/ffmpeg', $parameters[1]);
                         $this->assertStringStartsWith(PATH_site . 'typo3temp/var/transient/', $tmpFile, $command);
-                        file_put_contents($tmpFile, "hi");
+                        file_put_contents($tmpFile, 'hi');
                         return 0;
                 }
             });

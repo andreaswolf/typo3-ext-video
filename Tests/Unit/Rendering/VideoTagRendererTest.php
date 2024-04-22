@@ -2,7 +2,7 @@
 
 namespace Hn\Video\Tests\Unit\Rendering;
 
-
+use Hn\Video\Rendering\VideoTagRenderer;
 use Hn\Video\Tests\Unit\UnitTestCase;
 use TYPO3\CMS\Core\Resource\File;
 use TYPO3\CMS\Core\Resource\ProcessedFile;
@@ -15,14 +15,14 @@ class VideoTagRendererTest extends UnitTestCase
      */
     protected $renderer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
-        $this->renderer = new \Hn\Video\Rendering\VideoTagRenderer();
+        $this->renderer = new VideoTagRenderer();
         $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['video']['default_video_formats'] = ['mp4' => []];
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($GLOBALS['TYPO3_CONF_VARS']);
         GeneralUtility::purgeInstances();
@@ -117,8 +117,7 @@ class VideoTagRendererTest extends UnitTestCase
         $file->expects($this->atLeastOnce())->method('process')->with('Video.CropScale', ['format' => 'mp4'])->willReturn($processedFile);
 
         $result = $this->renderer->render($file, 200, 200, $options);
-        $videoTag = '<video width="200" height="200"' . ($expectedAttributes ? " $expectedAttributes" : "") . '>';
+        $videoTag = '<video width="200" height="200"' . ($expectedAttributes ? " $expectedAttributes" : '') . '>';
         $this->assertEquals($videoTag . '<source src="http://example.com/video.mp4" type="video/mp4" /></video>', $result);
     }
-
 }

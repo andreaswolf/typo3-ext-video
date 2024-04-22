@@ -1,13 +1,48 @@
 {
     "name": "hn/video",
     "description": "Automatic conversion of videos within typo3 using local ffmpeg or cloudconvert.",
-    "keywords": ["media","video","h264","vp9","aac","mp3","opus","gif","inline","autoplay","play","compress","compression","mp4","webm","2160p","1080p","720p","480p","full-hd","hd","ffmpeg","progress","dashboard","html5","process","crop","scale","uhd","4k","playsinline","camera","controls","loop","mute","muted","source","CloudConvert"],
-    "type": "typo3-cms-extension",
     "license": "GPL-2.0-or-later",
-    "support": {
-        "issues": "https://bitbucket.org/hauptsachenet/video/issues?status=new&status=open",
-        "source": "https://bitbucket.org/hauptsachenet/video/src"
-    },
+    "type": "typo3-cms-extension",
+    "keywords": [
+        "media",
+        "video",
+        "h264",
+        "vp9",
+        "aac",
+        "mp3",
+        "opus",
+        "gif",
+        "inline",
+        "autoplay",
+        "play",
+        "compress",
+        "compression",
+        "mp4",
+        "webm",
+        "2160p",
+        "1080p",
+        "720p",
+        "480p",
+        "full-hd",
+        "hd",
+        "ffmpeg",
+        "progress",
+        "dashboard",
+        "html5",
+        "process",
+        "crop",
+        "scale",
+        "uhd",
+        "4k",
+        "playsinline",
+        "camera",
+        "controls",
+        "loop",
+        "mute",
+        "muted",
+        "source",
+        "CloudConvert"
+    ],
     "authors": [
         {
             "name": "Marco Pfeiffer",
@@ -16,6 +51,10 @@
             "role": "Developer"
         }
     ],
+    "support": {
+        "issues": "https://bitbucket.org/hauptsachenet/video/issues?status=new&status=open",
+        "source": "https://bitbucket.org/hauptsachenet/video/src"
+    },
     "require": {
         "php": "^7.1",
         "ext-json": "*",
@@ -24,8 +63,14 @@
         "typo3/cms-core": "~8.7.10 || ~9.5.5"
     },
     "require-dev": {
-        "nimut/testing-framework": "^4.1",
-        "phpunit/phpunit": "^6.5",
+        "ergebnis/composer-normalize": "^2.8",
+        "nimut/testing-framework": "^6.0",
+        "phpstan/extension-installer": "^1.3",
+        "phpstan/phpstan": "^1.10",
+        "phpunit/phpunit": "^9.6",
+        "saschaegerer/phpstan-typo3": "^1.1",
+        "ssch/typo3-rector": "^1.3",
+        "symplify/easy-coding-standard": "^12.1",
         "typo3/cms-composer-installers": ">=1.4.1"
     },
     "autoload": {
@@ -39,14 +84,20 @@
         }
     },
     "config": {
+        "allow-plugins": {
+            "ergebnis/composer-normalize": true,
+            "phpstan/extension-installer": true,
+            "typo3/class-alias-loader": true,
+            "typo3/cms-composer-installers": true
+        },
+        "bin-dir": ".Build/bin",
         "sort-packages": true,
-        "vendor-dir": ".Build/vendor",
-        "bin-dir": ".Build/bin"
+        "vendor-dir": ".Build/vendor"
     },
     "extra": {
         "typo3/cms": {
-            "web-dir": ".Build",
-            "app-dir": ".Build"
+            "app-dir": ".Build",
+            "web-dir": ".Build"
         }
     },
     "scripts": {
@@ -54,27 +105,31 @@
             "mkdir -p .Build/typo3conf/ext",
             "ln -s ../../../ .Build/typo3conf/ext/video || true"
         ],
+        "analyze": "phpstan --memory-limit=256m",
         "cc": [
             "rm -rf .Build/typo3temp/var/tests/"
         ],
-        "db:stop": [
-            "docker rm --force --volumes `basename $PWD`_db || true"
-        ],
+        "cs:check": "ecs check",
+        "cs:fix": "ecs check --fix",
         "db:start": [
             "@db:stop",
             "@cc",
             "docker run --rm --name `basename $PWD`_db -d -p3306:3306 -eMYSQL_ALLOW_EMPTY_PASSWORD=yes mysql:5.7 mysqld --character-set-server=utf8 --collation-server=utf8_general_ci",
             "while ! docker exec `basename $PWD`_db mysql -e 'SELECT 1' &> /dev/null; do printf . && sleep 1; done && echo database is running"
         ],
+        "db:stop": [
+            "docker rm --force --volumes `basename $PWD`_db || true"
+        ],
+        "rector": "rector",
+        "test": [
+            "@test:unit",
+            "@test:functional"
+        ],
         "test:functional": [
             "phpunit -c Tests/FunctionalTests.xml"
         ],
         "test:unit": [
             "phpunit -c Tests/UnitTests.xml"
-        ],
-        "test": [
-            "@test:unit",
-            "@test:functional"
         ]
     }
 }

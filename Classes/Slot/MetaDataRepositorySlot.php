@@ -2,7 +2,6 @@
 
 namespace Hn\Video\Slot;
 
-
 use Hn\Video\VideoMetadataExtractor;
 use TYPO3\CMS\Core\Resource\File;
 use TYPO3\CMS\Core\Resource\FileRepository;
@@ -25,10 +24,8 @@ class MetaDataRepositorySlot implements SingletonInterface
      *
      * This is usually prevented by checking the "newlyCreated" property.
      * But since this extension might be installed after files were uploaded I need to check even existing files.
-     *
-     * @var array
      */
-    private $currentlyProcessing = [];
+    private array $currentlyProcessing = [];
 
     public function recordPostRetrieval(\ArrayObject $data)
     {

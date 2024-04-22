@@ -2,7 +2,6 @@
 
 namespace Hn\Video\Tests\Unit\Preset;
 
-
 use Hn\Video\Preset\AbstractAudioPreset;
 use PHPUnit\Framework\MockObject\MockObject;
 

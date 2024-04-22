@@ -2,9 +2,6 @@
 
 namespace Hn\Video\ViewHelpers;
 
-
-use function GuzzleHttp\Psr7\build_query;
-use function GuzzleHttp\Psr7\stream_for;
 use Hn\Video\Processing\VideoProcessingTask;
 use Hn\Video\Processing\VideoProcessor;
 use Hn\Video\Processing\VideoTaskRepository;
@@ -12,10 +9,12 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use TYPO3\CMS\Core\Error\Http\BadRequestException;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use function GuzzleHttp\Psr7\build_query;
+use function GuzzleHttp\Psr7\stream_for;
 
 class ProgressEid
 {
-    const EID = 'tx_video_progress';
+    public const EID = 'tx_video_progress';
 
     public static function render(ServerRequestInterface $request, ResponseInterface $response)
     {
@@ -23,7 +22,7 @@ class ProgressEid
 
         $uids = $queryParams['uids'];
         if (empty($uids)) {
-            throw new BadRequestException("At least one uid must be given.");
+            throw new BadRequestException('At least one uid must be given.');
         }
 
         /** @var VideoProcessingTask $highestTask */

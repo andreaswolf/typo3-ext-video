@@ -2,12 +2,11 @@
 
 namespace Hn\Video\Processing;
 
-
-use function GuzzleHttp\Psr7\build_query;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use TYPO3\CMS\Core\Error\Http\BadRequestException;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use function GuzzleHttp\Psr7\build_query;
 
 /**
  * This eid processor is meant for remote processing solutions.
@@ -15,7 +14,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  */
 class VideoProcessingEid
 {
-    const EID = 'tx_video_process';
+    public const EID = 'tx_video_process';
 
     public static function getKeys(): array
     {
@@ -35,12 +34,12 @@ class VideoProcessingEid
     public static function process(ServerRequestInterface $request, ResponseInterface $response)
     {
         if (!in_array($request->getQueryParams()['key'], self::getKeys())) {
-            throw new BadRequestException("The key is not valid");
+            throw new BadRequestException('The key is not valid');
         }
 
         $repository = GeneralUtility::makeInstance(VideoTaskRepository::class);
         $videoProcessor = GeneralUtility::makeInstance(VideoProcessor::class);
-        $timeout = ini_get("max_execution_time") - 10;
+        $timeout = ini_get('max_execution_time') - 10;
 
         $storedTasks = $repository->findByStatus(VideoProcessingTask::STATUS_NEW);
         foreach ($storedTasks as $index => $storedTask) {

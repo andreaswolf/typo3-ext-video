@@ -2,7 +2,6 @@
 
 namespace Hn\Video\Converter;
 
-
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\CommandUtility;
 
@@ -29,12 +28,11 @@ class LocalCommandRunner implements SingletonInterface
      * You can use the returned iterator to parse the output while the command is running.
      * The Generator return value will be the status code.
      *
-     * @param string $command
      *
-     * @return \Generator
      */
     public function run(string $command): \Generator
     {
+        $status = [];
         $process = proc_open("$command 2>&1", [1 => ['pipe', 'w']], $pipes);
         stream_set_blocking($pipes[1], false);
 

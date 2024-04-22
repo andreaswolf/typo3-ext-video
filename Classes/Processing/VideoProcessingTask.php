@@ -2,24 +2,23 @@
 
 namespace Hn\Video\Processing;
 
-
 use Hn\Video\FormatRepository;
 use TYPO3\CMS\Core\Resource\Processing\AbstractTask;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class VideoProcessingTask extends AbstractTask
 {
-    const TYPE = 'Video';
-    const NAME = 'CropScale';
+    public const TYPE = 'Video';
+    public const NAME = 'CropScale';
 
-    const STATUS_NEW = 'new';
-    const STATUS_FINISHED = 'finished';
-    const STATUS_FAILED = 'failed';
+    public const STATUS_NEW = 'new';
+    public const STATUS_FINISHED = 'finished';
+    public const STATUS_FAILED = 'failed';
 
     /**
      * @var int|null
      */
-    protected $uid = null;
+    protected $uid;
 
     /**
      * @var string
@@ -40,7 +39,6 @@ class VideoProcessingTask extends AbstractTask
      * Checks if the given configuration is sensible for this task, i.e. if all required parameters
      * are given, within the boundaries and don't conflict with each other.
      *
-     * @param array $configuration
      *
      * @return bool
      */
@@ -108,11 +106,8 @@ class VideoProcessingTask extends AbstractTask
 
         $formatRepository = GeneralUtility::makeInstance(FormatRepository::class);
         $definition = $formatRepository->findFormatDefinition($this->getConfiguration());
-        if (isset($definition['priority'])) {
-            return $definition['priority'];
-        }
 
-        return 0;
+        return $definition['priority'] ?? 0;
     }
 
     public function addProgressStep(float $progress, float $timestamp = null): int
@@ -202,13 +197,12 @@ class VideoProcessingTask extends AbstractTask
     }
 
     /**
-     * @param array $row
      * @internal this method is meant for deserialization
      */
     public function setDatabaseRow(array $row)
     {
         $this->uid = $row['uid'];
         $this->setStatus($row['status']);
-        $this->progress = json_decode($row['progress'], true) ?: [];
+        $this->progress = json_decode($row['progress'], true, 512, JSON_THROW_ON_ERROR) ?: [];
     }
 }

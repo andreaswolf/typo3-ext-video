@@ -2,7 +2,6 @@
 
 namespace Hn\Video\Tests\Functional\Processing;
 
-
 use Hn\Video\Processing\VideoProcessingTask;
 use Hn\Video\Processing\VideoTaskRepository;
 use Hn\Video\Tests\Functional\FunctionalTestCase;
@@ -11,12 +10,9 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class VideoTaskRepositoryTest extends FunctionalTestCase
 {
-    /**
-     * @var VideoTaskRepository
-     */
-    private $repository;
+    private VideoTaskRepository $repository;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->repository = GeneralUtility::makeInstance(VideoTaskRepository::class);

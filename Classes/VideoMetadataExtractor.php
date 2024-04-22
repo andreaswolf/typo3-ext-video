@@ -2,8 +2,9 @@
 
 namespace Hn\Video;
 
-
 use TYPO3\CMS\Core\Resource;
+use TYPO3\CMS\Core\Resource\AbstractFile;
+use TYPO3\CMS\Core\Resource\File;
 use TYPO3\CMS\Core\Resource\Index\ExtractorInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -15,7 +16,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  */
 class VideoMetadataExtractor implements ExtractorInterface
 {
-    private $getID3;
+    private \getID3 $getID3;
 
     public function __construct()
     {
@@ -40,7 +41,7 @@ class VideoMetadataExtractor implements ExtractorInterface
      */
     public function getFileTypeRestrictions()
     {
-        return [Resource\AbstractFile::FILETYPE_AUDIO, Resource\AbstractFile::FILETYPE_VIDEO];
+        return [AbstractFile::FILETYPE_AUDIO, AbstractFile::FILETYPE_VIDEO];
     }
 
     /**
@@ -88,11 +89,10 @@ class VideoMetadataExtractor implements ExtractorInterface
     /**
      * Checks if the given file can be processed by this Extractor
      *
-     * @param Resource\File $file
      *
      * @return bool
      */
-    public function canProcess(Resource\File $file)
+    public function canProcess(File $file)
     {
         if (!$file->exists()) {
             return false;
@@ -116,7 +116,7 @@ class VideoMetadataExtractor implements ExtractorInterface
      *
      * @return array
      */
-    public function extractMetaData(Resource\File $file, array $previousExtractedData = [])
+    public function extractMetaData(File $file, array $previousExtractedData = [])
     {
         $raw = $this->getID3->analyze($file->getForLocalProcessing(false), $file->getSize(), $file->getName());
 

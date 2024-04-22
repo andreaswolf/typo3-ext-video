@@ -2,7 +2,6 @@
 
 namespace Hn\Video\Processing;
 
-
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
@@ -14,17 +13,14 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class VideoTaskRepository implements SingletonInterface
 {
-    const TABLE_NAME = 'tx_video_task';
+    public const TABLE_NAME = 'tx_video_task';
 
-    /**
-     * @var Connection
-     */
-    private $connection;
+    private Connection $connection;
 
     /**
      * @var VideoProcessingTask[]
      */
-    private $tasks = [];
+    private array $tasks = [];
 
     public function __construct()
     {
@@ -53,9 +49,6 @@ class VideoTaskRepository implements SingletonInterface
         }
     }
 
-    /**
-     * @return QueryBuilder
-     */
     private function createQueryBuilder(): QueryBuilder
     {
         $qb = $this->connection->createQueryBuilder();
@@ -64,11 +57,6 @@ class VideoTaskRepository implements SingletonInterface
         return $qb;
     }
 
-    /**
-     * @param TaskInterface $task
-     *
-     * @return VideoProcessingTask|null
-     */
     public function findByTask(TaskInterface $task): ?VideoProcessingTask
     {
         if ($task instanceof VideoProcessingTask && $task->getUid() && isset($this->tasks[$task->getUid()])) {
@@ -78,12 +66,6 @@ class VideoTaskRepository implements SingletonInterface
         return $this->findByFile($task->getSourceFile()->getUid(), $task->getConfiguration());
     }
 
-    /**
-     * @param int $file
-     * @param array $configuration
-     *
-     * @return VideoProcessingTask|null
-     */
     public function findByFile(int $file, array $configuration): ?VideoProcessingTask
     {
         $qb = $this->createQueryBuilder();
@@ -104,11 +86,6 @@ class VideoTaskRepository implements SingletonInterface
         return $this->serializeTask($row);
     }
 
-    /**
-     * @param int $uid
-     *
-     * @return VideoProcessingTask|null
-     */
     public function findByUid(int $uid): ?VideoProcessingTask
     {
         $qb = $this->createQueryBuilder();
@@ -126,7 +103,6 @@ class VideoTaskRepository implements SingletonInterface
     /**
      * Finds tasks by a specific status.
      *
-     * @param string $status
      *
      * @return VideoProcessingTask[]
      */
@@ -158,7 +134,7 @@ class VideoTaskRepository implements SingletonInterface
         $task = $processedFile->getTask();
         if (!$task instanceof VideoProcessingTask) {
             $type = is_object($task) ? get_class($task) : gettype($task);
-            throw new \RuntimeException("Expected " . VideoProcessingTask::class . ", got $type");
+            throw new \RuntimeException('Expected ' . VideoProcessingTask::class . ", got $type");
         }
 
         $task->setDatabaseRow($row);
@@ -166,11 +142,6 @@ class VideoTaskRepository implements SingletonInterface
         return $task;
     }
 
-    /**
-     * @param VideoProcessingTask $task
-     *
-     * @return bool
-     */
     public function delete(VideoProcessingTask $task): bool
     {
         if ($task->getUid() === null || !isset($this->tasks[$task->getUid()])) {

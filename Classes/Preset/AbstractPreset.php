@@ -2,7 +2,6 @@
 
 namespace Hn\Video\Preset;
 
-
 abstract class AbstractPreset implements PresetInterface
 {
     public function __construct(array $options = [])
@@ -30,7 +29,7 @@ abstract class AbstractPreset implements PresetInterface
             } catch (\Exception $e) {
                 $className = get_class($this);
                 $msg = "Error while configuring $name in $className: " . $e->getMessage();
-                throw new \RuntimeException($msg, 1553159340, $e);
+                throw new \RuntimeException($msg, 1_553_159_340, $e);
             }
         }
     }
@@ -40,8 +39,6 @@ abstract class AbstractPreset implements PresetInterface
      *
      * The key will be the option name while the value is the setter for setting it after the preset is created.
      * eg. array("quality" => "setQuality")
-     *
-     * @return array
      */
     protected static function getPossibleOptions(): array
     {

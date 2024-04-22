@@ -2,7 +2,6 @@
 
 namespace Hn\Video\Controller;
 
-
 use Hn\Video\Processing\VideoTaskRepository;
 use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Core\Database\ConnectionPool;
@@ -68,9 +67,9 @@ class TaskController extends ActionController
         }
 
         if ($videoTaskRepository->delete($task)) {
-            $this->addFlashMessage("Task was deleted.", AbstractMessage::OK);
+            $this->addFlashMessage('Task was deleted.', AbstractMessage::OK);
         } else {
-            $this->addFlashMessage("Unknown error while deleting the task.", AbstractMessage::ERROR);
+            $this->addFlashMessage('Unknown error while deleting the task.', AbstractMessage::ERROR);
         }
 
         $this->redirect('list');

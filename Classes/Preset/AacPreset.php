@@ -2,7 +2,6 @@
 
 namespace Hn\Video\Preset;
 
-
 class AacPreset extends AbstractAudioPreset
 {
     /**
@@ -36,10 +35,8 @@ class AacPreset extends AbstractAudioPreset
      * Weather ot not to use libfdk for audio encoding.
      * libfdk will sound better especially at lower bitrates than the native ffmpeg encoder.
      * However it is probably not present on your system unless you compiled ffmpeg yourself.
-     *
-     * @var bool
      */
-    private $fdkAvailable = true;
+    private bool $fdkAvailable = true;
 
     public function getCodecName(): string
     {
@@ -103,8 +100,6 @@ class AacPreset extends AbstractAudioPreset
      *
      * Note that this is the name of the profile that the fdk uses.
      * mp4 metadata has a different name.
-     *
-     * @return string
      */
     protected function getProfile(): string
     {
@@ -130,7 +125,7 @@ class AacPreset extends AbstractAudioPreset
     {
         $profile = $this->getProfile();
         $bitrate = $this->getBitratePerChannel();
-        foreach (self::FDK_VBR_MAPPING as list($targetProfile, $targetBitrate, $vbrValue)) {
+        foreach (self::FDK_VBR_MAPPING as [$targetProfile, $targetBitrate, $vbrValue]) {
             if ($profile !== $targetProfile) {
                 continue;
             }

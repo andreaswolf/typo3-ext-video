@@ -2,7 +2,6 @@
 
 namespace Hn\Video\Preset;
 
-
 use TYPO3\CMS\Core\Utility\MathUtility;
 
 class H264Preset extends AbstractVideoPreset
@@ -38,14 +37,14 @@ class H264Preset extends AbstractVideoPreset
 
         '5.0' => [22080, 589824, 135000], // eg. 2560×1920@30
         '5.1' => [36864, 983040, 240000], // eg. 4096×2048@30
-        '5.2' => [36864, 2073600, 240000], // eg. 4096×2160@60
+        '5.2' => [36864, 2_073_600, 240000], // eg. 4096×2160@60
 
         // levels below this line are fairly new and may not be interpreted as valid
         // and even if they are, most hardware decoders won't be able to play them
 
-        '6.0' => [139264, 4177920, 240000], // eg. 8192×4320@30
-        '6.1' => [139264, 8355840, 480000], // eg. 8192×4320@60
-        '6.2' => [139264, 16711680, 800000], // eg. 8192×4320@120
+        '6.0' => [139264, 4_177_920, 240000], // eg. 8192×4320@30
+        '6.1' => [139264, 8_355_840, 480000], // eg. 8192×4320@60
+        '6.2' => [139264, 16_711_680, 800000], // eg. 8192×4320@120
     ];
 
     /**
@@ -103,26 +102,22 @@ class H264Preset extends AbstractVideoPreset
     /**
      * If null than the profile will be chosen based on the level.
      * Basically if the level is >= 4 than high will be used, main otherwise.
-     *
-     * @var string|null
      */
-    private $profile = null;
+    private ?string $profile = null;
 
     /**
-     * @var int
      * @see https://en.wikipedia.org/wiki/H.264/MPEG-4_AVC#Levels
      */
-    private $level = '3.0';
+    private string $level = '3.0';
 
     /**
      * The performance preset.
      *
-     * @var string
      * @see H264Preset::PERFORMANCE_PRESETS
      * @see http://dev.beandog.org/x264_preset_reference.html
      * @see https://encodingwissen.de/codecs/x264/referenz/
      */
-    private $preset = 'medium';
+    private string $preset = 'medium';
 
     public function getCodecName(): string
     {
@@ -151,8 +146,6 @@ class H264Preset extends AbstractVideoPreset
      * That behavior would be unexpected.
      * Besides, that would only work if the level was below 3.0 or the framerate limit above 30
      * since all level definitions starting with 3.0 are intended for 30 fps anyways.
-     *
-     * @return int
      */
     protected function getMaxMacroblocks(): int
     {
@@ -164,8 +157,6 @@ class H264Preset extends AbstractVideoPreset
      * Limit the scale factor (and therefor the resolution) by the macroblock limit.
      *
      * @param float[] $sourceDimensions
-     *
-     * @return float
      */
     protected function getScaleFactor(array $sourceDimensions): float
     {
@@ -203,8 +194,6 @@ class H264Preset extends AbstractVideoPreset
 
     /**
      * The maximum bitrate allowed by the configured level.
-     *
-     * @return int
      */
     protected function getBitrateLimit(): int
     {
@@ -217,9 +206,7 @@ class H264Preset extends AbstractVideoPreset
      * The equation is somewhat arbitrary and build by try&error to target specific bitrates at 80% quality.
      * Note that this preset uses this as -maxrate and the actual bitrate will be lower due to the crf value.
      *
-     * @param array $sourceStream
      *
-     * @return int
      * @see http://fooplot.com/#W3sidHlwZSI6MCwiZXEiOiIoeCoqMiowLjkrMC4xKSooKDM4NDAqMjE2MCkqKjAuOSkqKDMwKiowLjUpKjAuMDA0IiwiY29sb3IiOiIjMDAwMDAwIn0seyJ0eXBlIjowLCJlcSI6Iih4KioyKjAuOSswLjEpKigoMTkyMCoxMDgwKSoqMC45KSooMzAqKjAuNSkqMC4wMDQiLCJjb2xvciI6IiMwMDAwMDAifSx7InR5cGUiOjAsImVxIjoiKHgqKjIqMC45KzAuMSkqKCgxMjgwKjcyMCkqKjAuOSkqKDMwKiowLjUpKjAuMDA0IiwiY29sb3IiOiIjMDAwMDAwIn0seyJ0eXBlIjowLCJlcSI6Iih4KioyKjAuOSswLjEpKigoNjQwKjM2MCkqKjAuOSkqKDMwKiowLjUpKjAuMDA0IiwiY29sb3IiOiIjMDAwMDAwIn0seyJ0eXBlIjoxMDAwLCJ3aW5kb3ciOlsiMCIsIjEuMCIsIjAiLCIxNTAwMCJdfV0-
      */
     public function getTargetBitrate(array $sourceStream): int
@@ -246,7 +233,6 @@ class H264Preset extends AbstractVideoPreset
      *
      * @param array $sourceStream
      *
-     * @return float
      * @see http://fooplot.com/#W3sidHlwZSI6MCwiZXEiOiI0MysoMTgtNDMpKngiLCJjb2xvciI6IiMwMDAwMDAifSx7InR5cGUiOjEwMDAsIndpbmRvdyI6WyIwIiwiMSIsIjAiLCI1MCJdfV0-
      */
     public function getCrf(array $sourceStream): float
@@ -333,8 +319,6 @@ class H264Preset extends AbstractVideoPreset
      *
      * I prefer the string/float representation because other codes use it too.
      * Although level definitions are similar between codecs, they aren't identical.
-     *
-     * @return int
      */
     public function getIntLevel(): int
     {

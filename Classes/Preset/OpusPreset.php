@@ -2,7 +2,6 @@
 
 namespace Hn\Video\Preset;
 
-
 class OpusPreset extends AbstractAudioPreset
 {
     public function getCodecName(): string
@@ -23,7 +22,6 @@ class OpusPreset extends AbstractAudioPreset
     /**
      * The expected bitrate per channel in kbit/s.
      *
-     * @return int
      * @see http://fooplot.com/#W3sidHlwZSI6MCwiZXEiOiIyKk1hdGgucm91bmQoNisoNzItNikqeCoqMikiLCJjb2xvciI6IiMwMDAwMDAifSx7InR5cGUiOjAsImVxIjoiMSpNYXRoLnJvdW5kKDYrKDcyLTYpKngqKjIpIiwiY29sb3IiOiIjMDAwMDAwIn0seyJ0eXBlIjoxMDAwLCJ3aW5kb3ciOlsiMCIsIjEiLCIwIiwiMTkyIl0sImdyaWQiOlsiIiwiMTYiXX1d
      */
     protected function getBitratePerChannel(): int

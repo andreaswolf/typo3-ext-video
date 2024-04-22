@@ -2,7 +2,6 @@
 
 namespace Hn\Video\Preset;
 
-
 use TYPO3\CMS\Core\Utility\MathUtility;
 
 class VP9Preset extends AbstractVideoPreset
@@ -19,32 +18,27 @@ class VP9Preset extends AbstractVideoPreset
      */
     private const LEVEL_DEFINITION = [
         '1.0' => [36864, 829440, 512, 200, 1],
-        '1.1' => [73728, 2764800, 768, 800, 1],
-        '2.0' => [122880, 4608000, 960, 1800, 1],
-        '2.1' => [245760, 9216000, 1344, 3600, 2],
-        '3.0' => [552960, 20736000, 2048, 7200, 4],
-        '3.1' => [983040, 36864000, 2752, 12000, 4],
-        '4.0' => [2228224, 83558400, 4160, 18000, 4],
-        '4.1' => [2228224, 160432128, 4160, 30000, 4],
-        '5.0' => [8912896, 311951360, 8384, 60000, 8],
-        '5.1' => [8912896, 588251136, 8384, 120000, 8],
-        '5.2' => [8912896, 1176502272, 8384, 180000, 8],
-        '6.0' => [35651584, 1176502272, 16832, 180000, 16],
-        '6.1' => [35651584, 2353004544, 16832, 240000, 16],
-        '6.2' => [35651584, 4706009088, 16832, 480000, 16],
+        '1.1' => [73728, 2_764_800, 768, 800, 1],
+        '2.0' => [122880, 4_608_000, 960, 1800, 1],
+        '2.1' => [245760, 9_216_000, 1344, 3600, 2],
+        '3.0' => [552960, 20_736_000, 2048, 7200, 4],
+        '3.1' => [983040, 36_864_000, 2752, 12000, 4],
+        '4.0' => [2_228_224, 83_558_400, 4160, 18000, 4],
+        '4.1' => [2_228_224, 160_432_128, 4160, 30000, 4],
+        '5.0' => [8_912_896, 311_951_360, 8384, 60000, 8],
+        '5.1' => [8_912_896, 588_251_136, 8384, 120000, 8],
+        '5.2' => [8_912_896, 1_176_502_272, 8384, 180000, 8],
+        '6.0' => [35_651_584, 1_176_502_272, 16832, 180000, 16],
+        '6.1' => [35_651_584, 2_353_004_544, 16832, 240000, 16],
+        '6.2' => [35_651_584, 4_706_009_088, 16832, 480000, 16],
     ];
 
-    /**
-     * @var string
-     */
-    private $level = '3.0';
+    private string $level = '3.0';
 
     /**
      * Encoding speed, a number between 0 and 5 where 5 is the fastest
-     *
-     * @var int
      */
-    private $speed = 2;
+    private int $speed = 2;
 
     public function getCodecName(): string
     {
@@ -56,17 +50,11 @@ class VP9Preset extends AbstractVideoPreset
         return 'vp9.0';
     }
 
-    /**
-     * @return array
-     */
     protected function getLevelDefinition(): array
     {
         return self::LEVEL_DEFINITION[$this->getLevel()];
     }
 
-    /**
-     * @return int
-     */
     protected function getMaxLumaSamples(): int
     {
         $levelDefinition = self::LEVEL_DEFINITION[$this->getLevel()];
@@ -80,17 +68,12 @@ class VP9Preset extends AbstractVideoPreset
 
     /**
      * The maximum bitrate allowed by the configured level.
-     *
-     * @return int
      */
     protected function getBitrateLimit(): int
     {
         return $this->getLevelDefinition()[3];
     }
 
-    /**
-     * @return int
-     */
     protected function getMaxTiles(): int
     {
         return $this->getLevelDefinition()[4];
@@ -150,9 +133,7 @@ class VP9Preset extends AbstractVideoPreset
     /**
      * The parameters specific to this encoder like bitrate.
      *
-     * @param array $sourceStream
      *
-     * @return array
      * @see https://developers.google.com/media/vp9/settings/vod/
      */
     protected function getEncoderParameters(array $sourceStream): array
