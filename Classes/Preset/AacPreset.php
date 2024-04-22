@@ -129,7 +129,7 @@ class AacPreset extends AbstractAudioPreset
     {
         $profile = $this->getProfile();
         $bitrate = $this->getBitratePerChannel();
-        foreach (self::FDK_VBR_MAPPING as list($targetProfile, $targetBitrate, $vbrValue)) {
+        foreach (self::FDK_VBR_MAPPING as [$targetProfile, $targetBitrate, $vbrValue]) {
             if ($profile !== $targetProfile) {
                 continue;
             }

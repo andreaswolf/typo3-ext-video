@@ -15,11 +15,7 @@ class FormatRepository implements SingletonInterface
         $formats = $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['video']['formats'] ?? [];
         $format = $options['format'] ?? 'mp4';
 
-        if (isset($formats[$format])) {
-            return $formats[$format];
-        }
-
-        return $formats["$format:default"] ?? null;
+        return $formats[$format] ?? $formats["$format:default"] ?? null;
     }
 
     protected function getPresets(array $options = [], array $sourceStreams = null): array
@@ -78,7 +74,7 @@ class FormatRepository implements SingletonInterface
         $presets = $this->getPresets($options, $sourceStreams);
         if (isset($presets['video']) && $presets['video']['preset'] instanceof AbstractVideoPreset) {
             $dimensions = $presets['video']['preset']->getDimensions($presets['video']['stream']);
-            list($properties['width'], $properties['height']) = $dimensions;
+            [$properties['width'], $properties['height']] = $dimensions;
         }
 
         return $properties;

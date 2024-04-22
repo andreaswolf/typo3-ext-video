@@ -32,7 +32,7 @@ class TypeUtility
 
     public static function getBaseMimeType(string$originalMimeType): string
     {
-        list($mimeType) = GeneralUtility::trimExplode(';', $originalMimeType, true);
+        [$mimeType] = GeneralUtility::trimExplode(';', $originalMimeType, true);
         return strtolower($mimeType);
     }
 
