@@ -22,7 +22,6 @@ use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Locking\Exception;
 use TYPO3\CMS\Core\Locking\LockFactory;
 use TYPO3\CMS\Core\Locking\LockingStrategyInterface;
-use TYPO3\CMS\Core\Log\Logger;
 use TYPO3\CMS\Core\Log\LogManager;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use function GuzzleHttp\Psr7\try_fopen;
@@ -62,10 +61,7 @@ class CloudConvertConverter extends AbstractVideoConverter
 
     private Connection $db;
 
-    /**
-     * @var LoggerInterface
-     */
-    private Logger $logger;
+    private LoggerInterface $logger;
 
     /**
      * This decides if this typo3 instance is publicly available.
