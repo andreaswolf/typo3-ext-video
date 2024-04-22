@@ -13,7 +13,7 @@ return static function (RectorConfig $rectorConfig): void {
     ]);
 
     $rectorConfig->sets([
-        LevelSetList::UP_TO_PHP_56,
+        LevelSetList::UP_TO_PHP_70,
     ]);
 
     // Docblock names must not be imported for earlier TYPO3 versions

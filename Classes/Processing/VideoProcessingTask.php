@@ -107,11 +107,8 @@ class VideoProcessingTask extends AbstractTask
 
         $formatRepository = GeneralUtility::makeInstance(FormatRepository::class);
         $definition = $formatRepository->findFormatDefinition($this->getConfiguration());
-        if (isset($definition['priority'])) {
-            return $definition['priority'];
-        }
 
-        return 0;
+        return $definition['priority'] ?? 0;
     }
 
     public function addProgressStep(float $progress, float $timestamp = null): int

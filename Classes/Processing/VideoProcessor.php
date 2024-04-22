@@ -60,7 +60,7 @@ class VideoProcessor implements ProcessorInterface
         if ($storedTask === null || $storedTask->getStatus() === VideoProcessingTask::STATUS_FINISHED) {
             try {
                 $task->setStatus(VideoProcessingTask::STATUS_NEW);
-                $this->getConverter()->start($task);
+                static::getConverter()->start($task);
                 $this->handleTaskIfDone($task);
             } catch (\Exception $e) {
                 $task->setExecuted(false);
@@ -100,7 +100,7 @@ class VideoProcessor implements ProcessorInterface
         }
 
         try {
-            $converter = $this->getConverter();
+            $converter = static::getConverter();
             $converter->process($task);
             $this->handleTaskIfDone($task);
         } catch (\Exception $e) {

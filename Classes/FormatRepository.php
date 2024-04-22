@@ -19,18 +19,14 @@ class FormatRepository implements SingletonInterface
             return $formats[$format];
         }
 
-        if (isset($formats["$format:default"])) {
-            return $formats["$format:default"];
-        }
-
-        return null;
+        return $formats["$format:default"] ?? null;
     }
 
     protected function getPresets(array $options = [], array $sourceStreams = null): array
     {
         $result = [];
 
-        $options = $this->normalizeOptions($options);
+        $options = static::normalizeOptions($options);
         $definition = $this->findFormatDefinition($options);
 
         foreach (['video', 'audio', 'subtitle', 'data'] as $steamType) {
@@ -91,7 +87,7 @@ class FormatRepository implements SingletonInterface
     public function buildParameters(?string $input, ?string $output, array $options = [], array $sourceStreams = null): array
     {
         $parameters = [];
-        $options = $this->normalizeOptions($options);
+        $options = static::normalizeOptions($options);
         $definition = $this->findFormatDefinition($options);
         if ($definition === null) {
             throw new FormatException('No format defintion found for configuration: ' . print_r($options, true));
@@ -159,7 +155,7 @@ class FormatRepository implements SingletonInterface
      */
     public function buildMimeType(array $options, array $sourceStream = null): string
     {
-        $options = $this->normalizeOptions($options);
+        $options = static::normalizeOptions($options);
         $definition = $this->findFormatDefinition($options);
         if (!isset($definition['mimeType'])) {
             throw new \RuntimeException("A format is missing it's mimeType: " . print_r($definition, true));
