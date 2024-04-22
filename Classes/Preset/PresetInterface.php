@@ -8,8 +8,6 @@ interface PresetInterface
     /**
      * The constructor must accept an array of options.
      * These options may be specific to the preset.
-     *
-     * @param array $options
      */
     public function __construct(array $options = []);
 
@@ -20,8 +18,6 @@ interface PresetInterface
      * The preset may optimize around this information but it must be able to work without it.
      *
      * @param array $sourceStream
-     *
-     * @return array
      */
     public function getParameters(array $sourceStream): array;
 

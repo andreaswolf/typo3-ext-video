@@ -76,7 +76,6 @@ class CloudConvertConverter extends AbstractVideoConverter
     private ?UriInterface $baseUrl = null;
 
     /**
-     * @param string $apiKey
      * @param string|null $baseUrl
      */
     public function __construct(string $apiKey)

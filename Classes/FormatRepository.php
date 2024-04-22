@@ -73,8 +73,7 @@ class FormatRepository implements SingletonInterface
 
         $presets = $this->getPresets($options, $sourceStreams);
         if (isset($presets['video']) && $presets['video']['preset'] instanceof AbstractVideoPreset) {
-            $dimensions = $presets['video']['preset']->getDimensions($presets['video']['stream']);
-            [$properties['width'], $properties['height']] = $dimensions;
+            [$properties['width'], $properties['height']] = $presets['video']['preset']->getDimensions($presets['video']['stream']);
         }
 
         return $properties;
@@ -141,10 +140,7 @@ class FormatRepository implements SingletonInterface
     /**
      * Builds the source type parameter.
      *
-     * @param array $options
-     * @param array $sourceStream
      *
-     * @return string
      * @see https://wiki.whatwg.org/wiki/video_type_parameters
      */
     public function buildMimeType(array $options, array $sourceStream = null): string
@@ -181,7 +177,6 @@ class FormatRepository implements SingletonInterface
      *
      * @param array $options
      *
-     * @return array
      * @todo this method must take much more effort to normalize the parameters because unnecessary encodes are horrible
      */
     public static function normalizeOptions(array $options): array

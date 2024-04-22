@@ -49,10 +49,8 @@ class VideoTagRenderer implements FileRendererInterface
     /**
      * Render for given File(Reference) HTML output
      *
-     * @param Resource\FileInterface $file
      * @param int|string $width TYPO3 known format; examples: 220, 200m or 200c
      * @param int|string $height TYPO3 known format; examples: 220, 200m or 200c
-     * @param array $options
      * @param bool $usedPathsRelativeToCurrentScript See $file->getPublicUrl()
      *
      * @return string
@@ -169,11 +167,6 @@ class VideoTagRenderer implements FileRendererInterface
         return [$sources, $videos];
     }
 
-    /**
-     * @param array $options
-     *
-     * @return array
-     */
     protected function getConfigurations(array $options): array
     {
         $formats = $options['formats'] ?? $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['video']['default_video_formats'];
@@ -191,9 +184,6 @@ class VideoTagRenderer implements FileRendererInterface
         return $configurations;
     }
 
-    /**
-     * @return array
-     */
     protected function getAttributes(): array
     {
         return [

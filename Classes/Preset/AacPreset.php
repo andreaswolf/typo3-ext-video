@@ -100,8 +100,6 @@ class AacPreset extends AbstractAudioPreset
      *
      * Note that this is the name of the profile that the fdk uses.
      * mp4 metadata has a different name.
-     *
-     * @return string
      */
     protected function getProfile(): string
     {

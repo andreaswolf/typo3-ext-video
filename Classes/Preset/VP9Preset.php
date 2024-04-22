@@ -50,17 +50,11 @@ class VP9Preset extends AbstractVideoPreset
         return 'vp9.0';
     }
 
-    /**
-     * @return array
-     */
     protected function getLevelDefinition(): array
     {
         return self::LEVEL_DEFINITION[$this->getLevel()];
     }
 
-    /**
-     * @return int
-     */
     protected function getMaxLumaSamples(): int
     {
         $levelDefinition = self::LEVEL_DEFINITION[$this->getLevel()];
@@ -74,17 +68,12 @@ class VP9Preset extends AbstractVideoPreset
 
     /**
      * The maximum bitrate allowed by the configured level.
-     *
-     * @return int
      */
     protected function getBitrateLimit(): int
     {
         return $this->getLevelDefinition()[3];
     }
 
-    /**
-     * @return int
-     */
     protected function getMaxTiles(): int
     {
         return $this->getLevelDefinition()[4];
@@ -144,9 +133,7 @@ class VP9Preset extends AbstractVideoPreset
     /**
      * The parameters specific to this encoder like bitrate.
      *
-     * @param array $sourceStream
      *
-     * @return array
      * @see https://developers.google.com/media/vp9/settings/vod/
      */
     protected function getEncoderParameters(array $sourceStream): array

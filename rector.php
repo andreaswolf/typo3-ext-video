@@ -6,6 +6,7 @@ use Rector\Config\RectorConfig;
 use Rector\Php73\Rector\ConstFetch\SensitiveConstantNameRector;
 use Rector\PHPUnit\Set\PHPUnitLevelSetList;
 use Rector\Set\ValueObject\LevelSetList;
+use Rector\Set\ValueObject\SetList;
 
 return static function (RectorConfig $rectorConfig): void {
     $rectorConfig->paths([
@@ -17,6 +18,7 @@ return static function (RectorConfig $rectorConfig): void {
     $rectorConfig->sets([
         LevelSetList::UP_TO_PHP_74,
         PHPUnitLevelSetList::UP_TO_PHPUNIT_90,
+        SetList::DEAD_CODE,
     ]);
 
     $rectorConfig->skip([

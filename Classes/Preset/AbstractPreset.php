@@ -39,8 +39,6 @@ abstract class AbstractPreset implements PresetInterface
      *
      * The key will be the option name while the value is the setter for setting it after the preset is created.
      * eg. array("quality" => "setQuality")
-     *
-     * @return array
      */
     protected static function getPossibleOptions(): array
     {

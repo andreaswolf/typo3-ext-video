@@ -18,7 +18,7 @@ class VideoProcessingTask extends AbstractTask
     /**
      * @var int|null
      */
-    protected $uid = null;
+    protected $uid;
 
     /**
      * @var string
@@ -39,7 +39,6 @@ class VideoProcessingTask extends AbstractTask
      * Checks if the given configuration is sensible for this task, i.e. if all required parameters
      * are given, within the boundaries and don't conflict with each other.
      *
-     * @param array $configuration
      *
      * @return bool
      */
@@ -198,7 +197,6 @@ class VideoProcessingTask extends AbstractTask
     }
 
     /**
-     * @param array $row
      * @internal this method is meant for deserialization
      */
     public function setDatabaseRow(array $row)

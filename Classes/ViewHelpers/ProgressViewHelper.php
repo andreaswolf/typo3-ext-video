@@ -83,9 +83,8 @@ class ProgressViewHelper extends AbstractViewHelper
         ];
 
         $content = '<code ' . implode(' ', $attributes) . '></code>';
-        $content .= '<script>' . self::renderJavaScript($id) . '</script>';
 
-        return $content;
+        return $content . ('<script>' . self::renderJavaScript($id) . '</script>');
     }
 
     private static function renderJavaScript(string $id)

@@ -23,7 +23,6 @@ class VideoProcessor implements ProcessorInterface
     /**
      * Returns TRUE if this processor can process the given task.
      *
-     * @param TaskInterface $task
      *
      * @return bool
      */
@@ -127,8 +126,6 @@ class VideoProcessor implements ProcessorInterface
     }
 
     /**
-     * @param TaskInterface $task
-     *
      * @throws \TYPO3\CMS\Core\Cache\Exception\NoSuchCacheGroupException
      */
     protected function handleTaskIfDone(TaskInterface $task): void

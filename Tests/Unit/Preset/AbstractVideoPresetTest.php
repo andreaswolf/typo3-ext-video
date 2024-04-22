@@ -12,8 +12,7 @@ class AbstractVideoPresetTest extends AbstractPresetTest
 
     protected function createPreset()
     {
-        $preset = $this->getMockForAbstractClass(AbstractVideoPreset::class);
-        return $preset;
+        return $this->getMockForAbstractClass(AbstractVideoPreset::class);
     }
 
     public static function framerates()

@@ -46,17 +46,13 @@ abstract class AbstractCompressiblePreset extends AbstractPreset
     /**
      * The short name of this codec.
      * It must match with the codec type ffprobe reports.
-     *
-     * @return string
      */
     abstract public function getCodecName(): string;
 
     /**
      * This method checks if transcoding is necessary or if simple remuxing will be sufficient.
      *
-     * @param array $sourceStream
      *
-     * @return bool
      */
     public function requiresTranscoding(array $sourceStream): bool
     {
@@ -80,7 +76,6 @@ abstract class AbstractCompressiblePreset extends AbstractPreset
      *
      * @param array $sourceStream
      *
-     * @return array
      * @see AbstractCompressiblePreset::getTranscodingParameters()
      */
     final public function getParameters(array $sourceStream): array
@@ -96,9 +91,7 @@ abstract class AbstractCompressiblePreset extends AbstractPreset
      * Creates the parameters used if no conversion is necessary.
      * In this case the video stream will just be repackaged into the new container format.
      *
-     * @param array $sourceStream
      *
-     * @return array
      * @see AbstractCompressiblePreset::requiresTranscoding
      */
     abstract protected function getRemuxingParameters(array $sourceStream): array;
@@ -111,29 +104,21 @@ abstract class AbstractCompressiblePreset extends AbstractPreset
      *
      * @param array $sourceStream
      *
-     * @return array
      * @see AbstractCompressiblePreset::requiresTranscoding
      */
     abstract protected function getTranscodingParameters(array $sourceStream): array;
 
-    /**
-     * @return bool
-     */
     public function isForceTranscode(): bool
     {
         return $this->forceTranscode;
     }
 
-    /**
-     * @param bool $forceTranscode
-     */
     public function setForceTranscode(bool $forceTranscode): void
     {
         $this->forceTranscode = $forceTranscode;
     }
 
     /**
-     * @return float
      * @see AbstractCompressiblePreset::$quality
      */
     public function getQuality(): float
@@ -142,8 +127,6 @@ abstract class AbstractCompressiblePreset extends AbstractPreset
     }
 
     /**
-     * @param float $quality
-     *
      * @see AbstractCompressiblePreset::$quality
      */
     public function setQuality(float $quality): void

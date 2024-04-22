@@ -135,8 +135,6 @@ abstract class AbstractVideoPreset extends AbstractCompressiblePreset
      * This is required to get chroma sub-sampling to work.
      *
      * It'll probably be 2.
-     *
-     * @return int
      */
     protected function getDimensionDivisor(): int
     {
@@ -149,8 +147,6 @@ abstract class AbstractVideoPreset extends AbstractCompressiblePreset
      * This method must be modified by implementing presets if there are limitations present by the codec.
      *
      * @param float[] $sourceDimensions
-     *
-     * @return float
      */
     protected function getScaleFactor(array $sourceDimensions): float
     {
@@ -170,7 +166,6 @@ abstract class AbstractVideoPreset extends AbstractCompressiblePreset
     /**
      * Returns the dimensions for the final video.
      *
-     * @param array $sourceStream
      *
      * @return int[]
      */
@@ -213,8 +208,6 @@ abstract class AbstractVideoPreset extends AbstractCompressiblePreset
      * If your requested quality was 0.6 than the quality would be quality ~0.65
      *
      * @param array $sourceStream
-     *
-     * @return float
      */
     public function getBoostedQuality(array $sourceStream): float
     {
@@ -243,8 +236,6 @@ abstract class AbstractVideoPreset extends AbstractCompressiblePreset
      * but in general you can think of it as the maximum average bitrate.
      *
      * @param array $sourceStream
-     *
-     * @return int
      */
     abstract public function getTargetBitrate(array $sourceStream): int;
 
@@ -297,9 +288,7 @@ abstract class AbstractVideoPreset extends AbstractCompressiblePreset
     /**
      * The parameters specific to this encoder like bitrate.
      *
-     * @param array $sourceStream
      *
-     * @return array
      */
     abstract protected function getEncoderParameters(array $sourceStream): array;
 

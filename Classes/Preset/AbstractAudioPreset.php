@@ -24,8 +24,6 @@ abstract class AbstractAudioPreset extends AbstractCompressiblePreset
      * Returns the maximum number of channels supported by this preset.
      *
      * This is usually 2.
-     *
-     * @return int
      */
     protected function getMaxChannels(): int
     {
@@ -51,8 +49,6 @@ abstract class AbstractAudioPreset extends AbstractCompressiblePreset
      * and if that also fails the highest one will be chosen.
      *
      * Make sure the first item is your preferred sample rate since it will be used if the source is unknown.
-     *
-     * @return array
      */
     abstract protected function getSampleRates(): array;
 
@@ -87,17 +83,13 @@ abstract class AbstractAudioPreset extends AbstractCompressiblePreset
 
     /**
      * The expected bitrate per channel in kbit/s.
-     *
-     * @return int
      */
     abstract protected function getBitratePerChannel(): int;
 
     /**
      * the target bitrate in kbit/s.
      *
-     * @param array $sourceStream
      *
-     * @return int
      */
     public function getBitrate(array $sourceStream): int
     {

@@ -43,8 +43,6 @@ class TypeUtility
      *
      * @param string $mimeType
      * @param array $list
-     *
-     * @return bool
      */
     public static function inList(string $mimeType, array $list): bool
     {

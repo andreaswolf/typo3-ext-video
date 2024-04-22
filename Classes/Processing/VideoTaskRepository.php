@@ -49,9 +49,6 @@ class VideoTaskRepository implements SingletonInterface
         }
     }
 
-    /**
-     * @return QueryBuilder
-     */
     private function createQueryBuilder(): QueryBuilder
     {
         $qb = $this->connection->createQueryBuilder();
@@ -60,11 +57,6 @@ class VideoTaskRepository implements SingletonInterface
         return $qb;
     }
 
-    /**
-     * @param TaskInterface $task
-     *
-     * @return VideoProcessingTask|null
-     */
     public function findByTask(TaskInterface $task): ?VideoProcessingTask
     {
         if ($task instanceof VideoProcessingTask && $task->getUid() && isset($this->tasks[$task->getUid()])) {
@@ -74,12 +66,6 @@ class VideoTaskRepository implements SingletonInterface
         return $this->findByFile($task->getSourceFile()->getUid(), $task->getConfiguration());
     }
 
-    /**
-     * @param int $file
-     * @param array $configuration
-     *
-     * @return VideoProcessingTask|null
-     */
     public function findByFile(int $file, array $configuration): ?VideoProcessingTask
     {
         $qb = $this->createQueryBuilder();
@@ -100,11 +86,6 @@ class VideoTaskRepository implements SingletonInterface
         return $this->serializeTask($row);
     }
 
-    /**
-     * @param int $uid
-     *
-     * @return VideoProcessingTask|null
-     */
     public function findByUid(int $uid): ?VideoProcessingTask
     {
         $qb = $this->createQueryBuilder();
@@ -122,7 +103,6 @@ class VideoTaskRepository implements SingletonInterface
     /**
      * Finds tasks by a specific status.
      *
-     * @param string $status
      *
      * @return VideoProcessingTask[]
      */
@@ -162,11 +142,6 @@ class VideoTaskRepository implements SingletonInterface
         return $task;
     }
 
-    /**
-     * @param VideoProcessingTask $task
-     *
-     * @return bool
-     */
     public function delete(VideoProcessingTask $task): bool
     {
         if ($task->getUid() === null || !isset($this->tasks[$task->getUid()])) {

@@ -16,12 +16,7 @@ class FileProcessingServiceSlot
     protected $videoProcessor;
 
     /**
-     * @param FileProcessingService $fileProcessingService
-     * @param DriverInterface $driver
-     * @param ProcessedFile $processedFile
-     * @param FileInterface $file
      * @param $context
-     * @param array $configuration
      *
      * @see \TYPO3\CMS\Core\Resource\Service\FileProcessingService::processFile
      */

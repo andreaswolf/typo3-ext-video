@@ -22,8 +22,6 @@ class LocalFFmpegConverter extends AbstractVideoConverter
     }
 
     /**
-     * @param VideoProcessingTask $task
-     *
      * @throws ConversionException
      */
     public function process(VideoProcessingTask $task): void
@@ -64,9 +62,6 @@ class LocalFFmpegConverter extends AbstractVideoConverter
     }
 
     /**
-     * @param string $file
-     *
-     * @return array
      * @throws ConversionException
      */
     protected function ffprobe(string $file): array
@@ -106,9 +101,6 @@ class LocalFFmpegConverter extends AbstractVideoConverter
     }
 
     /**
-     * @param string $parameters
-     *
-     * @return \Iterator
      * @throws ConversionException
      */
     protected function ffmpeg(string $parameters): \Iterator
