@@ -205,6 +205,6 @@ class VideoProcessingTask extends AbstractTask
     {
         $this->uid = $row['uid'];
         $this->setStatus($row['status']);
-        $this->progress = json_decode($row['progress'], true) ?: [];
+        $this->progress = json_decode($row['progress'], true, 512, JSON_THROW_ON_ERROR) ?: [];
     }
 }

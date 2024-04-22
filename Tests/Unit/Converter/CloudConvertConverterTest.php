@@ -164,7 +164,7 @@ class CloudConvertConverterTest extends UnitTestCase
                     'maxsize' => 1024,
                     'maxtime' => 1500,
                     'concurrent' => 5,
-                ])),
+                ], JSON_THROW_ON_ERROR)),
             ]
         );
 
@@ -210,7 +210,7 @@ class CloudConvertConverterTest extends UnitTestCase
                     'maxsize' => 1024,
                     'maxtime' => 1500,
                     'concurrent' => 5,
-                ])),
+                ], JSON_THROW_ON_ERROR)),
             ],
             [
                 'post',
@@ -232,7 +232,7 @@ class CloudConvertConverterTest extends UnitTestCase
                     'input' => [
                         'type' => 'download',
                     ],
-                ])),
+                ], JSON_THROW_ON_ERROR)),
             ],
             [
                 'getAsync',
@@ -255,7 +255,7 @@ class CloudConvertConverterTest extends UnitTestCase
                             ['index' => 1, 'codec_type' => 'audio'],
                         ],
                     ],
-                ])),
+                ], JSON_THROW_ON_ERROR)),
             ]
         );
 
@@ -331,7 +331,7 @@ class CloudConvertConverterTest extends UnitTestCase
                     'maxsize' => 1024,
                     'maxtime' => 1500,
                     'concurrent' => 5,
-                ])),
+                ], JSON_THROW_ON_ERROR)),
             ],
             [
                 'postAsync',
@@ -356,7 +356,7 @@ class CloudConvertConverterTest extends UnitTestCase
                     'input' => [
                         'type' => 'download',
                     ],
-                ])),
+                ], JSON_THROW_ON_ERROR)),
             ]
         );
 
@@ -437,7 +437,7 @@ class CloudConvertConverterTest extends UnitTestCase
                     'output' => [
                         'url' => '//esta.infra.cloudconvert.com/process/some-id/file.mp4',
                     ],
-                ])),
+                ], JSON_THROW_ON_ERROR)),
             ]
         );
         $this->client->expects($this->once())

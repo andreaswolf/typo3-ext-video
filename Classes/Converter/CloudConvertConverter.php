@@ -265,7 +265,7 @@ class CloudConvertConverter extends AbstractVideoConverter
         }
 
         if ($info['failed'] ?? false) {
-            throw new ConversionException('Process error: ' . json_encode($info), 1554038915);
+            throw new ConversionException('Process error: ' . json_encode($info, JSON_THROW_ON_ERROR), 1554038915);
         }
 
         // do nothing if this task is already done
