@@ -15,9 +15,11 @@ use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 
 class VideoProcessor implements ProcessorInterface
 {
-    protected function getLogger(): LoggerInterface
+    private LoggerInterface $logger;
+
+    public function __construct()
     {
-        return GeneralUtility::makeInstance(LogManager::class)->getLogger(self::class);
+        $this->logger = GeneralUtility::makeInstance(LogManager::class)->getLogger(self::class);
     }
 
     /**
@@ -63,7 +65,7 @@ class VideoProcessor implements ProcessorInterface
                 $this->handleTaskIfDone($task);
             } catch (\Exception $e) {
                 $task->setExecuted(false);
-                $this->getLogger()->error($e->getMessage(), ['exception' => $e]);
+                $this->logger->error($e->getMessage(), ['exception' => $e]);
                 if (GeneralUtility::getApplicationContext()->isDevelopment()) {
                     throw new \RuntimeException('processTask failed', 0, $e); // let them know
                 }
@@ -103,8 +105,7 @@ class VideoProcessor implements ProcessorInterface
             $converter->process($task);
             $this->handleTaskIfDone($task);
         } catch (\Exception $e) {
-            $logger = GeneralUtility::makeInstance(LogManager::class)->getLogger(self::class);
-            $logger->critical($e->getMessage());
+            $this->logger->critical($e->getMessage());
 
             $task->setExecuted(false);
             if (!GeneralUtility::getApplicationContext()->isProduction()) {

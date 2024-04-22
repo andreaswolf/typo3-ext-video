@@ -6,6 +6,7 @@ use Hn\Video\Exception\ConversionException;
 use Hn\Video\FormatRepository;
 use Hn\Video\Processing\VideoProcessingTask;
 use Hn\Video\Processing\VideoTaskRepository;
+use Psr\Log\LoggerInterface;
 use TYPO3\CMS\Core\Log\LogManager;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -16,9 +17,12 @@ class LocalFFmpegConverter extends AbstractVideoConverter
      */
     protected $runner;
 
+    private LoggerInterface $logger;
+
     public function __construct()
     {
         $this->runner = GeneralUtility::makeInstance(LocalCommandRunner::class);
+        $this->logger = GeneralUtility::makeInstance(LogManager::class)->getLogger(self::class);
     }
 
     /**
@@ -66,8 +70,6 @@ class LocalFFmpegConverter extends AbstractVideoConverter
      */
     protected function ffprobe(string $file): array
     {
-        $logger = GeneralUtility::makeInstance(LogManager::class)->getLogger(self::class);
-
         $ffprobe = $this->runner->getCommand('ffprobe');
         if (!is_string($ffprobe)) {
             throw new \RuntimeException('ffprobe not found.');
@@ -75,12 +77,12 @@ class LocalFFmpegConverter extends AbstractVideoConverter
 
         $parameters = ['-v', 'quiet', '-print_format', 'json', '-show_streams', '-show_format', $file];
         $commandStr = $ffprobe . ' ' . implode(' ', array_map('escapeshellarg', $parameters));
-        $logger->info('run ffprobe command', ['command' => $commandStr]);
+        $this->logger->info('run ffprobe command', ['command' => $commandStr]);
 
         $execution = $this->runner->run($commandStr);
         $response = implode('', iterator_to_array($execution));
         $returnValue = $execution->getReturn();
-        $logger->debug('ffprobe result', ['output' => preg_replace('#\s{2,}#', ' ', $response)]);
+        $this->logger->debug('ffprobe result', ['output' => preg_replace('#\s{2,}#', ' ', $response)]);
 
         if ($returnValue !== 0 && $returnValue !== null) {
             throw new ConversionException("Probing failed: $commandStr", $returnValue);
@@ -105,8 +107,6 @@ class LocalFFmpegConverter extends AbstractVideoConverter
      */
     protected function ffmpeg(string $parameters): \Iterator
     {
-        $logger = GeneralUtility::makeInstance(LogManager::class)->getLogger(self::class);
-
         $ffmpeg = $this->runner->getCommand('ffmpeg');
         if (!is_string($ffmpeg)) {
             throw new \RuntimeException('ffmpeg not found.');
@@ -122,7 +122,7 @@ class LocalFFmpegConverter extends AbstractVideoConverter
         }
 
         $commandStr = "$ffmpeg -loglevel warning -stats $parameters";
-        $logger->notice('run ffmpeg command', ['command' => $commandStr]);
+        $this->logger->notice('run ffmpeg command', ['command' => $commandStr]);
         $process = $this->runner->run($commandStr);
         $output = '';
         foreach ($process as $line) {
@@ -131,7 +131,7 @@ class LocalFFmpegConverter extends AbstractVideoConverter
                 yield $matches[1] * 3600 + $matches[2] * 60 + $matches[3] + $matches[4] / 100;
             }
         }
-        $logger->debug('ffmpeg result', ['output' => $output]);
+        $this->logger->debug('ffmpeg result', ['output' => $output]);
 
         // because updating referenced values in unit tests is hard, null is also checked here
         $returnValue = $process->getReturn();
