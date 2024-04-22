@@ -34,7 +34,7 @@ abstract class FunctionalTestCase extends \Nimut\TestingFramework\TestCase\Funct
     /** @var File */
     protected $file;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->objectManager = GeneralUtility::makeInstance(ObjectManager::class);
@@ -56,7 +56,7 @@ abstract class FunctionalTestCase extends \Nimut\TestingFramework\TestCase\Funct
         $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['video']['video_converter'] = [NoopConverter::class];
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         // delete processed files after the test to avoid collisions with the next test
         foreach ($this->resourceStorage->getProcessingFolders() as $processingFolder) {

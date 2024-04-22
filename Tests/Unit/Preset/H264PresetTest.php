@@ -77,7 +77,7 @@ class H264PresetTest extends AbstractVideoPresetTest
             $result[$quality] = $this->preset->getTargetBitrate([]);
         }
 
-        $this->assertEquals($mapping, $result, '', 100);
+        $this->assertEqualsWithDelta($mapping, $result, 100);
     }
 
     public function testIntLevel()

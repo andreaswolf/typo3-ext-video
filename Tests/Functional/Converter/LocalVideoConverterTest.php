@@ -15,7 +15,7 @@ class LocalVideoConverterTest extends FunctionalTestCase
     /** @var LocalCommandRunner|MockObject */
     protected $commandRunner;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

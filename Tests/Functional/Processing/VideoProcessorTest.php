@@ -18,7 +18,7 @@ class VideoProcessorTest extends FunctionalTestCase
     /** @var VideoConverterInterface|MockObject */
     protected $converter;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -28,7 +28,7 @@ class VideoProcessorTest extends FunctionalTestCase
         $this->assertTasksAndProcessedFiles(0, 0);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['video']['video_converter']); // TODO reset
         parent::tearDown();

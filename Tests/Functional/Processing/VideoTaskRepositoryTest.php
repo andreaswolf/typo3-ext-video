@@ -15,7 +15,7 @@ class VideoTaskRepositoryTest extends FunctionalTestCase
      */
     private $repository;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->repository = GeneralUtility::makeInstance(VideoTaskRepository::class);

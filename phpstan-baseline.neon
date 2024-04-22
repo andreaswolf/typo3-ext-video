@@ -116,6 +116,11 @@ parameters:
 			path: Classes/Converter/CloudConvertConverter.php
 
 		-
+			message: "#^Cannot access offset 'running' on array\\{command\\: string, pid\\: int, running\\: bool, signaled\\: bool, stopped\\: bool, exitcode\\: int, termsig\\: int, stopsig\\: int\\}\\|false\\.$#"
+			count: 1
+			path: Classes/Converter/LocalCommandRunner.php
+
+		-
 			message: "#^Parameter \\#1 \\$process of function proc_close expects resource, resource\\|false given\\.$#"
 			count: 1
 			path: Classes/Converter/LocalCommandRunner.php
@@ -986,7 +991,7 @@ parameters:
 			path: Tests/Functional/Converter/LocalVideoConverterTest.php
 
 		-
-			message: "#^Parameter \\#1 \\$filename of function file_put_contents expects string, string\\|null given\\.$#"
+			message: "#^Parameter \\#1 \\$file of function file_put_contents expects string, string\\|null given\\.$#"
 			count: 1
 			path: Tests/Functional/Converter/LocalVideoConverterTest.php
 
@@ -1007,11 +1012,6 @@ parameters:
 
 		-
 			message: "#^Cannot call method getRootLevelFolder\\(\\) on TYPO3\\\\CMS\\\\Core\\\\Resource\\\\Storage\\|null\\.$#"
-			count: 1
-			path: Tests/Functional/FunctionalTestCase.php
-
-		-
-			message: "#^Method Hn\\\\Video\\\\Tests\\\\Functional\\\\FunctionalTestCase\\:\\:tearDown\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: Tests/Functional/FunctionalTestCase.php
 
@@ -1042,11 +1042,6 @@ parameters:
 
 		-
 			message: "#^Method Hn\\\\Video\\\\Tests\\\\Functional\\\\Processing\\\\VideoProcessorTest\\:\\:assertTasksAndProcessedFiles\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: Tests/Functional/Processing/VideoProcessorTest.php
-
-		-
-			message: "#^Method Hn\\\\Video\\\\Tests\\\\Functional\\\\Processing\\\\VideoProcessorTest\\:\\:tearDown\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: Tests/Functional/Processing/VideoProcessorTest.php
 
@@ -1086,18 +1081,8 @@ parameters:
 			path: Tests/Functional/Processing/VideoProcessorTest.php
 
 		-
-			message: "#^Parameter \\#2 \\$instance of static method TYPO3\\\\CMS\\\\Core\\\\Utility\\\\GeneralUtility\\:\\:setSingletonInstance\\(\\) expects TYPO3\\\\CMS\\\\Core\\\\SingletonInterface, PHPUnit\\\\Framework\\\\MockObject\\\\MockObject given\\.$#"
-			count: 2
-			path: Tests/Functional/Processing/VideoProcessorTest.php
-
-		-
 			message: "#^Call to an undefined method TYPO3\\\\CMS\\\\Core\\\\Resource\\\\Processing\\\\TaskInterface\\:\\:getUid\\(\\)\\.$#"
 			count: 2
-			path: Tests/Functional/Processing/VideoTaskRepositoryTest.php
-
-		-
-			message: "#^Cannot call method getStatus\\(\\) on Hn\\\\Video\\\\Processing\\\\VideoProcessingTask\\|null\\.$#"
-			count: 1
 			path: Tests/Functional/Processing/VideoTaskRepositoryTest.php
 
 		-
@@ -1201,16 +1186,6 @@ parameters:
 			path: Tests/Unit/Converter/CloudConvertConverterTest.php
 
 		-
-			message: "#^Method Hn\\\\Video\\\\Tests\\\\Unit\\\\Converter\\\\CloudConvertConverterTest\\:\\:setUp\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: Tests/Unit/Converter/CloudConvertConverterTest.php
-
-		-
-			message: "#^Method Hn\\\\Video\\\\Tests\\\\Unit\\\\Converter\\\\CloudConvertConverterTest\\:\\:setUpBeforeClass\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: Tests/Unit/Converter/CloudConvertConverterTest.php
-
-		-
 			message: "#^Method Hn\\\\Video\\\\Tests\\\\Unit\\\\Converter\\\\CloudConvertConverterTest\\:\\:testConvert\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: Tests/Unit/Converter/CloudConvertConverterTest.php
@@ -1236,24 +1211,19 @@ parameters:
 			path: Tests/Unit/Converter/CloudConvertConverterTest.php
 
 		-
-			message: "#^Parameter \\#1 \\$targetFile of class Hn\\\\Video\\\\Processing\\\\VideoProcessingTask constructor expects TYPO3\\\\CMS\\\\Core\\\\Resource\\\\ProcessedFile, PHPUnit\\\\Framework\\\\MockObject\\\\MockObject\\|TYPO3\\\\CMS\\\\Core\\\\Resource\\\\ProcessedFile given\\.$#"
-			count: 5
+			message: "#^Parameter \\#1 \\$argumentIndex of method PHPUnit\\\\Framework\\\\MockObject\\\\Builder\\\\InvocationMocker\\:\\:willReturnArgument\\(\\) expects int, array\\<int, mixed\\> given\\.$#"
+			count: 1
 			path: Tests/Unit/Converter/CloudConvertConverterTest.php
 
 		-
-			message: "#^Parameter \\#2 \\$instance of static method TYPO3\\\\CMS\\\\Core\\\\Utility\\\\GeneralUtility\\:\\:setSingletonInstance\\(\\) expects TYPO3\\\\CMS\\\\Core\\\\SingletonInterface, PHPUnit\\\\Framework\\\\MockObject\\\\MockObject given\\.$#"
-			count: 3
+			message: "#^Parameter \\#1 \\$targetFile of class Hn\\\\Video\\\\Processing\\\\VideoProcessingTask constructor expects TYPO3\\\\CMS\\\\Core\\\\Resource\\\\ProcessedFile, PHPUnit\\\\Framework\\\\MockObject\\\\MockObject\\|TYPO3\\\\CMS\\\\Core\\\\Resource\\\\ProcessedFile given\\.$#"
+			count: 5
 			path: Tests/Unit/Converter/CloudConvertConverterTest.php
 
 		-
 			message: "#^Parameter \\#3 \\$body of class GuzzleHttp\\\\Psr7\\\\Response constructor expects Psr\\\\Http\\\\Message\\\\StreamInterface\\|resource\\|string\\|null, string\\|false given\\.$#"
 			count: 7
 			path: Tests/Unit/Converter/CloudConvertConverterTest.php
-
-		-
-			message: "#^Method Hn\\\\Video\\\\Tests\\\\Unit\\\\FormatRepositoryTest\\:\\:setUp\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: Tests/Unit/FormatRepositoryTest.php
 
 		-
 			message: "#^Method Hn\\\\Video\\\\Tests\\\\Unit\\\\FormatRepositoryTest\\:\\:testBuildEmpty\\(\\) has no return type specified\\.$#"
@@ -1272,11 +1242,6 @@ parameters:
 
 		-
 			message: "#^Method Hn\\\\Video\\\\Tests\\\\Unit\\\\FormatRepositoryTest\\:\\:testFindDefinition\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: Tests/Unit/FormatRepositoryTest.php
-
-		-
-			message: "#^Parameter \\#2 \\$message of method PHPUnit\\\\Framework\\\\Assert\\:\\:assertNull\\(\\) expects string, array\\|null given\\.$#"
 			count: 1
 			path: Tests/Unit/FormatRepositoryTest.php
 
@@ -1342,11 +1307,6 @@ parameters:
 
 		-
 			message: "#^Method Hn\\\\Video\\\\Tests\\\\Unit\\\\Preset\\\\AbstractPresetTest\\:\\:createPreset\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: Tests/Unit/Preset/AbstractPresetTest.php
-
-		-
-			message: "#^Method Hn\\\\Video\\\\Tests\\\\Unit\\\\Preset\\\\AbstractPresetTest\\:\\:setUp\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: Tests/Unit/Preset/AbstractPresetTest.php
 
@@ -1556,17 +1516,17 @@ parameters:
 			path: Tests/Unit/Preset/VP9PresetTest.php
 
 		-
-			message: "#^Method Hn\\\\Video\\\\Tests\\\\Unit\\\\Processing\\\\VideoProcessingEidTest\\:\\:setUp\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: Tests/Unit/Processing/VideoProcessingEidTest.php
-
-		-
 			message: "#^Method Hn\\\\Video\\\\Tests\\\\Unit\\\\Processing\\\\VideoProcessingEidTest\\:\\:testKeys\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: Tests/Unit/Processing/VideoProcessingEidTest.php
 
 		-
-			message: "#^Parameter \\#1 \\$string of function parse_str expects string, string\\|false\\|null given\\.$#"
+			message: "#^Parameter \\#1 \\$encoded_string of function parse_str expects string, string\\|false\\|null given\\.$#"
+			count: 1
+			path: Tests/Unit/Processing/VideoProcessingEidTest.php
+
+		-
+			message: "#^Parameter \\#1 \\$object of method ReflectionProperty\\:\\:getValue\\(\\) expects object, null given\\.$#"
 			count: 1
 			path: Tests/Unit/Processing/VideoProcessingEidTest.php
 
@@ -1581,17 +1541,7 @@ parameters:
 			path: Tests/Unit/Processing/VideoProcessingTaskTest.php
 
 		-
-			message: "#^Parameter \\#1 \\$targetFile of class Hn\\\\Video\\\\Processing\\\\VideoProcessingTask constructor expects TYPO3\\\\CMS\\\\Core\\\\Resource\\\\ProcessedFile, PHPUnit\\\\Framework\\\\MockObject\\\\MockObject given\\.$#"
-			count: 2
-			path: Tests/Unit/Processing/VideoProcessingTaskTest.php
-
-		-
 			message: "#^Method Hn\\\\Video\\\\Tests\\\\Unit\\\\Rendering\\\\VideoTagRendererTest\\:\\:attributeSets\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: Tests/Unit/Rendering/VideoTagRendererTest.php
-
-		-
-			message: "#^Method Hn\\\\Video\\\\Tests\\\\Unit\\\\Rendering\\\\VideoTagRendererTest\\:\\:setUp\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: Tests/Unit/Rendering/VideoTagRendererTest.php
 
@@ -1609,18 +1559,3 @@ parameters:
 			message: "#^Method Hn\\\\Video\\\\Tests\\\\Unit\\\\Rendering\\\\VideoTagRendererTest\\:\\:testSimpleRendering\\(\\) has parameter \\$options with no type specified\\.$#"
 			count: 1
 			path: Tests/Unit/Rendering/VideoTagRendererTest.php
-
-		-
-			message: "#^Parameter \\#1 \\$file of method Hn\\\\Video\\\\Rendering\\\\VideoTagRenderer\\:\\:render\\(\\) expects TYPO3\\\\CMS\\\\Core\\\\Resource\\\\FileInterface, PHPUnit\\\\Framework\\\\MockObject\\\\MockObject given\\.$#"
-			count: 1
-			path: Tests/Unit/Rendering/VideoTagRendererTest.php
-
-		-
-			message: "#^Method Hn\\\\Video\\\\Tests\\\\Unit\\\\UnitTestCase\\:\\:setUp\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: Tests/Unit/UnitTestCase.php
-
-		-
-			message: "#^Parameter \\#2 \\$instance of static method TYPO3\\\\CMS\\\\Core\\\\Utility\\\\GeneralUtility\\:\\:setSingletonInstance\\(\\) expects TYPO3\\\\CMS\\\\Core\\\\SingletonInterface, PHPUnit\\\\Framework\\\\MockObject\\\\MockObject given\\.$#"
-			count: 1
-			path: Tests/Unit/UnitTestCase.php

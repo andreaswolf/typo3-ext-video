@@ -50,7 +50,7 @@ class AacPresetTest extends AbstractAudioPresetTest
             $result[$quality] = $this->preset->getBitrate([]);
         }
 
-        $this->assertEquals($mapping, $result, '', 8);
+        $this->assertEqualsWithDelta($mapping, $result, 8);
     }
 
     public function testBitrateWithoutFdk()
@@ -75,7 +75,7 @@ class AacPresetTest extends AbstractAudioPresetTest
             $result[$quality] = $this->preset->getBitrate([]);
         }
 
-        $this->assertEquals($mapping, $result, '', 8);
+        $this->assertEqualsWithDelta($mapping, $result, 8);
     }
 
     public function testGetMimeCodecParameter()

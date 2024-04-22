@@ -20,7 +20,7 @@ class UnitTestCase extends \Nimut\TestingFramework\TestCase\UnitTestCase
      */
     protected $tsfe;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -34,7 +34,7 @@ class UnitTestCase extends \Nimut\TestingFramework\TestCase\UnitTestCase
         GeneralUtility::setSingletonInstance(LogManager::class, $logManager);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         parent::tearDown();
         unset($GLOBALS['TSFE']);

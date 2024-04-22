@@ -14,14 +14,14 @@ class VideoTagRendererTest extends UnitTestCase
      */
     protected $renderer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->renderer = new \Hn\Video\Rendering\VideoTagRenderer();
         $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['video']['default_video_formats'] = ['mp4' => []];
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($GLOBALS['TYPO3_CONF_VARS']);
         GeneralUtility::purgeInstances();

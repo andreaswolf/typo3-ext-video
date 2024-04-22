@@ -8,7 +8,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class VideoProcessingEidTest extends UnitTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         if (function_exists('GeneralUtility::setIndpEnv')) {
@@ -22,7 +22,7 @@ class VideoProcessingEidTest extends UnitTestCase
         }
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         GeneralUtility::flushInternalRuntimeCaches();
         GeneralUtility::purgeInstances();

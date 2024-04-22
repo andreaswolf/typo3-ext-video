@@ -49,7 +49,7 @@ class AbstractVideoPresetTest extends AbstractPresetTest
      */
     public function testFramerate($expectedFramerate, array $sourceStream)
     {
-        $this->assertEquals($expectedFramerate, $this->preset->getFramerate($sourceStream), '', 0.001);
+        $this->assertEqualsWithDelta($expectedFramerate, $this->preset->getFramerate($sourceStream), 0.001);
     }
 
     public static function dimensions()
@@ -85,11 +85,11 @@ class AbstractVideoPresetTest extends AbstractPresetTest
     {
         $this->preset->setMaxWidth(1280);
         $this->preset->setMaxHeight(720);
-        $this->assertEquals(0.8, $this->preset->getBoostedQuality([]), '', 0.01);
-        $this->assertEquals(0.8, $this->preset->getBoostedQuality(['width' => 1920, 'height' => 1080]), '', 0.01);
-        $this->assertEquals(0.8, $this->preset->getBoostedQuality(['width' => 1280, 'height' => 720]), '', 0.01);
-        $this->assertEquals(0.85, $this->preset->getBoostedQuality(['width' => 1100, 'height' => 600]), '', 0.01);
-        $this->assertEquals(0.95, $this->preset->getBoostedQuality(['width' => 640, 'height' => 360]), '', 0.01);
-        $this->assertEquals(1.0, $this->preset->getBoostedQuality(['width' => 320, 'height' => 240]), '', 0.01);
+        $this->assertEqualsWithDelta(0.8, $this->preset->getBoostedQuality([]), 0.01);
+        $this->assertEqualsWithDelta(0.8, $this->preset->getBoostedQuality(['width' => 1920, 'height' => 1080]), 0.01);
+        $this->assertEqualsWithDelta(0.8, $this->preset->getBoostedQuality(['width' => 1280, 'height' => 720]), 0.01);
+        $this->assertEqualsWithDelta(0.85, $this->preset->getBoostedQuality(['width' => 1100, 'height' => 600]), 0.01);
+        $this->assertEqualsWithDelta(0.95, $this->preset->getBoostedQuality(['width' => 640, 'height' => 360]), 0.01);
+        $this->assertEqualsWithDelta(1.0, $this->preset->getBoostedQuality(['width' => 320, 'height' => 240]), 0.01);
     }
 }

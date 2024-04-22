@@ -11,14 +11,14 @@ class FormatRepositoryTest extends UnitTestCase
     /** @var FormatRepository */
     private $repository;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['video'] = [];
         $this->repository = new FormatRepository();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['video']);
         parent::tearDown();
@@ -35,14 +35,12 @@ class FormatRepositoryTest extends UnitTestCase
         $this->assertEquals(['foo' => 'bar'], $this->repository->findFormatDefinition(['format' => 'mp4']));
         $this->assertEquals(['foo' => 'bar'], $this->repository->findFormatDefinition(['format' => 'mp4:default']));
 
-        $this->assertNull(null, $this->repository->findFormatDefinition(['format' => 'mp4:high']));
+        $this->assertNull($this->repository->findFormatDefinition(['format' => 'mp4:high']));
     }
 
-    /**
-     * @expectedException \Hn\Video\Exception\FormatException
-     */
     public function testBuildUnknown()
     {
+        $this->expectException(\Hn\Video\Exception\FormatException::class);
         $this->repository->buildParameters(null, null, ['format' => 'mp4']);
     }
 

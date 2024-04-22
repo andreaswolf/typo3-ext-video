@@ -60,11 +60,9 @@ class VideoProcessingTaskTest extends UnitTestCase
         $this->assertEquals(0, $task->getEstimatedRemainingTime());
     }
 
-    /**
-     * @expectedException \OutOfRangeException
-     */
     public function testOutOfBounds()
     {
+        $this->expectException(\OutOfRangeException::class);
         $task = new VideoProcessingTask($this->createMock(ProcessedFile::class), []);
         $task->addProgressStep(-1, 5);
     }

@@ -36,7 +36,7 @@ class CloudConvertConverterTest extends UnitTestCase
     /** @var CloudConvertConverter */
     protected $converter;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -64,14 +64,14 @@ class CloudConvertConverterTest extends UnitTestCase
         $this->converter = new CloudConvertConverter('key');
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         queue()->run(); // this is the only way to process all tasks
         GeneralUtility::purgeInstances();
         parent::tearDown();
     }
 
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         queue()->disableShutdown();
     }
@@ -110,11 +110,9 @@ class CloudConvertConverterTest extends UnitTestCase
             }, $selects));
     }
 
-    /**
-     * @expectedException \Hn\Video\Exception\ConversionException
-     */
     public function testInfoFailure()
     {
+        $this->expectException(\Hn\Video\Exception\ConversionException::class);
         $task = new VideoProcessingTask($this->processedFile, []);
         $this->assertRequests(
             [
@@ -146,11 +144,9 @@ class CloudConvertConverterTest extends UnitTestCase
         $this->assertFalse($task->isExecuted());
     }
 
-    /**
-     * @expectedException \Hn\Video\Exception\ConversionException
-     */
     public function testGetInfoOversize()
     {
+        $this->expectException(\Hn\Video\Exception\ConversionException::class);
         $this->file->expects($this->atLeastOnce())->method('getSize')->willReturn(1024 * 1024 * 1024 * 5);
         $task = new VideoProcessingTask($this->processedFile, []);
 
