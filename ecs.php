@@ -20,4 +20,4 @@ return ECSConfig::configure()
         __DIR__ . '/Tests/',
     ])
     ->withRootFiles()
-    ;
+;

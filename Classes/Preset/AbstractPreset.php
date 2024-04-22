@@ -2,7 +2,6 @@
 
 namespace Hn\Video\Preset;
 
-
 abstract class AbstractPreset implements PresetInterface
 {
     public function __construct(array $options = [])

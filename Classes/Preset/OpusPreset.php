@@ -2,7 +2,6 @@
 
 namespace Hn\Video\Preset;
 
-
 class OpusPreset extends AbstractAudioPreset
 {
     public function getCodecName(): string

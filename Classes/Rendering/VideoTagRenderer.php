@@ -2,7 +2,6 @@
 
 namespace Hn\Video\Rendering;
 
-
 use Hn\Video\FormatRepository;
 use Hn\Video\TypeUtility;
 use Hn\Video\ViewHelpers\ProgressViewHelper;
@@ -138,7 +137,7 @@ class VideoTagRenderer implements Resource\Rendering\FileRendererInterface
 
         if (!$file instanceof Resource\File) {
             $type = is_object($file) ? get_class($file) : gettype($file);
-            throw new \RuntimeException("Expected " . Resource\File::class . ", got $type");
+            throw new \RuntimeException('Expected ' . Resource\File::class . ", got $type");
         }
 
         $sources = [];

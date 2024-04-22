@@ -2,7 +2,6 @@
 
 namespace Hn\Video;
 
-
 use TYPO3\CMS\Core\Resource;
 use TYPO3\CMS\Core\Resource\Index\ExtractorInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;

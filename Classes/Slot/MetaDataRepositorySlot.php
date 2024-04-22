@@ -2,7 +2,6 @@
 
 namespace Hn\Video\Slot;
 
-
 use Hn\Video\VideoMetadataExtractor;
 use TYPO3\CMS\Core\Resource\File;
 use TYPO3\CMS\Core\Resource\FileRepository;

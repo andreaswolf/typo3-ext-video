@@ -2,7 +2,6 @@
 
 namespace Hn\Video\Converter;
 
-
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Exception\ServerException;
 use GuzzleHttp\Promise\PromiseInterface;
@@ -26,16 +25,16 @@ use function GuzzleHttp\Psr7\uri_for;
 
 class CloudConvertConverter extends AbstractVideoConverter
 {
-    const DB_TABLE = 'tx_video_cloudconvert_process';
+    public const DB_TABLE = 'tx_video_cloudconvert_process';
 
-    const LOCKING_STRATEGY = Locking\LockingStrategyInterface::LOCK_CAPABILITY_EXCLUSIVE
+    public const LOCKING_STRATEGY = Locking\LockingStrategyInterface::LOCK_CAPABILITY_EXCLUSIVE
     | Locking\LockingStrategyInterface::LOCK_CAPABILITY_NOBLOCK;
 
-    const MODE_INFO = 'info';
-    const MODE_CONVERT = 'convert';
+    public const MODE_INFO = 'info';
+    public const MODE_CONVERT = 'convert';
 
     // define the progress ranges for the different stages of the conversion
-    const PROGRESS_RANGES = [
+    public const PROGRESS_RANGES = [
         self::MODE_INFO => [
             'input' => [0.0, 0.1],
             'wait' => [0.1, 0.1],
@@ -146,10 +145,10 @@ class CloudConvertConverter extends AbstractVideoConverter
 
         // if the instance is public than the process can start immediately.
         if ($this->isPublic()) {
-            $this->logger->notice("got a start signal in public mode.", $context);
+            $this->logger->notice('got a start signal in public mode.', $context);
             $this->process($task);
         } else {
-            $this->logger->notice("got a start signal in private mode.", $context);
+            $this->logger->notice('got a start signal in private mode.', $context);
         }
     }
 
@@ -188,7 +187,7 @@ class CloudConvertConverter extends AbstractVideoConverter
             escapeshellarg('{OUTPUTFILE}') => '{OUTPUTFILE}',
         ]);
 
-        $result = $this->pollProcess($task, self::MODE_CONVERT, ["command" => $command]);
+        $result = $this->pollProcess($task, self::MODE_CONVERT, ['command' => $command]);
         $this->logger->debug('polled for convert', ['result' => $result, 'command' => $command]);
         if ($result === null) {
             return;
@@ -239,17 +238,19 @@ class CloudConvertConverter extends AbstractVideoConverter
         $serializedOptionsLength = strlen($serializedOptions);
         if ($serializedOptionsLength > 767) {
             $msg = "The options passed to create this job were $serializedOptionsLength bytes long.";
-            $msg .= " There is a limit of 767 bytes for the mysql unique key to work. Sorry.";
+            $msg .= ' There is a limit of 767 bytes for the mysql unique key to work. Sorry.';
             throw new \RuntimeException($msg);
         }
 
         $statement = $this->db->select(
             ['uid', 'status', 'failed'],
-            self::DB_TABLE, [
+            self::DB_TABLE,
+            [
             'file' => $task->getSourceFile()->getUid(),
             'mode' => $mode,
             'options' => $serializedOptions,
-        ]);
+        ]
+        );
 
         // TODO make sure not to spam the api with tons of queries... maybe limit to one every 5 seconds
 
@@ -260,7 +261,7 @@ class CloudConvertConverter extends AbstractVideoConverter
         }
 
         if ($info['failed'] ?? false) {
-            throw new ConversionException("Process error: " . json_encode($info), 1554038915);
+            throw new ConversionException('Process error: ' . json_encode($info), 1554038915);
         }
 
         // do nothing if this task is already done
@@ -358,7 +359,7 @@ class CloudConvertConverter extends AbstractVideoConverter
                     $this->db->insert(self::DB_TABLE, $values + ['crdate' => $_SERVER['REQUEST_TIME']]);
                 }
                 $lock->release();
-                return new RejectedPromise(new ConversionException("Communication Error", 1554565455, $error));
+                return new RejectedPromise(new ConversionException('Communication Error', 1554565455, $error));
             }
         );
 

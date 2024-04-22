@@ -2,7 +2,6 @@
 
 namespace Hn\Video\Tests\Functional;
 
-
 use Hn\Video\Converter\NoopConverter;
 use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
 use TYPO3\CMS\Core\Resource\DuplicationBehavior;
@@ -62,7 +61,7 @@ abstract class FunctionalTestCase extends \Nimut\TestingFramework\TestCase\Funct
         // delete processed files after the test to avoid collisions with the next test
         foreach ($this->resourceStorage->getProcessingFolders() as $processingFolder) {
             foreach ($processingFolder->getFiles(0, 0, Folder::FILTER_MODE_NO_FILTERS, true) as $file) {
-                $this->assertTrue($file->delete(), "there was a processed file that could not be deleted");
+                $this->assertTrue($file->delete(), 'there was a processed file that could not be deleted');
             }
         }
 

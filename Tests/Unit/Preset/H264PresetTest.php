@@ -2,7 +2,6 @@
 
 namespace Hn\Video\Tests\Unit\Preset;
 
-
 use Hn\Video\Preset\H264Preset;
 
 class H264PresetTest extends AbstractVideoPresetTest
@@ -156,5 +155,4 @@ class H264PresetTest extends AbstractVideoPresetTest
             'profile' => 'main'
         ]));
     }
-
 }

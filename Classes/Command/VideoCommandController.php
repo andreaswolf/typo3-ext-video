@@ -2,7 +2,6 @@
 
 namespace Hn\Video\Command;
 
-
 use Hn\Video\Processing\VideoProcessingTask;
 use TYPO3\CMS\Extbase\Mvc\Controller\CommandController;
 
@@ -25,15 +24,15 @@ class VideoCommandController extends CommandController
      */
     public function processCommand(float $timeout = INF)
     {
-        $this->output("Search for new tasks... ");
+        $this->output('Search for new tasks... ');
         $storedTasks = $this->repository->findByStatus(VideoProcessingTask::STATUS_NEW);
         $count = count($storedTasks);
         if ($count <= 0) {
-            $this->outputLine("no task found.");
+            $this->outputLine('no task found.');
             return;
         }
 
-        $this->outputLine("found <info>%s</info> tasks:", [$count]);
+        $this->outputLine('found <info>%s</info> tasks:', [$count]);
         $this->output->progressStart($count);
         foreach ($storedTasks as $storedTask) {
             $this->videoProcessor->doProcessTask($storedTask);

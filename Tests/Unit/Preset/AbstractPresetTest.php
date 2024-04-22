@@ -2,7 +2,6 @@
 
 namespace Hn\Video\Tests\Unit\Preset;
 
-
 use Hn\Video\Preset\AbstractCompressiblePreset;
 use Hn\Video\Tests\Unit\UnitTestCase;
 use PHPUnit\Framework\MockObject\MockObject;

@@ -2,19 +2,18 @@
 
 namespace Hn\Video\Processing;
 
-
 use Hn\Video\FormatRepository;
 use TYPO3\CMS\Core\Resource\Processing\AbstractTask;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class VideoProcessingTask extends AbstractTask
 {
-    const TYPE = 'Video';
-    const NAME = 'CropScale';
+    public const TYPE = 'Video';
+    public const NAME = 'CropScale';
 
-    const STATUS_NEW = 'new';
-    const STATUS_FINISHED = 'finished';
-    const STATUS_FAILED = 'failed';
+    public const STATUS_NEW = 'new';
+    public const STATUS_FINISHED = 'finished';
+    public const STATUS_FAILED = 'failed';
 
     /**
      * @var int|null

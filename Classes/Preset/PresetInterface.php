@@ -3,7 +3,6 @@
 
 namespace Hn\Video\Preset;
 
-
 interface PresetInterface
 {
     /**

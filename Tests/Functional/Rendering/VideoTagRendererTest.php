@@ -2,7 +2,6 @@
 
 namespace Hn\Video\Tests\Functional\Rendering;
 
-
 use Hn\Video\Processing\VideoProcessingTask;
 use Hn\Video\Processing\VideoProcessor;
 use Hn\Video\Processing\VideoTaskRepository;

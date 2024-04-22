@@ -2,7 +2,6 @@
 
 namespace Hn\Video\Processing;
 
-
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
@@ -14,7 +13,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class VideoTaskRepository implements SingletonInterface
 {
-    const TABLE_NAME = 'tx_video_task';
+    public const TABLE_NAME = 'tx_video_task';
 
     /**
      * @var Connection
@@ -158,7 +157,7 @@ class VideoTaskRepository implements SingletonInterface
         $task = $processedFile->getTask();
         if (!$task instanceof VideoProcessingTask) {
             $type = is_object($task) ? get_class($task) : gettype($task);
-            throw new \RuntimeException("Expected " . VideoProcessingTask::class . ", got $type");
+            throw new \RuntimeException('Expected ' . VideoProcessingTask::class . ", got $type");
         }
 
         $task->setDatabaseRow($row);

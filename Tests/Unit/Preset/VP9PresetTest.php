@@ -2,7 +2,6 @@
 
 namespace Hn\Video\Tests\Unit\Preset;
 
-
 use Hn\Video\Preset\VP9Preset;
 
 class VP9PresetTest extends AbstractVideoPresetTest
@@ -77,5 +76,4 @@ class VP9PresetTest extends AbstractVideoPresetTest
             $this->assertGreaterThan(552960 * 0.9, array_product($dimensions), "{$dimensions[0]}x{$dimensions[1]}");
         }
     }
-
 }

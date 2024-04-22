@@ -2,7 +2,6 @@
 
 namespace Hn\Video\Tests\Unit\Preset;
 
-
 use Hn\Video\Preset\AbstractVideoPreset;
 use PHPUnit\Framework\MockObject\MockObject;
 
@@ -74,9 +73,9 @@ class AbstractVideoPresetTest extends AbstractPresetTest
             $this->preset->setMaxHeight($maxDimensions[1]);
         }
 
-        $this->assertEquals($expectedDimensions, $this->preset->getDimensions($sourceStream), "none cropped resolution");
+        $this->assertEquals($expectedDimensions, $this->preset->getDimensions($sourceStream), 'none cropped resolution');
         $this->preset->setCrop(true);
-        $this->assertEquals($expectedCroppedDimensions, $this->preset->getDimensions($sourceStream), "cropped resolution");
+        $this->assertEquals($expectedCroppedDimensions, $this->preset->getDimensions($sourceStream), 'cropped resolution');
     }
 
     public function testBoostedQuality()

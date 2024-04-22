@@ -2,7 +2,6 @@
 
 namespace Hn\Video;
 
-
 use Hn\Video\Exception\FormatException;
 use Hn\Video\Preset\AbstractVideoPreset;
 use Hn\Video\Preset\PresetInterface;
@@ -62,7 +61,7 @@ class FormatRepository implements SingletonInterface
             $preset = GeneralUtility::makeInstance($definition[$steamType][0], $presetOptions);
             if (!$preset instanceof PresetInterface) {
                 $type = is_object($preset) ? get_class($preset) : gettype($preset);
-                throw new \RuntimeException("Expected " . PresetInterface::class . ", got $type");
+                throw new \RuntimeException('Expected ' . PresetInterface::class . ", got $type");
             }
 
             $result[$steamType] = [
@@ -95,7 +94,7 @@ class FormatRepository implements SingletonInterface
         $options = $this->normalizeOptions($options);
         $definition = $this->findFormatDefinition($options);
         if ($definition === null) {
-            throw new FormatException("No format defintion found for configuration: " . print_r($options, true));
+            throw new FormatException('No format defintion found for configuration: ' . print_r($options, true));
         }
 
         if ($input !== null) {

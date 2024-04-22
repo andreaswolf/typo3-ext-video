@@ -2,7 +2,6 @@
 
 namespace Hn\Video\Tests\Unit;
 
-
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 use TYPO3\CMS\Core\Log\LogManager;
@@ -40,5 +39,4 @@ class UnitTestCase extends \Nimut\TestingFramework\TestCase\UnitTestCase
         parent::tearDown();
         unset($GLOBALS['TSFE']);
     }
-
 }

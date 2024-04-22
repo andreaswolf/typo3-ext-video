@@ -2,7 +2,6 @@
 
 namespace Hn\Video\Preset;
 
-
 class AacPreset extends AbstractAudioPreset
 {
     /**

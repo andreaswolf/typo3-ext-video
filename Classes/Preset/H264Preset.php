@@ -2,7 +2,6 @@
 
 namespace Hn\Video\Preset;
 
-
 use TYPO3\CMS\Core\Utility\MathUtility;
 
 class H264Preset extends AbstractVideoPreset

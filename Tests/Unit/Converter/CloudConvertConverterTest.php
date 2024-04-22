@@ -2,7 +2,6 @@
 
 namespace Hn\Video\Tests\Unit\Converter;
 
-
 use Doctrine\DBAL\Statement;
 use GuzzleHttp\Client;
 use GuzzleHttp\Promise\FulfilledPromise;
@@ -122,7 +121,7 @@ class CloudConvertConverterTest extends UnitTestCase
                 'post',
                 '/process',
                 ['inputformat' => 'mp4', 'mode' => 'info'],
-                new \Exception("something went wrong"),
+                new \Exception('something went wrong'),
             ]
         );
 
@@ -134,7 +133,7 @@ class CloudConvertConverterTest extends UnitTestCase
             'file' => 5,
             'mode' => 'info',
             'options' => serialize([]),
-            'status' => serialize(['message' => "something went wrong", 'step' => 'exception']),
+            'status' => serialize(['message' => 'something went wrong', 'step' => 'exception']),
             'failed' => 1,
             'tstamp' => $_SERVER['REQUEST_TIME'],
             'crdate' => $_SERVER['REQUEST_TIME'],
@@ -161,13 +160,13 @@ class CloudConvertConverterTest extends UnitTestCase
                 '/process',
                 ['mode' => 'info', 'inputformat' => 'mp4'],
                 new Response(200, [], json_encode([
-                    "url" => "//esta.infra.cloudconvert.com/process/some-id",
-                    "id" => "some-id",
-                    "host" => "esta.infra.cloudconvert.com",
-                    "expires" => date('Y-m-d H:i:s', strtotime('+10 hours')),
-                    "maxsize" => 1024,
-                    "maxtime" => 1500,
-                    "concurrent" => 5,
+                    'url' => '//esta.infra.cloudconvert.com/process/some-id',
+                    'id' => 'some-id',
+                    'host' => 'esta.infra.cloudconvert.com',
+                    'expires' => date('Y-m-d H:i:s', strtotime('+10 hours')),
+                    'maxsize' => 1024,
+                    'maxtime' => 1500,
+                    'concurrent' => 5,
                 ])),
             ]
         );
@@ -181,7 +180,7 @@ class CloudConvertConverterTest extends UnitTestCase
             'mode' => 'info',
             'options' => serialize([]),
             'status' => serialize([
-                'message' => "File to big for cloud convert. Max size is 1024 MB.",
+                'message' => 'File to big for cloud convert. Max size is 1024 MB.',
                 'step' => 'exception',
             ]),
             'failed' => 1,
@@ -207,13 +206,13 @@ class CloudConvertConverterTest extends UnitTestCase
                 '/process',
                 ['mode' => 'info', 'inputformat' => 'mp4'],
                 new Response(200, [], json_encode([
-                    "url" => "//esta.infra.cloudconvert.com/process/some-id",
-                    "id" => "some-id",
-                    "host" => "esta.infra.cloudconvert.com",
-                    "expires" => date('Y-m-d H:i:s', strtotime('+10 hours')),
-                    "maxsize" => 1024,
-                    "maxtime" => 1500,
-                    "concurrent" => 5,
+                    'url' => '//esta.infra.cloudconvert.com/process/some-id',
+                    'id' => 'some-id',
+                    'host' => 'esta.infra.cloudconvert.com',
+                    'expires' => date('Y-m-d H:i:s', strtotime('+10 hours')),
+                    'maxsize' => 1024,
+                    'maxtime' => 1500,
+                    'concurrent' => 5,
                 ])),
             ],
             [
@@ -226,15 +225,15 @@ class CloudConvertConverterTest extends UnitTestCase
                     'filename' => 'example.mp4',
                 ],
                 new Response(200, [], json_encode($startResponse = [
-                    "id" => "some-id",
-                    "url" => "//esta.infra.cloudconvert.com/process/some-id",
-                    "expire" => strtotime("+10 hours"),
-                    "percent" => 0,
-                    "message" => "Preparing process",
-                    "step" => "input",
-                    "starttime" => time(),
-                    "input" => [
-                        "type" => "download",
+                    'id' => 'some-id',
+                    'url' => '//esta.infra.cloudconvert.com/process/some-id',
+                    'expire' => strtotime('+10 hours'),
+                    'percent' => 0,
+                    'message' => 'Preparing process',
+                    'step' => 'input',
+                    'starttime' => time(),
+                    'input' => [
+                        'type' => 'download',
                     ],
                 ])),
             ],
@@ -243,18 +242,18 @@ class CloudConvertConverterTest extends UnitTestCase
                 '//esta.infra.cloudconvert.com/process/some-id',
                 null,
                 new Response(200, [], json_encode($statusResponse = [
-                    "id" => "some-id",
-                    "url" => "//esta.infra.cloudconvert.com/process/some-id",
-                    "expire" => strtotime("+10 hours"),
-                    "percent" => 0,
-                    "message" => "File initialized!",
-                    "step" => "finished",
-                    "starttime" => time(),
-                    "input" => [
-                        "type" => "download",
+                    'id' => 'some-id',
+                    'url' => '//esta.infra.cloudconvert.com/process/some-id',
+                    'expire' => strtotime('+10 hours'),
+                    'percent' => 0,
+                    'message' => 'File initialized!',
+                    'step' => 'finished',
+                    'starttime' => time(),
+                    'input' => [
+                        'type' => 'download',
                     ],
-                    "info" => [
-                        "streams" => [
+                    'info' => [
+                        'streams' => [
                             ['index' => 0, 'codec_type' => 'video'],
                             ['index' => 1, 'codec_type' => 'audio'],
                         ],
@@ -301,18 +300,18 @@ class CloudConvertConverterTest extends UnitTestCase
         $task = new VideoProcessingTask($this->processedFile, []);
 
         $statusResponse = [
-            "id" => "some-id",
-            "url" => "//esta.infra.cloudconvert.com/process/some-id",
-            "expire" => strtotime("+10 hours"),
-            "percent" => 0,
-            "message" => "File initialized!",
-            "step" => "finished",
-            "starttime" => time(),
-            "input" => [
-                "type" => "download",
+            'id' => 'some-id',
+            'url' => '//esta.infra.cloudconvert.com/process/some-id',
+            'expire' => strtotime('+10 hours'),
+            'percent' => 0,
+            'message' => 'File initialized!',
+            'step' => 'finished',
+            'starttime' => time(),
+            'input' => [
+                'type' => 'download',
             ],
-            "info" => [
-                "streams" => [
+            'info' => [
+                'streams' => [
                     ['index' => 0, 'codec_type' => 'video'],
                     ['index' => 1, 'codec_type' => 'audio'],
                 ],
@@ -328,13 +327,13 @@ class CloudConvertConverterTest extends UnitTestCase
                     'inputformat' => 'mp4',
                 ],
                 new Response(200, [], json_encode([
-                    "url" => "//esta.infra.cloudconvert.com/process/some-id",
-                    "id" => "some-id",
-                    "host" => "esta.infra.cloudconvert.com",
-                    "expires" => date('Y-m-d H:i:s', strtotime('+10 hours')),
-                    "maxsize" => 1024,
-                    "maxtime" => 1500,
-                    "concurrent" => 5,
+                    'url' => '//esta.infra.cloudconvert.com/process/some-id',
+                    'id' => 'some-id',
+                    'host' => 'esta.infra.cloudconvert.com',
+                    'expires' => date('Y-m-d H:i:s', strtotime('+10 hours')),
+                    'maxsize' => 1024,
+                    'maxtime' => 1500,
+                    'concurrent' => 5,
                 ])),
             ],
             [
@@ -346,19 +345,19 @@ class CloudConvertConverterTest extends UnitTestCase
                     'file' => 'http://www.example.com/fileadmin/example.mp4',
                     'filename' => 'example.mp4',
                     'converteroptions' => [
-                        'command' => $command = "-i {INPUTFILE} -c:v libx264 -y {OUTPUTFILE}",
+                        'command' => $command = '-i {INPUTFILE} -c:v libx264 -y {OUTPUTFILE}',
                     ],
                 ],
                 new Response(200, [], json_encode($startResponse = [
-                    "id" => "some-id",
-                    "url" => "//esta.infra.cloudconvert.com/process/some-id",
-                    "expire" => strtotime("+10 hours"),
-                    "percent" => 0,
-                    "message" => "Preparing process",
-                    "step" => "input",
-                    "starttime" => time(),
-                    "input" => [
-                        "type" => "download",
+                    'id' => 'some-id',
+                    'url' => '//esta.infra.cloudconvert.com/process/some-id',
+                    'expire' => strtotime('+10 hours'),
+                    'percent' => 0,
+                    'message' => 'Preparing process',
+                    'step' => 'input',
+                    'starttime' => time(),
+                    'input' => [
+                        'type' => 'download',
                     ],
                 ])),
             ]
@@ -404,18 +403,18 @@ class CloudConvertConverterTest extends UnitTestCase
         $task = new VideoProcessingTask($this->processedFile, []);
 
         $statusResponse = [
-            "id" => "some-id",
-            "url" => "//esta.infra.cloudconvert.com/process/some-id",
-            "expire" => strtotime("+10 hours"),
-            "percent" => 0,
-            "message" => "File initialized!",
-            "step" => "finished",
-            "starttime" => time(),
-            "input" => [
-                "type" => "download",
+            'id' => 'some-id',
+            'url' => '//esta.infra.cloudconvert.com/process/some-id',
+            'expire' => strtotime('+10 hours'),
+            'percent' => 0,
+            'message' => 'File initialized!',
+            'step' => 'finished',
+            'starttime' => time(),
+            'input' => [
+                'type' => 'download',
             ],
-            "info" => [
-                "streams" => [
+            'info' => [
+                'streams' => [
                     ['index' => 0, 'codec_type' => 'video'],
                     ['index' => 1, 'codec_type' => 'audio'],
                 ],
@@ -428,18 +427,18 @@ class CloudConvertConverterTest extends UnitTestCase
                 '//esta.infra.cloudconvert.com/process/some-id',
                 false,
                 new Response(200, [], json_encode($startResponse = [
-                    "id" => "some-id",
-                    "url" => "//esta.infra.cloudconvert.com/process/some-id",
-                    "expire" => strtotime("+10 hours"),
-                    "percent" => 0,
-                    "message" => "Finished",
-                    "step" => "finished",
-                    "starttime" => time(),
-                    "input" => [
-                        "type" => "download",
+                    'id' => 'some-id',
+                    'url' => '//esta.infra.cloudconvert.com/process/some-id',
+                    'expire' => strtotime('+10 hours'),
+                    'percent' => 0,
+                    'message' => 'Finished',
+                    'step' => 'finished',
+                    'starttime' => time(),
+                    'input' => [
+                        'type' => 'download',
                     ],
-                    "output" => [
-                        "url" => "//esta.infra.cloudconvert.com/process/some-id/file.mp4",
+                    'output' => [
+                        'url' => '//esta.infra.cloudconvert.com/process/some-id/file.mp4',
                     ],
                 ])),
             ]
@@ -453,7 +452,7 @@ class CloudConvertConverterTest extends UnitTestCase
         $formatRepository->expects($this->once())
             ->method('buildParameterString')
             ->with('{INPUTFILE}', '{OUTPUTFILE}', [], [['index' => 0, 'codec_type' => 'video'], ['index' => 1, 'codec_type' => 'audio']])
-            ->willReturn($command = "-i {INPUTFILE} -c:v libx264 {OUTPUTFILE}");
+            ->willReturn($command = '-i {INPUTFILE} -c:v libx264 {OUTPUTFILE}');
         $formatRepository->expects($this->atLeastOnce())
             ->method('findFormatDefinition')
             ->with([])

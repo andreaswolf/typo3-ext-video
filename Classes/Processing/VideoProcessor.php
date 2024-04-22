@@ -2,7 +2,6 @@
 
 namespace Hn\Video\Processing;
 
-
 use Hn\Video\Converter\VideoConverterInterface;
 use Psr\Log\LoggerInterface;
 use TYPO3\CMS\Core\Cache\CacheManager;
@@ -46,7 +45,7 @@ class VideoProcessor implements ProcessorInterface
     {
         if (!$task instanceof VideoProcessingTask) {
             $type = is_object($task) ? get_class($task) : gettype($task);
-            throw new \InvalidArgumentException("Expected " . VideoProcessingTask::class . ", got $type");
+            throw new \InvalidArgumentException('Expected ' . VideoProcessingTask::class . ", got $type");
         }
 
         if ($task->getTargetFile()->isProcessed()) {
@@ -93,11 +92,11 @@ class VideoProcessor implements ProcessorInterface
     {
         if (!$task instanceof VideoProcessingTask) {
             $type = is_object($task) ? get_class($task) : gettype($task);
-            throw new \InvalidArgumentException("Expected " . VideoProcessingTask::class . ", got $type");
+            throw new \InvalidArgumentException('Expected ' . VideoProcessingTask::class . ", got $type");
         }
 
         if ($task->getStatus() !== VideoProcessingTask::STATUS_NEW) {
-            throw new \RuntimeException("This task is not new.");
+            throw new \RuntimeException('This task is not new.');
         }
 
         try {

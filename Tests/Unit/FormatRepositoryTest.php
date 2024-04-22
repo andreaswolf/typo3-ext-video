@@ -2,7 +2,6 @@
 
 namespace Hn\Video\Tests\Unit;
 
-
 use Hn\Video\FormatRepository;
 use Hn\Video\Preset\PresetInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -65,5 +64,4 @@ class FormatRepositoryTest extends UnitTestCase
 
         $this->assertEquals(['-c:v', 'libx264', '-an', '-sn', '-dn'], $this->repository->buildParameters(null, null, ['format' => 'mp4', 'video' => ['x' => 'y']]));
     }
-
 }

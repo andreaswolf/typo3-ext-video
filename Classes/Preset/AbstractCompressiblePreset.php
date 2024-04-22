@@ -2,22 +2,21 @@
 
 namespace Hn\Video\Preset;
 
-
 abstract class AbstractCompressiblePreset extends AbstractPreset
 {
-    const QUALITY_BEST = 1.0;
-    const QUALITY_BETTER = 0.9;
-    const QUALITY_GOOD = 0.8;
-    const QUALITY_ACCEPTABLE = 0.7;
-    const QUALITY_TOLERABLE = 0.6;
-    const QUALITY_BORDERLINE = 0.5;
-    const QUALITY_BAD = 0.4;
-    const QUALITY_WORSE = 0.3;
-    const QUALITY_HORRIBLE = 0.2;
-    const QUALITY_UNACCEPTABLE = 0.1;
-    const QUALITY_WORST = 0.0;
+    public const QUALITY_BEST = 1.0;
+    public const QUALITY_BETTER = 0.9;
+    public const QUALITY_GOOD = 0.8;
+    public const QUALITY_ACCEPTABLE = 0.7;
+    public const QUALITY_TOLERABLE = 0.6;
+    public const QUALITY_BORDERLINE = 0.5;
+    public const QUALITY_BAD = 0.4;
+    public const QUALITY_WORSE = 0.3;
+    public const QUALITY_HORRIBLE = 0.2;
+    public const QUALITY_UNACCEPTABLE = 0.1;
+    public const QUALITY_WORST = 0.0;
 
-    const QUALITY_DEFAULT = self::QUALITY_GOOD;
+    public const QUALITY_DEFAULT = self::QUALITY_GOOD;
 
     /**
      * The implementation has the chance to check if the stream is already matching expectations.
@@ -54,7 +53,7 @@ abstract class AbstractCompressiblePreset extends AbstractPreset
      *
      * @return string
      */
-    public abstract function getCodecName(): string;
+    abstract public function getCodecName(): string;
 
     /**
      * This method checks if transcoding is necessary or if simple remuxing will be sufficient.
@@ -88,7 +87,7 @@ abstract class AbstractCompressiblePreset extends AbstractPreset
      * @return array
      * @see AbstractCompressiblePreset::getTranscodingParameters()
      */
-    public final function getParameters(array $sourceStream): array
+    final public function getParameters(array $sourceStream): array
     {
         if ($this->requiresTranscoding($sourceStream)) {
             return $this->getTranscodingParameters($sourceStream);
@@ -106,7 +105,7 @@ abstract class AbstractCompressiblePreset extends AbstractPreset
      * @return array
      * @see AbstractCompressiblePreset::requiresTranscoding
      */
-    protected abstract function getRemuxingParameters(array $sourceStream): array;
+    abstract protected function getRemuxingParameters(array $sourceStream): array;
 
     /**
      * Creates the parameters used to transcode the stream into the desired format.
@@ -119,7 +118,7 @@ abstract class AbstractCompressiblePreset extends AbstractPreset
      * @return array
      * @see AbstractCompressiblePreset::requiresTranscoding
      */
-    protected abstract function getTranscodingParameters(array $sourceStream): array;
+    abstract protected function getTranscodingParameters(array $sourceStream): array;
 
     /**
      * @return bool
@@ -154,11 +153,11 @@ abstract class AbstractCompressiblePreset extends AbstractPreset
     public function setQuality(float $quality): void
     {
         if ($quality < 0.0) {
-            throw new \RuntimeException("Quality must be equal or above 0.0");
+            throw new \RuntimeException('Quality must be equal or above 0.0');
         }
 
         if ($quality > 1.0) {
-            throw new \RuntimeException("Quality must be equal or below 1.0");
+            throw new \RuntimeException('Quality must be equal or below 1.0');
         }
 
         $this->quality = round($quality * 20) / 20;

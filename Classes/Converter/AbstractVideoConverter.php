@@ -2,7 +2,6 @@
 
 namespace Hn\Video\Converter;
 
-
 use Hn\Video\FormatRepository;
 use Hn\Video\Processing\VideoProcessingTask;
 use TYPO3\CMS\Core\Utility\GeneralUtility;

@@ -2,7 +2,6 @@
 
 namespace Hn\Video;
 
-
 use Hn\Video\Processing\VideoProcessingTask;
 use Hn\Video\Processing\VideoTaskRepository;
 use Hn\Video\ViewHelpers\ProgressViewHelper;
@@ -74,7 +73,7 @@ class TestContentElement
                     $renderer = RendererRegistry::getInstance()->getRenderer($processedFile);
                     $content .= $renderer->render($processedFile, 0, 0, $configuration);
                 } else {
-                    $content .= "<div>file is still processing</div>";
+                    $content .= '<div>file is still processing</div>';
                     $content .= ProgressViewHelper::renderHtml($processedFile);
                 }
 

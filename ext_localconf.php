@@ -18,7 +18,7 @@ call_user_func(function () {
     $performanceOptions = [
         // @formatter:off
         'h264' => ['ultrafast', 'medium', 'slow', 'veryslow', 'slow', 'veryslow'][$conf['preset'] ?? 2],
-        'vp9' =>  [ null      ,  null   ,  null ,  null     ,  2    ,  1        ][$conf['preset'] ?? 2],
+        'vp9' => [ null,  null,  null,  null,  2,  1        ][$conf['preset'] ?? 2],
         // @formatter:on
     ];
 
@@ -160,7 +160,8 @@ call_user_func(function () {
     }
 
     if (!empty($conf['testElement'])) {
-        \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addPageTSConfig(<<<PageTSConfig
+        \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addPageTSConfig(
+            <<<PageTSConfig
 mod.wizards.newContentElement.wizardItems.special.elements.video {
     iconIdentifier = content-media
     title = video testing utility
@@ -173,7 +174,8 @@ mod.wizards.newContentElement.wizardItems.special.show := addToList(video)
 PageTSConfig
         );
 
-        \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addTypoScriptSetup(<<<TypoScript
+        \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addTypoScriptSetup(
+            <<<TypoScript
 tt_content.video = USER
 tt_content.video.userFunc = Hn\Video\TestContentElement->render
 tt_content.video.configurations.data = flexform:pi_flexform:settings.options

@@ -2,7 +2,6 @@
 
 namespace Hn\Video\Converter;
 
-
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\CommandUtility;
 

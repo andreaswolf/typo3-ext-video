@@ -2,7 +2,6 @@
 
 namespace Hn\Video\Converter;
 
-
 use Hn\Video\Exception\ConversionException;
 use Hn\Video\FormatRepository;
 use Hn\Video\Processing\VideoProcessingTask;
@@ -76,7 +75,7 @@ class LocalFFmpegConverter extends AbstractVideoConverter
 
         $ffprobe = $this->runner->getCommand('ffprobe');
         if (!is_string($ffprobe)) {
-            throw new \RuntimeException("ffprobe not found.");
+            throw new \RuntimeException('ffprobe not found.');
         }
 
         $parameters = ['-v', 'quiet', '-print_format', 'json', '-show_streams', '-show_format', $file];
@@ -118,7 +117,7 @@ class LocalFFmpegConverter extends AbstractVideoConverter
 
         $ffmpeg = $this->runner->getCommand('ffmpeg');
         if (!is_string($ffmpeg)) {
-            throw new \RuntimeException("ffmpeg not found.");
+            throw new \RuntimeException('ffmpeg not found.');
         }
 
         // if possible run ffmpeg with lower priority
@@ -131,7 +130,7 @@ class LocalFFmpegConverter extends AbstractVideoConverter
         }
 
         $commandStr = "$ffmpeg -loglevel warning -stats $parameters";
-        $logger->notice("run ffmpeg command", ['command' => $commandStr]);
+        $logger->notice('run ffmpeg command', ['command' => $commandStr]);
         $process = $this->runner->run($commandStr);
         $output = '';
         foreach ($process as $line) {

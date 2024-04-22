@@ -2,7 +2,6 @@
 
 namespace Hn\Video\Slot;
 
-
 use TYPO3\CMS\Core\Resource\Driver\DriverInterface;
 use TYPO3\CMS\Core\Resource\FileInterface;
 use TYPO3\CMS\Core\Resource\ProcessedFile;

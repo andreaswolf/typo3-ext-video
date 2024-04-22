@@ -2,7 +2,6 @@
 
 namespace Hn\Video\Tests\Unit\Preset;
 
-
 use Hn\Video\Preset\AacPreset;
 
 class AacPresetTest extends AbstractAudioPresetTest

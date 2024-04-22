@@ -2,7 +2,6 @@
 
 namespace Hn\Video\ViewHelpers;
 
-
 use Hn\Video\Processing\VideoProcessingTask;
 use Hn\Video\Processing\VideoTaskRepository;
 use TYPO3\CMS\Core\Resource\ProcessedFile;
@@ -12,8 +11,8 @@ use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
 
 class ProgressViewHelper extends AbstractViewHelper
 {
-    const POLLING_INTERVAL = 15;
-    const MAX_PREDICTED_PROGRESS = 20;
+    public const POLLING_INTERVAL = 15;
+    public const MAX_PREDICTED_PROGRESS = 20;
     private static $counter = 0;
 
     protected $escapeChildren = false;
@@ -51,7 +50,6 @@ class ProgressViewHelper extends AbstractViewHelper
 
         $uids = [];
         foreach ($argument as $item) {
-
             if (is_numeric($item)) {
                 $uids[] = intval($item);
                 continue;
@@ -70,7 +68,7 @@ class ProgressViewHelper extends AbstractViewHelper
                     $uids[] = $item->getUid();
                     continue;
                 } else {
-                    throw new \RuntimeException("The given VideoProcessingTask has no id. You must start the process first.");
+                    throw new \RuntimeException('The given VideoProcessingTask has no id. You must start the process first.');
                 }
             }
 

@@ -2,7 +2,6 @@
 
 namespace Hn\Video\Tests\Unit\Processing;
 
-
 use Hn\Video\Processing\VideoProcessingEid;
 use Hn\Video\Tests\Unit\UnitTestCase;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
