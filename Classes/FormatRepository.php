@@ -131,9 +131,7 @@ class FormatRepository implements SingletonInterface
 
     public function buildParameterString(?string $input, ?string $output, array $options = [], array $sourceStreams = null): string
     {
-        $escapeShellArg = static function ($parameter) {
-            return preg_match('#^[\w:.-]+$#', $parameter) ? $parameter : escapeshellarg($parameter);
-        };
+        $escapeShellArg = static fn ($parameter) => preg_match('#^[\w:.-]+$#', $parameter) ? $parameter : escapeshellarg($parameter);
 
         $parameters = $this->buildParameters($input, $output, $options, $sourceStreams);
         $parameters = array_map($escapeShellArg, $parameters);

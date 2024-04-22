@@ -13,7 +13,7 @@ class ProgressViewHelper extends AbstractViewHelper
 {
     public const POLLING_INTERVAL = 15;
     public const MAX_PREDICTED_PROGRESS = 20;
-    private static $counter = 0;
+    private static int $counter = 0;
 
     protected $escapeChildren = false;
     protected $escapeOutput = false;

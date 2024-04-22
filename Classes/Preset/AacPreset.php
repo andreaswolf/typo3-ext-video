@@ -35,10 +35,8 @@ class AacPreset extends AbstractAudioPreset
      * Weather ot not to use libfdk for audio encoding.
      * libfdk will sound better especially at lower bitrates than the native ffmpeg encoder.
      * However it is probably not present on your system unless you compiled ffmpeg yourself.
-     *
-     * @var bool
      */
-    private $fdkAvailable = true;
+    private bool $fdkAvailable = true;
 
     public function getCodecName(): string
     {

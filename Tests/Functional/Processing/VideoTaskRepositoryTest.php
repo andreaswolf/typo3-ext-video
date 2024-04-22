@@ -10,10 +10,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class VideoTaskRepositoryTest extends FunctionalTestCase
 {
-    /**
-     * @var VideoTaskRepository
-     */
-    private $repository;
+    private VideoTaskRepository $repository;
 
     protected function setUp(): void
     {

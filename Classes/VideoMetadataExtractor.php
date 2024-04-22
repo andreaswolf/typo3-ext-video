@@ -16,7 +16,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  */
 class VideoMetadataExtractor implements ExtractorInterface
 {
-    private $getID3;
+    private \getID3 $getID3;
 
     public function __construct()
     {

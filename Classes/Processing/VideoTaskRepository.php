@@ -15,15 +15,12 @@ class VideoTaskRepository implements SingletonInterface
 {
     public const TABLE_NAME = 'tx_video_task';
 
-    /**
-     * @var Connection
-     */
-    private $connection;
+    private Connection $connection;
 
     /**
      * @var VideoProcessingTask[]
      */
-    private $tasks = [];
+    private array $tasks = [];
 
     public function __construct()
     {

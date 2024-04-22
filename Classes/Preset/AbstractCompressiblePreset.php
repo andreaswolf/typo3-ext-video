@@ -26,10 +26,8 @@ abstract class AbstractCompressiblePreset extends AbstractPreset
      * However (as always) there might be situations not foreseeable where the input stream matches the preset
      * but for some reason won't work or have other kinks. If this happens to you than you can force a transcode here.
      * If it happens, I'd be curious to know what situation that is, open an issue and tell me what i've overlooked.
-     *
-     * @var bool
      */
-    private $forceTranscode = false;
+    private bool $forceTranscode = false;
 
     /**
      * The quality is a value > 0.0 and <= 1.0.
@@ -42,10 +40,8 @@ abstract class AbstractCompressiblePreset extends AbstractPreset
      * A great reference to jpeg quality is here:
      * http://pieroxy.net/blog/2016/05/01/jpeg_compression_is_80_the_magic_quality_part_1_the_retina_screens.html
      * Be careful when implementing this value as some devices don't like too high or too low a bitrate.
-     *
-     * @var float
      */
-    private $quality = self::QUALITY_GOOD;
+    private float $quality = self::QUALITY_GOOD;
 
     /**
      * The short name of this codec.

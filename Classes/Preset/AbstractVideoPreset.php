@@ -12,36 +12,26 @@ abstract class AbstractVideoPreset extends AbstractCompressiblePreset
      * The maximum framerate allowed within this video.
      * Videos must always be encoded with a constant framerate
      * but be sure to reference the source stream to avoid frame duplication.
-     *
-     * @var float
      */
-    private $maxFramerate = 30.0;
+    private float $maxFramerate = 30.0;
 
-    /**
-     * @var int|null
-     */
-    private $maxWidth = null;
+    private ?int $maxWidth = null;
 
-    /**
-     * @var int|null
-     */
-    private $maxHeight = null;
+    private ?int $maxHeight = null;
 
     /**
      * If true than the video will be cropped.
      *
-     * @var bool
      * @todo implement
      */
-    private $crop = false;
+    private bool $crop = false;
 
     /**
      * The scaling algorithm to use.
      *
      * @see https://ffmpeg.org/ffmpeg-scaler.html
-     * @var string
      */
-    private $scalingAlgorithm = 'bicubic';
+    private string $scalingAlgorithm = 'bicubic';
 
     protected function getPixelFormat(): string
     {

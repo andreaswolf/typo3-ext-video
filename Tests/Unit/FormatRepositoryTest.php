@@ -9,8 +9,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class FormatRepositoryTest extends UnitTestCase
 {
-    /** @var FormatRepository */
-    private $repository;
+    private FormatRepository $repository;
 
     protected function setUp(): void
     {

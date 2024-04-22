@@ -82,9 +82,7 @@ class CloudConvertConverterTest extends UnitTestCase
         $this->client
             ->expects($this->exactly(count($requests)))
             ->method('requestAsync')
-            ->willReturnArgument(...array_map(function (array $request) {
-                return [$request[0], $request[1], $request[2] ? ['json' => $request[2]] : []];
-            }, $requests))
+            ->willReturnArgument(...array_map(fn (array $request) => [$request[0], $request[1], $request[2] ? ['json' => $request[2]] : []], $requests))
             ->willReturnOnConsecutiveCalls(...array_map(function (array $request) {
                 if ($request[3] instanceof \Exception) {
                     return new RejectedPromise($request[3]);
@@ -99,16 +97,12 @@ class CloudConvertConverterTest extends UnitTestCase
         $this->db
             ->expects($this->exactly(count($selects)))
             ->method('select')
-            ->withConsecutive(...array_map(function (array $select) {
-                return [
-                    ['uid', 'status', 'failed'],
-                    CloudConvertConverter::DB_TABLE,
-                    ['file' => 5, 'mode' => $select[0], 'options' => serialize($select[1])],
-                ];
-            }, $selects))
-            ->willReturnOnConsecutiveCalls(...array_map(function (array $select) {
-                return $this->createConfiguredMock(Statement::class, ['fetch' => $select[2]]);
-            }, $selects));
+            ->withConsecutive(...array_map(fn (array $select) => [
+                ['uid', 'status', 'failed'],
+                CloudConvertConverter::DB_TABLE,
+                ['file' => 5, 'mode' => $select[0], 'options' => serialize($select[1])],
+            ], $selects))
+            ->willReturnOnConsecutiveCalls(...array_map(fn (array $select) => $this->createConfiguredMock(Statement::class, ['fetch' => $select[2]]), $selects));
     }
 
     public function testInfoFailure()

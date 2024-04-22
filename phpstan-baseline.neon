@@ -511,11 +511,6 @@ parameters:
 			path: Classes/Preset/H264Preset.php
 
 		-
-			message: "#^Method Hn\\\\Video\\\\Preset\\\\H264Preset\\:\\:getLevel\\(\\) should return string but returns int\\.$#"
-			count: 1
-			path: Classes/Preset/H264Preset.php
-
-		-
 			message: "#^Method Hn\\\\Video\\\\Preset\\\\H264Preset\\:\\:getMaxMacroblocks\\(\\) should return int but returns float\\|int\\.$#"
 			count: 1
 			path: Classes/Preset/H264Preset.php
@@ -537,16 +532,6 @@ parameters:
 
 		-
 			message: "#^Method Hn\\\\Video\\\\Preset\\\\H264Preset\\:\\:requiresTranscoding\\(\\) has parameter \\$sourceStream with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: Classes/Preset/H264Preset.php
-
-		-
-			message: "#^Property Hn\\\\Video\\\\Preset\\\\H264Preset\\:\\:\\$level \\(int\\) does not accept default value of type string\\.$#"
-			count: 1
-			path: Classes/Preset/H264Preset.php
-
-		-
-			message: "#^Property Hn\\\\Video\\\\Preset\\\\H264Preset\\:\\:\\$level \\(int\\) does not accept string\\.$#"
 			count: 1
 			path: Classes/Preset/H264Preset.php
 
@@ -921,11 +906,6 @@ parameters:
 			path: Classes/VideoMetadataExtractor.php
 
 		-
-			message: "#^Property Hn\\\\Video\\\\VideoMetadataExtractor\\:\\:\\$getID3 has no type specified\\.$#"
-			count: 1
-			path: Classes/VideoMetadataExtractor.php
-
-		-
 			message: "#^Cannot call method getLastProgress\\(\\) on Hn\\\\Video\\\\Processing\\\\VideoProcessingTask\\|null\\.$#"
 			count: 1
 			path: Classes/ViewHelpers/ProgressEid.php
@@ -967,11 +947,6 @@ parameters:
 
 		-
 			message: "#^Method Hn\\\\Video\\\\ViewHelpers\\\\ProgressViewHelper\\:\\:renderJavaScript\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: Classes/ViewHelpers/ProgressViewHelper.php
-
-		-
-			message: "#^Property Hn\\\\Video\\\\ViewHelpers\\\\ProgressViewHelper\\:\\:\\$counter has no type specified\\.$#"
 			count: 1
 			path: Classes/ViewHelpers/ProgressViewHelper.php
 

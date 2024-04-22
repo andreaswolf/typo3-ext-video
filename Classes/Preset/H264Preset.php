@@ -37,14 +37,14 @@ class H264Preset extends AbstractVideoPreset
 
         '5.0' => [22080, 589824, 135000], // eg. 2560×1920@30
         '5.1' => [36864, 983040, 240000], // eg. 4096×2048@30
-        '5.2' => [36864, 2073600, 240000], // eg. 4096×2160@60
+        '5.2' => [36864, 2_073_600, 240000], // eg. 4096×2160@60
 
         // levels below this line are fairly new and may not be interpreted as valid
         // and even if they are, most hardware decoders won't be able to play them
 
-        '6.0' => [139264, 4177920, 240000], // eg. 8192×4320@30
-        '6.1' => [139264, 8355840, 480000], // eg. 8192×4320@60
-        '6.2' => [139264, 16711680, 800000], // eg. 8192×4320@120
+        '6.0' => [139264, 4_177_920, 240000], // eg. 8192×4320@30
+        '6.1' => [139264, 8_355_840, 480000], // eg. 8192×4320@60
+        '6.2' => [139264, 16_711_680, 800000], // eg. 8192×4320@120
     ];
 
     /**
@@ -102,26 +102,22 @@ class H264Preset extends AbstractVideoPreset
     /**
      * If null than the profile will be chosen based on the level.
      * Basically if the level is >= 4 than high will be used, main otherwise.
-     *
-     * @var string|null
      */
-    private $profile = null;
+    private ?string $profile = null;
 
     /**
-     * @var int
      * @see https://en.wikipedia.org/wiki/H.264/MPEG-4_AVC#Levels
      */
-    private $level = '3.0';
+    private string $level = '3.0';
 
     /**
      * The performance preset.
      *
-     * @var string
      * @see H264Preset::PERFORMANCE_PRESETS
      * @see http://dev.beandog.org/x264_preset_reference.html
      * @see https://encodingwissen.de/codecs/x264/referenz/
      */
-    private $preset = 'medium';
+    private string $preset = 'medium';
 
     public function getCodecName(): string
     {

@@ -29,7 +29,7 @@ abstract class AbstractPreset implements PresetInterface
             } catch (\Exception $e) {
                 $className = get_class($this);
                 $msg = "Error while configuring $name in $className: " . $e->getMessage();
-                throw new \RuntimeException($msg, 1553159340, $e);
+                throw new \RuntimeException($msg, 1_553_159_340, $e);
             }
         }
     }

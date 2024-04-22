@@ -17,11 +17,12 @@ use Hn\Video\Processing\VideoTaskRepository;
 use Hn\Video\ViewHelpers\ProgressViewHelper;
 use Psr\Http\Message\UriInterface;
 use Psr\Log\LoggerInterface;
+use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
-use TYPO3\CMS\Core\Locking;
 use TYPO3\CMS\Core\Locking\Exception;
 use TYPO3\CMS\Core\Locking\LockFactory;
 use TYPO3\CMS\Core\Locking\LockingStrategyInterface;
+use TYPO3\CMS\Core\Log\Logger;
 use TYPO3\CMS\Core\Log\LogManager;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use function GuzzleHttp\Psr7\try_fopen;
@@ -55,25 +56,16 @@ class CloudConvertConverter extends AbstractVideoConverter
         ],
     ];
 
-    /**
-     * @var \GuzzleHttp\Client
-     */
-    private $guzzle;
+    private Client $guzzle;
 
-    /**
-     * @var Locking\LockFactory
-     */
-    private $lockFactory;
+    private LockFactory $lockFactory;
 
-    /**
-     * @var \TYPO3\CMS\Core\Database\Connection
-     */
-    private $db;
+    private Connection $db;
 
     /**
      * @var LoggerInterface
      */
-    private $logger;
+    private Logger $logger;
 
     /**
      * This decides if this typo3 instance is publicly available.
@@ -84,10 +76,8 @@ class CloudConvertConverter extends AbstractVideoConverter
      * if null
      *  - files will be uploaded by php which blocks processes and therefor won't be done during requests.
      *  - polling has to be used to figure out if the process is done
-     *
-     * @var UriInterface|null
      */
-    private $baseUrl = null;
+    private ?UriInterface $baseUrl = null;
 
     /**
      * @param string $apiKey
@@ -265,7 +255,7 @@ class CloudConvertConverter extends AbstractVideoConverter
         }
 
         if ($info['failed'] ?? false) {
-            throw new ConversionException('Process error: ' . json_encode($info, JSON_THROW_ON_ERROR), 1554038915);
+            throw new ConversionException('Process error: ' . json_encode($info, JSON_THROW_ON_ERROR), 1_554_038_915);
         }
 
         // do nothing if this task is already done
@@ -363,7 +353,7 @@ class CloudConvertConverter extends AbstractVideoConverter
                     $this->db->insert(self::DB_TABLE, $values + ['crdate' => $_SERVER['REQUEST_TIME']]);
                 }
                 $lock->release();
-                return new RejectedPromise(new ConversionException('Communication Error', 1554565455, $error));
+                return new RejectedPromise(new ConversionException('Communication Error', 1_554_565_455, $error));
             }
         );
 
