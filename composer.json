@@ -56,7 +56,7 @@
         "source": "https://bitbucket.org/hauptsachenet/video/src"
     },
     "require": {
-        "php": "^7.1",
+        "php": "^7.4",
         "ext-json": "*",
         "guzzlehttp/guzzle": "^6.3",
         "james-heinrich/getid3": "^1.9.16",

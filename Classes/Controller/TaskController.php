@@ -11,6 +11,14 @@ use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 
 class TaskController extends ActionController
 {
+    private VideoTaskRepository $videoTaskRepository;
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->videoTaskRepository = GeneralUtility::makeInstance(VideoTaskRepository::class);
+    }
+
     public function listAction()
     {
         $qb = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('tx_video_task');
@@ -50,8 +58,7 @@ class TaskController extends ActionController
 
     public function deleteAction(int $task)
     {
-        $videoTaskRepository = GeneralUtility::makeInstance(VideoTaskRepository::class);
-        $task = $videoTaskRepository->findByUid($task);
+        $task = $this->videoTaskRepository->findByUid($task);
         if (!$task) {
             $this->addFlashMessage("Task wasn't found", AbstractMessage::ERROR);
             $this->redirect('list');
@@ -66,7 +73,7 @@ class TaskController extends ActionController
             $this->addFlashMessage("The associated processed file {$processedFile->getName()} could not be deleted.", AbstractMessage::ERROR);
         }
 
-        if ($videoTaskRepository->delete($task)) {
+        if ($this->videoTaskRepository->delete($task)) {
             $this->addFlashMessage('Task was deleted.', AbstractMessage::OK);
         } else {
             $this->addFlashMessage('Unknown error while deleting the task.', AbstractMessage::ERROR);

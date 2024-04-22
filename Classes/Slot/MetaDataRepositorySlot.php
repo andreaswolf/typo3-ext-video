@@ -27,6 +27,13 @@ class MetaDataRepositorySlot implements SingletonInterface
      */
     private array $currentlyProcessing = [];
 
+    private FileRepository $fileRepository;
+
+    public function __construct()
+    {
+        $this->fileRepository = GeneralUtility::makeInstance(FileRepository::class);
+    }
+
     public function recordPostRetrieval(\ArrayObject $data)
     {
         if (isset($this->currentlyProcessing[$data['file']])) {
@@ -38,7 +45,7 @@ class MetaDataRepositorySlot implements SingletonInterface
         }
 
         $this->currentlyProcessing[$data['file']] = true;
-        $file = GeneralUtility::makeInstance(FileRepository::class)->findByUid($data['file']);
+        $file = $this->fileRepository->findByUid($data['file']);
         if (!$file instanceof File) {
             return;
         }

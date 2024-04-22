@@ -17,6 +17,8 @@ class VideoTaskRepository implements SingletonInterface
 
     private Connection $connection;
 
+    private ProcessedFileRepository $processedFileRepository;
+
     /**
      * @var VideoProcessingTask[]
      */
@@ -26,6 +28,7 @@ class VideoTaskRepository implements SingletonInterface
     {
         $connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
         $this->connection = $connectionPool->getConnectionForTable(self::TABLE_NAME);
+        $this->processedFileRepository = GeneralUtility::makeInstance(ProcessedFileRepository::class);
     }
 
     public function store(VideoProcessingTask $task)
@@ -129,8 +132,7 @@ class VideoTaskRepository implements SingletonInterface
         $file = ResourceFactory::getInstance()->getFileObject($row['file']);
         $configuration = unserialize($row['configuration']);
 
-        $repository = GeneralUtility::makeInstance(ProcessedFileRepository::class);
-        $processedFile = $repository->findOneByOriginalFileAndTaskTypeAndConfiguration($file, 'Video.CropScale', $configuration);
+        $processedFile = $this->processedFileRepository->findOneByOriginalFileAndTaskTypeAndConfiguration($file, 'Video.CropScale', $configuration);
         $task = $processedFile->getTask();
         if (!$task instanceof VideoProcessingTask) {
             $type = is_object($task) ? get_class($task) : gettype($task);

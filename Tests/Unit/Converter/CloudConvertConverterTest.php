@@ -11,6 +11,7 @@ use Hn\Video\Converter\CloudConvertConverter;
 use Hn\Video\Exception\ConversionException;
 use Hn\Video\FormatRepository;
 use Hn\Video\Processing\VideoProcessingTask;
+use Hn\Video\Processing\VideoTaskRepository;
 use Hn\Video\Tests\Unit\UnitTestCase;
 use PHPUnit\Framework\MockObject\MockObject;
 use TYPO3\CMS\Core\Database\Connection;
@@ -34,8 +35,6 @@ class CloudConvertConverterTest extends UnitTestCase
     protected $client;
     /** @var LockingStrategyInterface|MockObject */
     protected $lock;
-    /** @var CloudConvertConverter */
-    protected $converter;
 
     protected function setUp(): void
     {
@@ -45,6 +44,8 @@ class CloudConvertConverterTest extends UnitTestCase
         GeneralUtility::addInstance(ConnectionPool::class, $connectionPool);
         $this->db = $this->createMock(Connection::class);
         $connectionPool->method('getConnectionForTable')->willReturn($this->db);
+
+        GeneralUtility::setSingletonInstance(VideoTaskRepository::class, $this->createMock(VideoTaskRepository::class));
 
         $lockFactory = $this->createMock(LockFactory::class);
         GeneralUtility::setSingletonInstance(LockFactory::class, $lockFactory);
@@ -61,8 +62,6 @@ class CloudConvertConverterTest extends UnitTestCase
 
         $this->client = $this->createMock(Client::class);
         GeneralUtility::addInstance(Client::class, $this->client);
-
-        $this->converter = new CloudConvertConverter('key');
     }
 
     protected function tearDown(): void
@@ -135,7 +134,7 @@ class CloudConvertConverterTest extends UnitTestCase
         $this->lock->expects($this->once())->method('acquire')->willReturn(true);
         $this->lock->expects($this->once())->method('release')->willReturn(true);
 
-        $this->converter->getInfo($task);
+        (new CloudConvertConverter('key'))->getInfo($task);
         $this->assertFalse($task->isExecuted());
     }
 
@@ -182,7 +181,7 @@ class CloudConvertConverterTest extends UnitTestCase
         $this->lock->expects($this->once())->method('acquire')->willReturn(true);
         $this->lock->expects($this->once())->method('release')->willReturn(true);
 
-        $this->converter->getInfo($task);
+        (new CloudConvertConverter('key'))->getInfo($task);
         $this->assertFalse($task->isExecuted());
     }
 
@@ -280,13 +279,25 @@ class CloudConvertConverterTest extends UnitTestCase
         $this->lock->expects($this->exactly(2))->method('acquire')->willReturn(true);
         $this->lock->expects($this->exactly(2))->method('release')->willReturn(true);
 
-        $this->assertNull($this->converter->getInfo($task));
-        $this->assertEquals($statusResponse['info'], $this->converter->getInfo($task));
+        $converter = new CloudConvertConverter('key');
+        $this->assertNull($converter->getInfo($task));
+        $this->assertEquals($statusResponse['info'], $converter->getInfo($task));
         $this->assertFalse($task->isExecuted());
     }
 
     public function testConvert()
     {
+        $formatRepository = $this->createMock(FormatRepository::class);
+        $formatRepository->expects($this->once())
+            ->method('buildParameterString')
+            ->with('{INPUTFILE}', '{OUTPUTFILE}', [], [['index' => 0, 'codec_type' => 'video'], ['index' => 1, 'codec_type' => 'audio']])
+            ->willReturn('-i {INPUTFILE} -c:v libx264 -y {OUTPUTFILE}');
+        $formatRepository->expects($this->atLeastOnce())
+            ->method('findFormatDefinition')
+            ->with([])
+            ->willReturn(['fileExtension' => 'mp4']);
+        GeneralUtility::setSingletonInstance(FormatRepository::class, $formatRepository);
+
         $this->file->expects($this->atLeastOnce())->method('getSize')->willReturn(1024 * 1024 * 200);
         $task = new VideoProcessingTask($this->processedFile, []);
 
@@ -354,17 +365,6 @@ class CloudConvertConverterTest extends UnitTestCase
             ]
         );
 
-        $formatRepository = $this->createMock(FormatRepository::class);
-        $formatRepository->expects($this->once())
-            ->method('buildParameterString')
-            ->with('{INPUTFILE}', '{OUTPUTFILE}', [], [['index' => 0, 'codec_type' => 'video'], ['index' => 1, 'codec_type' => 'audio']])
-            ->willReturn('-i {INPUTFILE} -c:v libx264 -y {OUTPUTFILE}');
-        $formatRepository->expects($this->atLeastOnce())
-            ->method('findFormatDefinition')
-            ->with([])
-            ->willReturn(['fileExtension' => 'mp4']);
-        GeneralUtility::setSingletonInstance(FormatRepository::class, $formatRepository);
-
         $this->assertDbSelects(
             ['info', [], ['uid' => 1, 'status' => serialize($statusResponse), 'failed' => '0']],
             ['convert', ['command' => $command], false]
@@ -383,7 +383,8 @@ class CloudConvertConverterTest extends UnitTestCase
         $this->lock->expects($this->exactly(1))->method('acquire')->willReturn(true);
         $this->lock->expects($this->exactly(1))->method('release')->willReturn(true);
 
-        $this->converter->process($task);
+        $converter = new CloudConvertConverter('key');
+        $converter->process($task);
         $this->assertFalse($task->isExecuted());
         $this->assertCount(1, $task->getProgressSteps());
         $this->assertEquals(CloudConvertConverter::PROGRESS_RANGES['convert']['input'][0], $task->getLastProgress());
@@ -391,6 +392,17 @@ class CloudConvertConverterTest extends UnitTestCase
 
     public function testDownload()
     {
+        $formatRepository = $this->createMock(FormatRepository::class);
+        $formatRepository->expects($this->once())
+            ->method('buildParameterString')
+            ->with('{INPUTFILE}', '{OUTPUTFILE}', [], [['index' => 0, 'codec_type' => 'video'], ['index' => 1, 'codec_type' => 'audio']])
+            ->willReturn($command = '-i {INPUTFILE} -c:v libx264 {OUTPUTFILE}');
+        $formatRepository->expects($this->atLeastOnce())
+            ->method('findFormatDefinition')
+            ->with([])
+            ->willReturn(['fileExtension' => 'mp4']);
+        GeneralUtility::setSingletonInstance(FormatRepository::class, $formatRepository);
+
         $task = new VideoProcessingTask($this->processedFile, []);
 
         $statusResponse = [
@@ -439,17 +451,6 @@ class CloudConvertConverterTest extends UnitTestCase
             ->with('get' /* i don't know how to test tempname */)
             ->willReturn(new Response(200, [], 'hello'));
 
-        $formatRepository = $this->createMock(FormatRepository::class);
-        $formatRepository->expects($this->once())
-            ->method('buildParameterString')
-            ->with('{INPUTFILE}', '{OUTPUTFILE}', [], [['index' => 0, 'codec_type' => 'video'], ['index' => 1, 'codec_type' => 'audio']])
-            ->willReturn($command = '-i {INPUTFILE} -c:v libx264 {OUTPUTFILE}');
-        $formatRepository->expects($this->atLeastOnce())
-            ->method('findFormatDefinition')
-            ->with([])
-            ->willReturn(['fileExtension' => 'mp4']);
-        GeneralUtility::setSingletonInstance(FormatRepository::class, $formatRepository);
-
         $this->assertDbSelects(
             ['info', [], ['uid' => 1, 'status' => serialize($statusResponse), 'failed' => '0']],
             ['convert', ['command' => $command], ['uid' => 2, 'status' => serialize(['step' => 'convert'] + $startResponse), 'failed' => '0']]
@@ -462,7 +463,8 @@ class CloudConvertConverterTest extends UnitTestCase
         $this->processedFile->expects($this->once())->method('updateProperties')->withAnyParameters();
         $this->processedFile->expects($this->once())->method('updateWithLocalFile')->withAnyParameters();
 
-        $this->converter->process($task);
+        $converter = new CloudConvertConverter('key');
+        $converter->process($task);
         $this->assertEquals(1.0, $task->getLastProgress());
         $this->assertTrue($task->isExecuted());
         $this->assertTrue($task->isSuccessful());
