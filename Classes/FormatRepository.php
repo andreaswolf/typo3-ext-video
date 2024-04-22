@@ -169,7 +169,7 @@ class FormatRepository implements SingletonInterface
 
         $codecs = [];
         /** @var PresetInterface $preset */
-        foreach ($this->getPresets($options, $sourceStream) as list('preset' => $preset)) {
+        foreach ($this->getPresets($options, $sourceStream) as ['preset' => $preset]) {
             $codec = $preset->getMimeCodecParameter($sourceStream ?? []);
             if ($codec !== null) {
                 $codecs[] = $codec;
