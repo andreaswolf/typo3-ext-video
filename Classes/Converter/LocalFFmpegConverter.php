@@ -3,7 +3,6 @@
 namespace Hn\Video\Converter;
 
 use Hn\Video\Exception\ConversionException;
-use Hn\Video\FormatRepository;
 use Hn\Video\Processing\VideoProcessingTask;
 use Hn\Video\Processing\VideoTaskRepository;
 use Psr\Log\LoggerInterface;
@@ -12,17 +11,18 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class LocalFFmpegConverter extends AbstractVideoConverter
 {
-    /**
-     * @var LocalCommandRunner
-     */
-    protected $runner;
+    private LocalCommandRunner $runner;
 
     private LoggerInterface $logger;
 
+    private VideoTaskRepository $videoTaskRepository;
+
     public function __construct()
     {
+        parent::__construct();
         $this->runner = GeneralUtility::makeInstance(LocalCommandRunner::class);
         $this->logger = GeneralUtility::makeInstance(LogManager::class)->getLogger(self::class);
+        $this->videoTaskRepository = GeneralUtility::makeInstance(VideoTaskRepository::class);
     }
 
     /**
@@ -40,10 +40,7 @@ class LocalFFmpegConverter extends AbstractVideoConverter
 
         $tempFilename = GeneralUtility::tempnam('video');
         try {
-            $videoTaskRepository = GeneralUtility::makeInstance(VideoTaskRepository::class);
-            $formatRepository = GeneralUtility::makeInstance(FormatRepository::class);
-
-            $ffmpegCommand = $formatRepository->buildParameterString($localFile, $tempFilename, $task->getConfiguration(), $streams);
+            $ffmpegCommand = $this->formatRepository->buildParameterString($localFile, $tempFilename, $task->getConfiguration(), $streams);
             $progress = $this->ffmpeg($ffmpegCommand);
             foreach ($progress as $time) {
                 $progress = $time / $duration;
@@ -52,12 +49,12 @@ class LocalFFmpegConverter extends AbstractVideoConverter
                 }
 
                 $task->addProgressStep($progress);
-                $videoTaskRepository->store($task);
+                $this->videoTaskRepository->store($task);
             }
 
             // make the progress bar end
             $task->addProgressStep(1.0);
-            $videoTaskRepository->store($task);
+            $this->videoTaskRepository->store($task);
 
             $this->finishTask($task, $tempFilename, $streams);
         } finally {

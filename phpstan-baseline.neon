@@ -641,6 +641,11 @@ parameters:
 			path: Classes/Processing/VideoProcessingEid.php
 
 		-
+			message: "#^Method Hn\\\\Video\\\\Processing\\\\VideoProcessingTask\\:\\:__construct\\(\\) has parameter \\$configuration with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: Classes/Processing/VideoProcessingTask.php
+
+		-
 			message: "#^Method Hn\\\\Video\\\\Processing\\\\VideoProcessingTask\\:\\:getProgressSteps\\(\\) return type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: Classes/Processing/VideoProcessingTask.php

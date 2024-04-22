@@ -10,7 +10,6 @@ use GuzzleHttp\Promise\RejectedPromise;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\Psr7\UriResolver;
 use Hn\Video\Exception\ConversionException;
-use Hn\Video\FormatRepository;
 use Hn\Video\Processing\VideoProcessingEid;
 use Hn\Video\Processing\VideoProcessingTask;
 use Hn\Video\Processing\VideoTaskRepository;
@@ -63,6 +62,8 @@ class CloudConvertConverter extends AbstractVideoConverter
 
     private LoggerInterface $logger;
 
+    private VideoTaskRepository $videoTaskRepository;
+
     /**
      * This decides if this typo3 instance is publicly available.
      *
@@ -80,6 +81,7 @@ class CloudConvertConverter extends AbstractVideoConverter
      */
     public function __construct(string $apiKey)
     {
+        parent::__construct();
         $this->guzzle = GeneralUtility::makeInstance(Client::class, [
             'base_uri' => 'https://api.cloudconvert.com/',
             'timeout' => 5.0,
@@ -99,6 +101,7 @@ class CloudConvertConverter extends AbstractVideoConverter
         if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 | FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)) {
             $this->baseUrl = uri_for(GeneralUtility::getIndpEnv('TYPO3_SITE_URL'));
         }
+        $this->videoTaskRepository = GeneralUtility::makeInstance(VideoTaskRepository::class);
     }
 
     public function isPublic(): bool
@@ -157,8 +160,7 @@ class CloudConvertConverter extends AbstractVideoConverter
 
     public function process(VideoProcessingTask $task): void
     {
-        $formatRepository = GeneralUtility::makeInstance(FormatRepository::class);
-        $definition = $formatRepository->findFormatDefinition($task->getConfiguration());
+        $definition = $this->formatRepository->findFormatDefinition($task->getConfiguration());
         if ($definition === null) {
             throw new ConversionException("Can't find format for: " . print_r($task->getConfiguration(), true));
         }
@@ -169,7 +171,7 @@ class CloudConvertConverter extends AbstractVideoConverter
             return;
         }
 
-        $command = $formatRepository->buildParameterString('{INPUTFILE}', '{OUTPUTFILE}', $task->getConfiguration(), $info['streams']);
+        $command = $this->formatRepository->buildParameterString('{INPUTFILE}', '{OUTPUTFILE}', $task->getConfiguration(), $info['streams']);
         // remove possible escaping from the inputfile/outputfile segments since they are actually placeholders
         $command = strtr($command, [
             escapeshellarg('{INPUTFILE}') => '{INPUTFILE}',
@@ -454,8 +456,7 @@ class CloudConvertConverter extends AbstractVideoConverter
         $totalProgress = $range[0] + ($range[1] - $range[0]) * $progress;
         $task->addProgressStep($totalProgress);
 
-        $videoTaskRepository = GeneralUtility::makeInstance(VideoTaskRepository::class);
-        $videoTaskRepository->store($task);
+        $this->videoTaskRepository->store($task);
     }
 
     private function acquireLock(string $identifier): ?LockingStrategyInterface

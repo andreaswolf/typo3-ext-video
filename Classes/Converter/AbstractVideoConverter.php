@@ -8,6 +8,13 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 abstract class AbstractVideoConverter implements VideoConverterInterface
 {
+    protected FormatRepository $formatRepository;
+
+    public function __construct()
+    {
+        $this->formatRepository = GeneralUtility::makeInstance(FormatRepository::class);
+    }
+
     public function start(VideoProcessingTask $task): void
     {
     }
@@ -19,8 +26,7 @@ abstract class AbstractVideoConverter implements VideoConverterInterface
         $processedFile->setName($task->getTargetFilename());
 
         // the properties also have to be set before writing the file or else... guess
-        $formatRepository = GeneralUtility::makeInstance(FormatRepository::class);
-        $properties = $formatRepository->getProperties($task->getConfiguration(), $streams);
+        $properties = $this->formatRepository->getProperties($task->getConfiguration(), $streams);
         $processedFile->updateProperties($properties + ['checksum' => $task->getConfigurationChecksum()]);
 
         // now actually update the file

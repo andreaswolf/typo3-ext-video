@@ -3,6 +3,7 @@
 namespace Hn\Video\Processing;
 
 use Hn\Video\FormatRepository;
+use TYPO3\CMS\Core\Resource\ProcessedFile;
 use TYPO3\CMS\Core\Resource\Processing\AbstractTask;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -14,6 +15,8 @@ class VideoProcessingTask extends AbstractTask
     public const STATUS_NEW = 'new';
     public const STATUS_FINISHED = 'finished';
     public const STATUS_FAILED = 'failed';
+
+    private FormatRepository $formatRepository;
 
     /**
      * @var int|null
@@ -34,6 +37,12 @@ class VideoProcessingTask extends AbstractTask
      * @var array
      */
     protected $progress = [];
+
+    public function __construct(ProcessedFile $targetFile, array $configuration)
+    {
+        parent::__construct($targetFile, $configuration);
+        $this->formatRepository = GeneralUtility::makeInstance(FormatRepository::class);
+    }
 
     /**
      * Checks if the given configuration is sensible for this task, i.e. if all required parameters
@@ -62,8 +71,7 @@ class VideoProcessingTask extends AbstractTask
 
     public function getTargetFileExtension(): string
     {
-        $formatRepository = GeneralUtility::makeInstance(FormatRepository::class);
-        $definition = $formatRepository->findFormatDefinition($this->getConfiguration());
+        $definition = $this->formatRepository->findFormatDefinition($this->getConfiguration());
         return $definition['fileExtension'];
     }
 

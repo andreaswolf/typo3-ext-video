@@ -17,9 +17,18 @@ class VideoProcessor implements ProcessorInterface
 {
     private LoggerInterface $logger;
 
+    private VideoTaskRepository $taskRepository;
+
+    private ProcessedFileRepository $processedFileRepository;
+
+    private CacheManager $cacheManager;
+
     public function __construct()
     {
         $this->logger = GeneralUtility::makeInstance(LogManager::class)->getLogger(self::class);
+        $this->taskRepository = GeneralUtility::makeInstance(VideoTaskRepository::class);
+        $this->processedFileRepository = GeneralUtility::makeInstance(ProcessedFileRepository::class);
+        $this->cacheManager = GeneralUtility::makeInstance(CacheManager::class);
     }
 
     /**
@@ -53,8 +62,7 @@ class VideoProcessor implements ProcessorInterface
             return;
         }
 
-        $taskRepository = GeneralUtility::makeInstance(VideoTaskRepository::class);
-        $storedTask = $taskRepository->findByTask($task);
+        $storedTask = $this->taskRepository->findByTask($task);
 
         // if there wasn't a task before ~ this is the first time someone wants that video with that configuration
         // or if there was one successfully executed ~ the processed file was deleted and we have to do it again
@@ -70,7 +78,7 @@ class VideoProcessor implements ProcessorInterface
                     throw new \RuntimeException('processTask failed', 0, $e); // let them know
                 }
             }
-            $taskRepository->store($task);
+            $this->taskRepository->store($task);
         }
 
         // the video should never be done processing here ...
@@ -113,7 +121,7 @@ class VideoProcessor implements ProcessorInterface
             }
         }
 
-        GeneralUtility::makeInstance(VideoTaskRepository::class)->store($task);
+        $this->taskRepository->store($task);
     }
 
     public static function getConverter(): VideoConverterInterface
@@ -132,11 +140,9 @@ class VideoProcessor implements ProcessorInterface
     protected function handleTaskIfDone(TaskInterface $task): void
     {
         if ($task->isExecuted() && $task->isSuccessful() && $task->getTargetFile()->isProcessed()) {
-            $processedFileRepository = GeneralUtility::makeInstance(ProcessedFileRepository::class);
-            $processedFileRepository->add($task->getTargetFile());
+            $this->processedFileRepository->add($task->getTargetFile());
 
-            $cacheManager = GeneralUtility::makeInstance(CacheManager::class);
-            $cacheManager->flushCachesInGroupByTag('pages', $task->getConfigurationChecksum());
+            $this->cacheManager->flushCachesInGroupByTag('pages', $task->getConfigurationChecksum());
         }
     }
 }
