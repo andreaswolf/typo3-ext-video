@@ -68,6 +68,9 @@ class AbstractVideoPresetTest extends AbstractPresetTest
      */
     public function testDimensionsAndCropping($expectedDimensions, $expectedCroppedDimensions, array $maxDimensions, array $sourceStream)
     {
+        if (static::class !== self::class) {
+            $this->markTestSkipped('Needed to rename the method because of different parameter sets, but the test should not run in child classes');
+        }
         if (!empty($maxDimensions)) {
             $this->preset->setMaxWidth($maxDimensions[0]);
             $this->preset->setMaxHeight($maxDimensions[1]);
