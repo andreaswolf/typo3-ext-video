@@ -125,11 +125,10 @@ class VideoTagRenderer implements FileRendererInterface
                 $GLOBALS['TSFE']->addCacheTags(["processed_video_{$file->getUid()}"]);
             }
 
-            $source = sprintf(
-                '<source src="%s" type="%s" />',
-                htmlspecialchars($file->getPublicUrl($usedPathsRelativeToCurrentScript)),
-                htmlspecialchars($file->getMimeType())
-            );
+            $source = (string)(new SourceTag(
+                $file,
+                $file->getPublicUrl($usedPathsRelativeToCurrentScript)
+            ));
 
             return [[$source], [$file]];
         }
@@ -157,11 +156,10 @@ class VideoTagRenderer implements FileRendererInterface
                 $GLOBALS['TSFE']->addCacheTags(["processed_video_{$video->getUid()}"]);
             }
 
-            $sources[] = sprintf(
-                '<source src="%s" type="%s" />',
-                htmlspecialchars($video->getPublicUrl($usedPathsRelativeToCurrentScript)),
-                htmlspecialchars($video->getMimeType())
-            );
+            $sources[] = (string)(new SourceTag(
+                $file,
+                $file->getPublicUrl($usedPathsRelativeToCurrentScript)
+            ));
         }
 
         return [$sources, $videos];
