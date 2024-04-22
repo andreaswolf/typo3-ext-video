@@ -13,7 +13,10 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Object\ObjectManager;
 use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 
-class VideoProcessor implements ProcessorInterface
+/**
+ * Processor for Video.CropScale tasks in the File Abstraction Layer.
+ */
+class VideoTaskProcessor implements ProcessorInterface
 {
     private LoggerInterface $logger;
 
@@ -33,10 +36,8 @@ class VideoProcessor implements ProcessorInterface
 
     /**
      * Returns TRUE if this processor can process the given task.
-     *
-     * @return bool
      */
-    public function canProcessTask(TaskInterface $task)
+    public function canProcessTask(TaskInterface $task): bool
     {
         return $task instanceof VideoProcessingTask;
     }

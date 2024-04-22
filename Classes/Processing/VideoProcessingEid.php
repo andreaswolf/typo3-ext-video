@@ -38,7 +38,7 @@ class VideoProcessingEid
         }
 
         $repository = GeneralUtility::makeInstance(VideoTaskRepository::class);
-        $videoProcessor = GeneralUtility::makeInstance(VideoProcessor::class);
+        $videoProcessor = GeneralUtility::makeInstance(VideoTaskProcessor::class);
         $timeout = ini_get('max_execution_time') - 10;
 
         $storedTasks = $repository->findByStatus(VideoProcessingTask::STATUS_NEW);

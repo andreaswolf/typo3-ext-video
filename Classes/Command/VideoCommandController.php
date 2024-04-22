@@ -14,7 +14,7 @@ class VideoCommandController extends CommandController
     protected $repository;
 
     /**
-     * @var \Hn\Video\Processing\VideoProcessor
+     * @var \Hn\Video\Processing\VideoTaskProcessor
      * @inject
      */
     protected $videoProcessor;
