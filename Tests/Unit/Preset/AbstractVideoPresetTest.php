@@ -66,7 +66,7 @@ class AbstractVideoPresetTest extends AbstractPresetTest
     /**
      * @dataProvider dimensions
      */
-    public function testDimensions($expectedDimensions, $expectedCroppedDimensions, array $maxDimensions, array $sourceStream)
+    public function testDimensionsAndCropping($expectedDimensions, $expectedCroppedDimensions, array $maxDimensions, array $sourceStream)
     {
         if (!empty($maxDimensions)) {
             $this->preset->setMaxWidth($maxDimensions[0]);
