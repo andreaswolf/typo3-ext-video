@@ -1,11 +1,13 @@
 <?php
 
+use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
+
 // TODO move that into pagets
-\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addTcaSelectItem('tt_content', 'CType', [
+ExtensionManagementUtility::addTcaSelectItem('tt_content', 'CType', [
     'video testing utility', 'video'
 ]);
 
-\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addPiFlexFormValue('', 'FILE:EXT:video/Configuration/FlexForm/TestElement.xml', 'video');
+ExtensionManagementUtility::addPiFlexFormValue('', 'FILE:EXT:video/Configuration/FlexForm/TestElement.xml', 'video');
 
 $GLOBALS['TCA']['tt_content']['types']['video'] = [
     'showitem' => implode(',', [

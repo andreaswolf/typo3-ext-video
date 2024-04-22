@@ -2,6 +2,7 @@
 
 namespace Hn\Video\Tests\Unit\Rendering;
 
+use Hn\Video\Rendering\VideoTagRenderer;
 use Hn\Video\Tests\Unit\UnitTestCase;
 use TYPO3\CMS\Core\Resource\File;
 use TYPO3\CMS\Core\Resource\ProcessedFile;
@@ -17,7 +18,7 @@ class VideoTagRendererTest extends UnitTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->renderer = new \Hn\Video\Rendering\VideoTagRenderer();
+        $this->renderer = new VideoTagRenderer();
         $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['video']['default_video_formats'] = ['mp4' => []];
     }
 

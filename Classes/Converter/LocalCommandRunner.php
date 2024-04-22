@@ -34,6 +34,7 @@ class LocalCommandRunner implements SingletonInterface
      */
     public function run(string $command): \Generator
     {
+        $status = [];
         $process = proc_open("$command 2>&1", [1 => ['pipe', 'w']], $pipes);
         stream_set_blocking($pipes[1], false);
 

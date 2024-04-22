@@ -19,6 +19,8 @@ jobs:
             command: analyze
           - name: PHPUnit
             command: test:unit
+          - name: Rector
+            command: 'rector -- --dry-run'
 
     name: ${{ matrix.composer-command.name }}
 

@@ -17,7 +17,7 @@ class VideoProcessor implements ProcessorInterface
 {
     protected function getLogger(): LoggerInterface
     {
-        return GeneralUtility::makeInstance(LogManager::class)->getLogger(__CLASS__);
+        return GeneralUtility::makeInstance(LogManager::class)->getLogger(self::class);
     }
 
     /**
@@ -104,7 +104,7 @@ class VideoProcessor implements ProcessorInterface
             $converter->process($task);
             $this->handleTaskIfDone($task);
         } catch (\Exception $e) {
-            $logger = GeneralUtility::makeInstance(LogManager::class)->getLogger(__CLASS__);
+            $logger = GeneralUtility::makeInstance(LogManager::class)->getLogger(self::class);
             $logger->critical($e->getMessage());
 
             $task->setExecuted(false);

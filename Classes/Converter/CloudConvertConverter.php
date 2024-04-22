@@ -2,6 +2,7 @@
 
 namespace Hn\Video\Converter;
 
+use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Exception\ServerException;
 use GuzzleHttp\Promise\PromiseInterface;
@@ -18,6 +19,9 @@ use Psr\Http\Message\UriInterface;
 use Psr\Log\LoggerInterface;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Locking;
+use TYPO3\CMS\Core\Locking\Exception;
+use TYPO3\CMS\Core\Locking\LockFactory;
+use TYPO3\CMS\Core\Locking\LockingStrategyInterface;
 use TYPO3\CMS\Core\Log\LogManager;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use function GuzzleHttp\Psr7\try_fopen;
@@ -27,8 +31,8 @@ class CloudConvertConverter extends AbstractVideoConverter
 {
     public const DB_TABLE = 'tx_video_cloudconvert_process';
 
-    public const LOCKING_STRATEGY = Locking\LockingStrategyInterface::LOCK_CAPABILITY_EXCLUSIVE
-    | Locking\LockingStrategyInterface::LOCK_CAPABILITY_NOBLOCK;
+    public const LOCKING_STRATEGY = LockingStrategyInterface::LOCK_CAPABILITY_EXCLUSIVE
+    | LockingStrategyInterface::LOCK_CAPABILITY_NOBLOCK;
 
     public const MODE_INFO = 'info';
     public const MODE_CONVERT = 'convert';
@@ -91,7 +95,7 @@ class CloudConvertConverter extends AbstractVideoConverter
      */
     public function __construct(string $apiKey)
     {
-        $this->guzzle = GeneralUtility::makeInstance(\GuzzleHttp\Client::class, [
+        $this->guzzle = GeneralUtility::makeInstance(Client::class, [
             'base_uri' => 'https://api.cloudconvert.com/',
             'timeout' => 5.0,
             'headers' => [
@@ -100,9 +104,9 @@ class CloudConvertConverter extends AbstractVideoConverter
             ],
         ]);
 
-        $this->lockFactory = GeneralUtility::makeInstance(Locking\LockFactory::class);
+        $this->lockFactory = GeneralUtility::makeInstance(LockFactory::class);
         $this->db = GeneralUtility::makeInstance(ConnectionPool::class)->getConnectionForTable(self::DB_TABLE);
-        $this->logger = GeneralUtility::makeInstance(LogManager::class)->getLogger(__CLASS__);
+        $this->logger = GeneralUtility::makeInstance(LogManager::class)->getLogger(self::class);
 
         // if we are in a publicly accessible frontend environment than define the base url
         // this allows the implementation to use the "download" way of delivering the video file
@@ -469,7 +473,7 @@ class CloudConvertConverter extends AbstractVideoConverter
         $videoTaskRepository->store($task);
     }
 
-    private function acquireLock(string $identifier): ?Locking\LockingStrategyInterface
+    private function acquireLock(string $identifier): ?LockingStrategyInterface
     {
         try {
             $lock = $this->lockFactory->createLocker($identifier, self::LOCKING_STRATEGY);
@@ -479,7 +483,7 @@ class CloudConvertConverter extends AbstractVideoConverter
             }
 
             return $lock;
-        } catch (Locking\Exception $e) {
+        } catch (Exception $e) {
             // it seems that the noblock implementation is not really tested
             // passing noblock to acquire will not block on supported platforms
             // and will block on unsuported platforms while throwing this exception afterwards

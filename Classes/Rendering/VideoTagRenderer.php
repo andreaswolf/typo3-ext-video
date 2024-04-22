@@ -6,11 +6,16 @@ use Hn\Video\FormatRepository;
 use Hn\Video\TypeUtility;
 use Hn\Video\ViewHelpers\ProgressViewHelper;
 use TYPO3\CMS\Core\Resource;
+use TYPO3\CMS\Core\Resource\File;
+use TYPO3\CMS\Core\Resource\FileInterface;
+use TYPO3\CMS\Core\Resource\FileReference;
+use TYPO3\CMS\Core\Resource\ProcessedFile;
+use TYPO3\CMS\Core\Resource\Rendering\FileRendererInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\SignalSlot\Dispatcher;
 use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 
-class VideoTagRenderer implements Resource\Rendering\FileRendererInterface
+class VideoTagRenderer implements FileRendererInterface
 {
     /**
      * Returns the priority of the renderer
@@ -35,7 +40,7 @@ class VideoTagRenderer implements Resource\Rendering\FileRendererInterface
      *
      * @return bool
      */
-    public function canRender(Resource\FileInterface $file)
+    public function canRender(FileInterface $file)
     {
         return TypeUtility::inList($file->getMimeType(), TypeUtility::VIDEO_MIME_TYPES)
             && $file->getProperty('width') && $file->getProperty('height');
@@ -52,7 +57,7 @@ class VideoTagRenderer implements Resource\Rendering\FileRendererInterface
      *
      * @return string
      */
-    public function render(Resource\FileInterface $file, $width, $height, array $options = [], $usedPathsRelativeToCurrentScript = false)
+    public function render(FileInterface $file, $width, $height, array $options = [], $usedPathsRelativeToCurrentScript = false)
     {
         $attributes = [];
 
@@ -114,10 +119,10 @@ class VideoTagRenderer implements Resource\Rendering\FileRendererInterface
         return $tag;
     }
 
-    protected function buildSources(Resource\FileInterface $file, array $options, $usedPathsRelativeToCurrentScript): array
+    protected function buildSources(FileInterface $file, array $options, $usedPathsRelativeToCurrentScript): array
     {
         // do not process a processed file
-        if ($file instanceof Resource\ProcessedFile) {
+        if ($file instanceof ProcessedFile) {
             if ($GLOBALS['TSFE'] instanceof TypoScriptFrontendController) {
                 $GLOBALS['TSFE']->addCacheTags(["processed_video_{$file->getUid()}"]);
             }
@@ -131,13 +136,13 @@ class VideoTagRenderer implements Resource\Rendering\FileRendererInterface
             return [[$source], [$file]];
         }
 
-        if ($file instanceof Resource\FileReference) {
+        if ($file instanceof FileReference) {
             $file = $file->getOriginalFile();
         }
 
-        if (!$file instanceof Resource\File) {
+        if (!$file instanceof File) {
             $type = is_object($file) ? get_class($file) : gettype($file);
-            throw new \RuntimeException('Expected ' . Resource\File::class . ", got $type");
+            throw new \RuntimeException('Expected ' . File::class . ", got $type");
         }
 
         $sources = [];
@@ -212,6 +217,6 @@ class VideoTagRenderer implements Resource\Rendering\FileRendererInterface
             $arguments = array_merge($arguments, ...$furtherArguments);
         }
 
-        GeneralUtility::makeInstance(Dispatcher::class)->dispatch(__CLASS__, $name, $arguments);
+        GeneralUtility::makeInstance(Dispatcher::class)->dispatch(self::class, $name, $arguments);
     }
 }

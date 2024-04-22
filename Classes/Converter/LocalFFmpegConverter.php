@@ -71,7 +71,7 @@ class LocalFFmpegConverter extends AbstractVideoConverter
      */
     protected function ffprobe(string $file): array
     {
-        $logger = GeneralUtility::makeInstance(LogManager::class)->getLogger(__CLASS__);
+        $logger = GeneralUtility::makeInstance(LogManager::class)->getLogger(self::class);
 
         $ffprobe = $this->runner->getCommand('ffprobe');
         if (!is_string($ffprobe)) {
@@ -113,7 +113,7 @@ class LocalFFmpegConverter extends AbstractVideoConverter
      */
     protected function ffmpeg(string $parameters): \Iterator
     {
-        $logger = GeneralUtility::makeInstance(LogManager::class)->getLogger(__CLASS__);
+        $logger = GeneralUtility::makeInstance(LogManager::class)->getLogger(self::class);
 
         $ffmpeg = $this->runner->getCommand('ffmpeg');
         if (!is_string($ffmpeg)) {

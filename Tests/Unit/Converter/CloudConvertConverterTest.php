@@ -8,6 +8,7 @@ use GuzzleHttp\Promise\FulfilledPromise;
 use GuzzleHttp\Promise\RejectedPromise;
 use GuzzleHttp\Psr7\Response;
 use Hn\Video\Converter\CloudConvertConverter;
+use Hn\Video\Exception\ConversionException;
 use Hn\Video\FormatRepository;
 use Hn\Video\Processing\VideoProcessingTask;
 use Hn\Video\Tests\Unit\UnitTestCase;
@@ -112,7 +113,7 @@ class CloudConvertConverterTest extends UnitTestCase
 
     public function testInfoFailure()
     {
-        $this->expectException(\Hn\Video\Exception\ConversionException::class);
+        $this->expectException(ConversionException::class);
         $task = new VideoProcessingTask($this->processedFile, []);
         $this->assertRequests(
             [
@@ -146,7 +147,7 @@ class CloudConvertConverterTest extends UnitTestCase
 
     public function testGetInfoOversize()
     {
-        $this->expectException(\Hn\Video\Exception\ConversionException::class);
+        $this->expectException(ConversionException::class);
         $this->file->expects($this->atLeastOnce())->method('getSize')->willReturn(1024 * 1024 * 1024 * 5);
         $task = new VideoProcessingTask($this->processedFile, []);
 
