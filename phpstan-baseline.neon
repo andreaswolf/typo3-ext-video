@@ -641,6 +641,21 @@ parameters:
 			path: Classes/Processing/VideoProcessingTask.php
 
 		-
+			message: "#^Method Hn\\\\Video\\\\Processing\\\\VideoProcessor\\:\\:dispatch\\(\\) has parameter \\$arguments with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: Classes/Processing/VideoProcessor.php
+
+		-
+			message: "#^Method Hn\\\\Video\\\\Processing\\\\VideoProcessor\\:\\:dispatch\\(\\) has parameter \\$furtherArguments with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: Classes/Processing/VideoProcessor.php
+
+		-
+			message: "#^Method Hn\\\\Video\\\\Processing\\\\VideoProcessor\\:\\:getConfigurations\\(\\) should return array\\<int, array\\{format\\: string\\}\\> but returns array\\<int\\<0, max\\>, array\\>\\.$#"
+			count: 1
+			path: Classes/Processing/VideoProcessor.php
+
+		-
 			message: "#^Else branch is unreachable because ternary operator condition is always true\\.$#"
 			count: 2
 			path: Classes/Processing/VideoTaskProcessor.php
@@ -681,31 +696,6 @@ parameters:
 			path: Classes/Rendering/VideoTagRenderer.php
 
 		-
-			message: "#^Cannot access an offset on array\\|float\\|int\\|string\\|false\\|null\\.$#"
-			count: 1
-			path: Classes/Rendering/VideoTagRenderer.php
-
-		-
-			message: "#^Else branch is unreachable because ternary operator condition is always true\\.$#"
-			count: 1
-			path: Classes/Rendering/VideoTagRenderer.php
-
-		-
-			message: "#^Method Hn\\\\Video\\\\Rendering\\\\VideoTagRenderer\\:\\:buildSources\\(\\) has parameter \\$options with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: Classes/Rendering/VideoTagRenderer.php
-
-		-
-			message: "#^Method Hn\\\\Video\\\\Rendering\\\\VideoTagRenderer\\:\\:buildSources\\(\\) has parameter \\$usedPathsRelativeToCurrentScript with no type specified\\.$#"
-			count: 1
-			path: Classes/Rendering/VideoTagRenderer.php
-
-		-
-			message: "#^Method Hn\\\\Video\\\\Rendering\\\\VideoTagRenderer\\:\\:buildSources\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: Classes/Rendering/VideoTagRenderer.php
-
-		-
 			message: "#^Method Hn\\\\Video\\\\Rendering\\\\VideoTagRenderer\\:\\:dispatch\\(\\) has parameter \\$arguments with no value type specified in iterable type array\\.$#"
 			count: 1
 			path: Classes/Rendering/VideoTagRenderer.php
@@ -721,23 +711,8 @@ parameters:
 			path: Classes/Rendering/VideoTagRenderer.php
 
 		-
-			message: "#^Method Hn\\\\Video\\\\Rendering\\\\VideoTagRenderer\\:\\:getConfigurations\\(\\) has parameter \\$options with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: Classes/Rendering/VideoTagRenderer.php
-
-		-
-			message: "#^Method Hn\\\\Video\\\\Rendering\\\\VideoTagRenderer\\:\\:getConfigurations\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: Classes/Rendering/VideoTagRenderer.php
-
-		-
 			message: "#^Method Hn\\\\Video\\\\Rendering\\\\VideoTagRenderer\\:\\:render\\(\\) has parameter \\$options with no value type specified in iterable type array\\.$#"
 			count: 1
-			path: Classes/Rendering/VideoTagRenderer.php
-
-		-
-			message: "#^Parameter \\#1 \\$string of function htmlspecialchars expects string, string\\|null given\\.$#"
-			count: 2
 			path: Classes/Rendering/VideoTagRenderer.php
 
 		-

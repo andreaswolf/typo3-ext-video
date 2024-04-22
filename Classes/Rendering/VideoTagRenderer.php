@@ -2,7 +2,7 @@
 
 namespace Hn\Video\Rendering;
 
-use Hn\Video\FormatRepository;
+use Hn\Video\Processing\VideoProcessor;
 use Hn\Video\TypeUtility;
 use Hn\Video\ViewHelpers\ProgressViewHelper;
 use TYPO3\CMS\Core\Resource;
@@ -102,7 +102,9 @@ class VideoTagRenderer implements FileRendererInterface
             }
         }
 
-        [$sources, $videos] = $this->buildSources($file, $options, $usedPathsRelativeToCurrentScript);
+        $videos = $this->processVideo($file, $options);
+        $this->addCacheTags($videos);
+        $sources = $this->buildSources($videos, $usedPathsRelativeToCurrentScript);
         self::dispatch('beforeTag', [&$attributes, &$sources], func_get_args());
 
         if (empty($sources) && ($options['progress'] ?? true)) {
@@ -117,20 +119,15 @@ class VideoTagRenderer implements FileRendererInterface
         return $tag;
     }
 
-    protected function buildSources(FileInterface $file, array $options, $usedPathsRelativeToCurrentScript): array
+    /**
+     * @param array{formats?: list<string>} $options
+     * @return list<ProcessedFile>
+     */
+    protected function processVideo(FileInterface $file, array $options): array
     {
         // do not process a processed file
         if ($file instanceof ProcessedFile) {
-            if ($GLOBALS['TSFE'] instanceof TypoScriptFrontendController) {
-                $GLOBALS['TSFE']->addCacheTags(["processed_video_{$file->getUid()}"]);
-            }
-
-            $source = (string)(new SourceTag(
-                $file,
-                $file->getPublicUrl($usedPathsRelativeToCurrentScript)
-            ));
-
-            return [[$source], [$file]];
+            return [$file];
         }
 
         if ($file instanceof FileReference) {
@@ -138,48 +135,45 @@ class VideoTagRenderer implements FileRendererInterface
         }
 
         if (!$file instanceof File) {
-            $type = is_object($file) ? get_class($file) : gettype($file);
-            throw new \RuntimeException('Expected ' . File::class . ", got $type");
+            throw new \RuntimeException(sprintf('Expected %s, got %s', File::class, get_class($file)));
         }
 
-        $sources = [];
-        $videos = [];
-
-        $configurations = $this->getConfigurations($options);
-        foreach ($configurations as $configuration) {
-            $videos[] = $video = $file->process('Video.CropScale', $configuration);
-            if (!$video->exists()) {
-                continue;
-            }
-
-            if ($GLOBALS['TSFE'] instanceof TypoScriptFrontendController) {
-                $GLOBALS['TSFE']->addCacheTags(["processed_video_{$video->getUid()}"]);
-            }
-
-            $sources[] = (string)(new SourceTag(
-                $file,
-                $file->getPublicUrl($usedPathsRelativeToCurrentScript)
-            ));
-        }
-
-        return [$sources, $videos];
+        return (new VideoProcessor())->createVideoVariants($file, $options);
     }
 
-    protected function getConfigurations(array $options): array
+    /**
+     * @param list<ProcessedFile> $videos
+     * @return list<string>
+     */
+    protected function buildSources(array $videos, bool $usedPathsRelativeToCurrentScript): array
     {
-        $formats = $options['formats'] ?? $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['video']['default_video_formats'];
-        self::dispatch('formats', [&$formats], func_get_args());
+        return array_values(array_filter(array_map(
+            static function (ProcessedFile $video) use ($usedPathsRelativeToCurrentScript): ?string {
+                $url = $video->getPublicUrl($usedPathsRelativeToCurrentScript);
 
-        $configurations = [];
-        foreach ($formats as $formatKey => $formatOptions) {
-            $configurations[] = FormatRepository::normalizeOptions(array_replace(
-                $options,
-                ['format' => $formatKey],
-                $formatOptions
-            ));
+                if ($url === null) {
+                    return null;
+                }
+                return (string)(new SourceTag(
+                    $video,
+                    $url
+                ));
+            },
+            $videos
+        )));
+    }
+
+    /**
+     * @param list<ProcessedFile> $videos
+     */
+    protected function addCacheTags(array $videos): void
+    {
+        if (!$GLOBALS['TSFE'] instanceof TypoScriptFrontendController) {
+            return;
         }
-
-        return $configurations;
+        foreach ($videos as $video) {
+            $GLOBALS['TSFE']->addCacheTags(["processed_video_{$video->getUid()}"]);
+        }
     }
 
     protected function getAttributes(): array
