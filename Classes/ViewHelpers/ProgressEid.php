@@ -3,7 +3,7 @@
 namespace Hn\Video\ViewHelpers;
 
 use Hn\Video\Processing\VideoProcessingTask;
-use Hn\Video\Processing\VideoProcessor;
+use Hn\Video\Processing\VideoTaskProcessor;
 use Hn\Video\Processing\VideoTaskRepository;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -32,7 +32,7 @@ class ProgressEid
             $task = $videoTaskRepository->findByUid($uid);
 
             // get the newest information
-            VideoProcessor::getConverter()->update($task);
+            VideoTaskProcessor::getConverter()->update($task);
             if ($highestTask === null || $highestTask->getLastProgress() < $task->getLastProgress()) {
                 $highestTask = $task;
             }

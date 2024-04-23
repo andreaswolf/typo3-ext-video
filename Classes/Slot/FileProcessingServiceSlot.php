@@ -10,7 +10,7 @@ use TYPO3\CMS\Core\Resource\Service\FileProcessingService;
 class FileProcessingServiceSlot
 {
     /**
-     * @var \Hn\Video\Processing\VideoProcessor
+     * @var \Hn\Video\Processing\VideoTaskProcessor
      * @inject
      */
     protected $videoProcessor;

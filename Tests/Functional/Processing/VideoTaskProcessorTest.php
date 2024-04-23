@@ -4,7 +4,7 @@ namespace Hn\Video\Tests\Functional\Processing;
 
 use Hn\Video\Converter\VideoConverterInterface;
 use Hn\Video\Processing\VideoProcessingTask;
-use Hn\Video\Processing\VideoProcessor;
+use Hn\Video\Processing\VideoTaskProcessor;
 use Hn\Video\Processing\VideoTaskRepository;
 use Hn\Video\Tests\Functional\FunctionalTestCase;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -13,7 +13,7 @@ use TYPO3\CMS\Core\Resource\ProcessedFile;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 
-class VideoProcessorTest extends FunctionalTestCase
+class VideoTaskProcessorTest extends FunctionalTestCase
 {
     /**
      * @var VideoConverterInterface|MockObject
@@ -68,7 +68,7 @@ class VideoProcessorTest extends FunctionalTestCase
         GeneralUtility::setSingletonInstance(CacheManager::class, $cacheManager);
         $cacheManager->expects($this->never())->method('flushCachesInGroupByTag')->withAnyParameters();
 
-        $videoProcessor = $this->objectManager->get(VideoProcessor::class);
+        $videoProcessor = $this->objectManager->get(VideoTaskProcessor::class);
         $task = $processedFile->getTask();
         $videoProcessor->doProcessTask($task);
         $this->assertFalse($task->isExecuted());
@@ -96,7 +96,7 @@ class VideoProcessorTest extends FunctionalTestCase
         GeneralUtility::setSingletonInstance(CacheManager::class, $cacheManager);
         $cacheManager->expects($this->once())->method('flushCachesInGroupByTag')->withAnyParameters();
 
-        $videoProcessor = $this->objectManager->get(VideoProcessor::class);
+        $videoProcessor = $this->objectManager->get(VideoTaskProcessor::class);
         $task = $processedFile->getTask();
         $videoProcessor->doProcessTask($task);
 

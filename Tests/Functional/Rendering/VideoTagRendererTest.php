@@ -3,7 +3,7 @@
 namespace Hn\Video\Tests\Functional\Rendering;
 
 use Hn\Video\Processing\VideoProcessingTask;
-use Hn\Video\Processing\VideoProcessor;
+use Hn\Video\Processing\VideoTaskProcessor;
 use Hn\Video\Processing\VideoTaskRepository;
 use Hn\Video\Tests\Functional\FunctionalTestCase;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -39,7 +39,7 @@ class VideoTagRendererTest extends FunctionalTestCase
         $this->assertEquals(1, $this->getDatabaseConnection()->selectCount('uid', 'tx_video_task'));
 
         $taskRepository = GeneralUtility::makeInstance(ObjectManager::class)->get(VideoTaskRepository::class);
-        $videoProcessor = GeneralUtility::makeInstance(ObjectManager::class)->get(VideoProcessor::class);
+        $videoProcessor = GeneralUtility::makeInstance(ObjectManager::class)->get(VideoTaskProcessor::class);
         [$task] = $taskRepository->findByStatus(VideoProcessingTask::STATUS_NEW);
         $videoProcessor->doProcessTask($task);
         $this->assertTrue($task->getTargetFile()->exists());
