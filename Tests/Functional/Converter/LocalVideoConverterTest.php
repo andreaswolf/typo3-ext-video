@@ -10,9 +10,13 @@ use TYPO3\CMS\Core\Resource\ProcessedFile;
 
 class LocalVideoConverterTest extends FunctionalTestCase
 {
-    /** @var LocalFFmpegConverter */
+    /**
+     * @var LocalFFmpegConverter
+     */
     protected $videoConverter;
-    /** @var LocalCommandRunner|MockObject */
+    /**
+     * @var LocalCommandRunner|MockObject
+     */
     protected $commandRunner;
 
     protected function setUp(): void
@@ -24,7 +28,7 @@ class LocalVideoConverterTest extends FunctionalTestCase
         $this->inject($this->videoConverter, 'runner', $this->commandRunner);
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $calls = 0;
         $this->commandRunner->expects($this->exactly(3))->method('getCommand')

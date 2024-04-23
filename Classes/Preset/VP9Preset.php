@@ -133,7 +133,6 @@ class VP9Preset extends AbstractVideoPreset
     /**
      * The parameters specific to this encoder like bitrate.
      *
-     *
      * @see https://developers.google.com/media/vp9/settings/vod/
      */
     protected function getEncoderParameters(array $sourceStream): array

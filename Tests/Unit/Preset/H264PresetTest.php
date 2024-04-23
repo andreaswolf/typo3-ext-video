@@ -6,7 +6,9 @@ use Hn\Video\Preset\H264Preset;
 
 class H264PresetTest extends AbstractVideoPresetTest
 {
-    /** @var H264Preset */
+    /**
+     * @var H264Preset
+     */
     protected $preset;
 
     protected function createPreset()
@@ -14,7 +16,7 @@ class H264PresetTest extends AbstractVideoPresetTest
         return new H264Preset();
     }
 
-    public function testParameters()
+    public function testParameters(): void
     {
         $this->assertEquals([
             '-pix_fmt',
@@ -40,7 +42,7 @@ class H264PresetTest extends AbstractVideoPresetTest
         ], $this->preset->getParameters([]));
     }
 
-    public function testCrf()
+    public function testCrf(): void
     {
         $mapping = [
             '0.0' => 48,
@@ -60,7 +62,7 @@ class H264PresetTest extends AbstractVideoPresetTest
         $this->assertEquals($mapping, $result);
     }
 
-    public function testMaxBitrate()
+    public function testMaxBitrate(): void
     {
         $this->preset->setLevel('3.1');
         $mapping = [
@@ -80,7 +82,7 @@ class H264PresetTest extends AbstractVideoPresetTest
         $this->assertEqualsWithDelta($mapping, $result, 100);
     }
 
-    public function testIntLevel()
+    public function testIntLevel(): void
     {
         $this->preset->setLevel('4.0');
         $this->assertSame('4.0', $this->preset->getLevel());
@@ -90,7 +92,7 @@ class H264PresetTest extends AbstractVideoPresetTest
         $this->assertSame(10, $this->preset->getIntLevel());
     }
 
-    public function testDimensions()
+    public function testDimensions(): void
     {
         $this->preset->setLevel('3.1');
         for ($x = 1444; $x < 2560; $x += 16) {
@@ -108,7 +110,7 @@ class H264PresetTest extends AbstractVideoPresetTest
         }
     }
 
-    public function test16by9Dimensions()
+    public function test16by9Dimensions(): void
     {
         $source = ['width' => 3840, 'height' => 2160];
 
@@ -124,7 +126,7 @@ class H264PresetTest extends AbstractVideoPresetTest
         $this->assertEquals([1920, 1080], $this->preset->getDimensions($source));
     }
 
-    public function testGetMimeCodecParameter()
+    public function testGetMimeCodecParameter(): void
     {
         $this->assertEquals('avc1.4D401E', $this->preset->getMimeCodecParameter([]));
 
@@ -139,7 +141,7 @@ class H264PresetTest extends AbstractVideoPresetTest
         $this->assertEquals('avc1.640028', $this->preset->getMimeCodecParameter([]));
     }
 
-    public function testRequiresTranscoding()
+    public function testRequiresTranscoding(): void
     {
         parent::testRequiresTranscoding();
         $this->assertTrue($this->preset->requiresTranscoding(['width' => 320, 'height' => 240]));

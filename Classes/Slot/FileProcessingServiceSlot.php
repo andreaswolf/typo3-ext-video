@@ -16,11 +16,9 @@ class FileProcessingServiceSlot
     protected $videoProcessor;
 
     /**
-     * @param $context
-     *
      * @see \TYPO3\CMS\Core\Resource\Service\FileProcessingService::processFile
      */
-    public function preFileProcess(FileProcessingService $fileProcessingService, DriverInterface $driver, ProcessedFile $processedFile, FileInterface $file, $context, array $configuration)
+    public function preFileProcess(FileProcessingService $fileProcessingService, DriverInterface $driver, ProcessedFile $processedFile, FileInterface $file, $context, array $configuration): void
     {
         $needsProcessing = $processedFile->isNew()
             || (!$processedFile->usesOriginalFile() && !$processedFile->exists()) || $processedFile->isOutdated();

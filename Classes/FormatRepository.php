@@ -140,7 +140,6 @@ class FormatRepository implements SingletonInterface
     /**
      * Builds the source type parameter.
      *
-     *
      * @see https://wiki.whatwg.org/wiki/video_type_parameters
      */
     public function buildMimeType(array $options, array $sourceStream = null): string
@@ -174,8 +173,6 @@ class FormatRepository implements SingletonInterface
      *
      * It is currently not possible to hook into the typo3 processing pipeline before it searches for a processed file.
      * That means that you must do the normalization yourself before asking typo3 for a processed video.
-     *
-     * @param array $options
      *
      * @todo this method must take much more effort to normalize the parameters because unnecessary encodes are horrible
      */

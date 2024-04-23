@@ -51,8 +51,6 @@ abstract class AbstractCompressiblePreset extends AbstractPreset
 
     /**
      * This method checks if transcoding is necessary or if simple remuxing will be sufficient.
-     *
-     *
      */
     public function requiresTranscoding(array $sourceStream): bool
     {
@@ -74,8 +72,6 @@ abstract class AbstractCompressiblePreset extends AbstractPreset
      * This method is final so you don't accidentally override it.
      * The method you probably want to override is #getTranscodingParameters
      *
-     * @param array $sourceStream
-     *
      * @see AbstractCompressiblePreset::getTranscodingParameters()
      */
     final public function getParameters(array $sourceStream): array
@@ -91,7 +87,6 @@ abstract class AbstractCompressiblePreset extends AbstractPreset
      * Creates the parameters used if no conversion is necessary.
      * In this case the video stream will just be repackaged into the new container format.
      *
-     *
      * @see AbstractCompressiblePreset::requiresTranscoding
      */
     abstract protected function getRemuxingParameters(array $sourceStream): array;
@@ -101,8 +96,6 @@ abstract class AbstractCompressiblePreset extends AbstractPreset
      *
      * If you create a codec specific implementation than this is the method you want to override to add your parameters.
      * Be sure that ::requiresTranscoding does check your codec and conditions.
-     *
-     * @param array $sourceStream
      *
      * @see AbstractCompressiblePreset::requiresTranscoding
      */

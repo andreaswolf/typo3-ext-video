@@ -18,7 +18,7 @@ class VideoTaskRepositoryTest extends FunctionalTestCase
         $this->repository = GeneralUtility::makeInstance(VideoTaskRepository::class);
     }
 
-    public function testStore()
+    public function testStore(): void
     {
         $this->assertTaskCount(0);
 
@@ -37,12 +37,12 @@ class VideoTaskRepositoryTest extends FunctionalTestCase
         $this->assertNotNull($this->repository->findByTask($task));
     }
 
-    protected function assertTaskCount(int $expected)
+    protected function assertTaskCount(int $expected): void
     {
         $this->assertEquals($expected, $this->getDatabaseConnection()->selectCount('uid', VideoTaskRepository::TABLE_NAME));
     }
 
-    public function testRestoreState()
+    public function testRestoreState(): void
     {
         $processedFile = new ProcessedFile($this->file, 'Video.CropScale', []);
         /** @var VideoProcessingTask $task */
@@ -60,7 +60,7 @@ class VideoTaskRepositoryTest extends FunctionalTestCase
         $this->assertSame($storedTask2, $storedTask);
     }
 
-    public function testPriority()
+    public function testPriority(): void
     {
         $this->repository->store($low = (new ProcessedFile($this->file, 'Video.CropScale', ['format' => 'webm']))->getTask());
         $this->repository->store($high = (new ProcessedFile($this->file, 'Video.CropScale', ['format' => 'mp4']))->getTask());

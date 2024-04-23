@@ -206,7 +206,6 @@ class H264Preset extends AbstractVideoPreset
      * The equation is somewhat arbitrary and build by try&error to target specific bitrates at 80% quality.
      * Note that this preset uses this as -maxrate and the actual bitrate will be lower due to the crf value.
      *
-     *
      * @see http://fooplot.com/#W3sidHlwZSI6MCwiZXEiOiIoeCoqMiowLjkrMC4xKSooKDM4NDAqMjE2MCkqKjAuOSkqKDMwKiowLjUpKjAuMDA0IiwiY29sb3IiOiIjMDAwMDAwIn0seyJ0eXBlIjowLCJlcSI6Iih4KioyKjAuOSswLjEpKigoMTkyMCoxMDgwKSoqMC45KSooMzAqKjAuNSkqMC4wMDQiLCJjb2xvciI6IiMwMDAwMDAifSx7InR5cGUiOjAsImVxIjoiKHgqKjIqMC45KzAuMSkqKCgxMjgwKjcyMCkqKjAuOSkqKDMwKiowLjUpKjAuMDA0IiwiY29sb3IiOiIjMDAwMDAwIn0seyJ0eXBlIjowLCJlcSI6Iih4KioyKjAuOSswLjEpKigoNjQwKjM2MCkqKjAuOSkqKDMwKiowLjUpKjAuMDA0IiwiY29sb3IiOiIjMDAwMDAwIn0seyJ0eXBlIjoxMDAwLCJ3aW5kb3ciOlsiMCIsIjEuMCIsIjAiLCIxNTAwMCJdfV0-
      */
     public function getTargetBitrate(array $sourceStream): int
@@ -230,8 +229,6 @@ class H264Preset extends AbstractVideoPreset
      * quality 1.0 = crf 18
      * quality 0.8 = crf 24
      * quality 0.6 = crf 30
-     *
-     * @param array $sourceStream
      *
      * @see http://fooplot.com/#W3sidHlwZSI6MCwiZXEiOiI0MysoMTgtNDMpKngiLCJjb2xvciI6IiMwMDAwMDAifSx7InR5cGUiOjEwMDAsIndpbmRvdyI6WyIwIiwiMSIsIjAiLCI1MCJdfV0-
      */

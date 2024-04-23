@@ -1,22 +1,7 @@
 parameters:
 	ignoreErrors:
 		-
-			message: "#^Method Hn\\\\Video\\\\Command\\\\VideoCommandController\\:\\:processCommand\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: Classes/Command/VideoCommandController.php
-
-		-
 			message: "#^Cannot call method fetch\\(\\) on Doctrine\\\\DBAL\\\\Driver\\\\Statement\\|int\\.$#"
-			count: 1
-			path: Classes/Controller/TaskController.php
-
-		-
-			message: "#^Method Hn\\\\Video\\\\Controller\\\\TaskController\\:\\:deleteAction\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: Classes/Controller/TaskController.php
-
-		-
-			message: "#^Method Hn\\\\Video\\\\Controller\\\\TaskController\\:\\:listAction\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: Classes/Controller/TaskController.php
 
@@ -24,11 +9,6 @@ parameters:
 			message: "#^Parameter \\#2 \\$messageTitle of method TYPO3\\\\CMS\\\\Extbase\\\\Mvc\\\\Controller\\\\AbstractController\\:\\:addFlashMessage\\(\\) expects string, int given\\.$#"
 			count: 5
 			path: Classes/Controller/TaskController.php
-
-		-
-			message: "#^Method Hn\\\\Video\\\\Converter\\\\AbstractVideoConverter\\:\\:finishTask\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: Classes/Converter/AbstractVideoConverter.php
 
 		-
 			message: "#^Method Hn\\\\Video\\\\Converter\\\\AbstractVideoConverter\\:\\:finishTask\\(\\) has parameter \\$streams with no value type specified in iterable type array\\.$#"
@@ -86,22 +66,12 @@ parameters:
 			path: Classes/Converter/CloudConvertConverter.php
 
 		-
-			message: "#^Method Hn\\\\Video\\\\Converter\\\\CloudConvertConverter\\:\\:updateProgressInformation\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: Classes/Converter/CloudConvertConverter.php
-
-		-
 			message: "#^Method Hn\\\\Video\\\\Converter\\\\CloudConvertConverter\\:\\:updateProgressInformation\\(\\) has parameter \\$response with no value type specified in iterable type array\\.$#"
 			count: 1
 			path: Classes/Converter/CloudConvertConverter.php
 
 		-
 			message: "#^Offset 'step' does not exist on array\\|null\\.$#"
-			count: 1
-			path: Classes/Converter/CloudConvertConverter.php
-
-		-
-			message: "#^PHPDoc tag @param references unknown parameter\\: \\$baseUrl$#"
 			count: 1
 			path: Classes/Converter/CloudConvertConverter.php
 
@@ -636,11 +606,6 @@ parameters:
 			path: Classes/Processing/VideoProcessingEid.php
 
 		-
-			message: "#^Method Hn\\\\Video\\\\Processing\\\\VideoProcessingEid\\:\\:process\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: Classes/Processing/VideoProcessingEid.php
-
-		-
 			message: "#^Method Hn\\\\Video\\\\Processing\\\\VideoProcessingTask\\:\\:__construct\\(\\) has parameter \\$configuration with no value type specified in iterable type array\\.$#"
 			count: 1
 			path: Classes/Processing/VideoProcessingTask.php
@@ -656,17 +621,7 @@ parameters:
 			path: Classes/Processing/VideoProcessingTask.php
 
 		-
-			message: "#^Method Hn\\\\Video\\\\Processing\\\\VideoProcessingTask\\:\\:setDatabaseRow\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: Classes/Processing/VideoProcessingTask.php
-
-		-
 			message: "#^Method Hn\\\\Video\\\\Processing\\\\VideoProcessingTask\\:\\:setDatabaseRow\\(\\) has parameter \\$row with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: Classes/Processing/VideoProcessingTask.php
-
-		-
-			message: "#^Method Hn\\\\Video\\\\Processing\\\\VideoProcessingTask\\:\\:setStatus\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: Classes/Processing/VideoProcessingTask.php
 
@@ -691,17 +646,7 @@ parameters:
 			path: Classes/Processing/VideoProcessor.php
 
 		-
-			message: "#^Method Hn\\\\Video\\\\Processing\\\\VideoProcessor\\:\\:doProcessTask\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: Classes/Processing/VideoProcessor.php
-
-		-
 			message: "#^Method Hn\\\\Video\\\\Processing\\\\VideoProcessor\\:\\:getConverter\\(\\) should return Hn\\\\Video\\\\Converter\\\\VideoConverterInterface but returns object\\.$#"
-			count: 1
-			path: Classes/Processing/VideoProcessor.php
-
-		-
-			message: "#^Method Hn\\\\Video\\\\Processing\\\\VideoProcessor\\:\\:processTask\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: Classes/Processing/VideoProcessor.php
 
@@ -727,11 +672,6 @@ parameters:
 
 		-
 			message: "#^Method Hn\\\\Video\\\\Processing\\\\VideoTaskRepository\\:\\:serializeTask\\(\\) has parameter \\$row with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: Classes/Processing/VideoTaskRepository.php
-
-		-
-			message: "#^Method Hn\\\\Video\\\\Processing\\\\VideoTaskRepository\\:\\:store\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: Classes/Processing/VideoTaskRepository.php
 
@@ -762,11 +702,6 @@ parameters:
 
 		-
 			message: "#^Method Hn\\\\Video\\\\Rendering\\\\VideoTagRenderer\\:\\:buildSources\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: Classes/Rendering/VideoTagRenderer.php
-
-		-
-			message: "#^Method Hn\\\\Video\\\\Rendering\\\\VideoTagRenderer\\:\\:dispatch\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: Classes/Rendering/VideoTagRenderer.php
 
@@ -811,11 +746,6 @@ parameters:
 			path: Classes/Rendering/VideoTagRenderer.php
 
 		-
-			message: "#^Method Hn\\\\Video\\\\Slot\\\\FileProcessingServiceSlot\\:\\:preFileProcess\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: Classes/Slot/FileProcessingServiceSlot.php
-
-		-
 			message: "#^Method Hn\\\\Video\\\\Slot\\\\FileProcessingServiceSlot\\:\\:preFileProcess\\(\\) has parameter \\$configuration with no value type specified in iterable type array\\.$#"
 			count: 1
 			path: Classes/Slot/FileProcessingServiceSlot.php
@@ -824,11 +754,6 @@ parameters:
 			message: "#^Method Hn\\\\Video\\\\Slot\\\\FileProcessingServiceSlot\\:\\:preFileProcess\\(\\) has parameter \\$context with no type specified\\.$#"
 			count: 1
 			path: Classes/Slot/FileProcessingServiceSlot.php
-
-		-
-			message: "#^Method Hn\\\\Video\\\\Slot\\\\MetaDataRepositorySlot\\:\\:recordPostRetrieval\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: Classes/Slot/MetaDataRepositorySlot.php
 
 		-
 			message: "#^Method Hn\\\\Video\\\\Slot\\\\MetaDataRepositorySlot\\:\\:recordPostRetrieval\\(\\) has parameter \\$data with generic class ArrayObject but does not specify its types\\: TKey, TValue$#"
@@ -946,11 +871,6 @@ parameters:
 			path: Classes/ViewHelpers/ProgressViewHelper.php
 
 		-
-			message: "#^Method Hn\\\\Video\\\\ViewHelpers\\\\ProgressViewHelper\\:\\:initializeArguments\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: Classes/ViewHelpers/ProgressViewHelper.php
-
-		-
 			message: "#^Method Hn\\\\Video\\\\ViewHelpers\\\\ProgressViewHelper\\:\\:renderJavaScript\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: Classes/ViewHelpers/ProgressViewHelper.php
@@ -962,11 +882,6 @@ parameters:
 
 		-
 			message: "#^Constant PATH_site not found\\.$#"
-			count: 1
-			path: Tests/Functional/Converter/LocalVideoConverterTest.php
-
-		-
-			message: "#^Method Hn\\\\Video\\\\Tests\\\\Functional\\\\Converter\\\\LocalVideoConverterTest\\:\\:testProcess\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: Tests/Functional/Converter/LocalVideoConverterTest.php
 
@@ -1021,68 +936,8 @@ parameters:
 			path: Tests/Functional/Processing/VideoProcessorTest.php
 
 		-
-			message: "#^Method Hn\\\\Video\\\\Tests\\\\Functional\\\\Processing\\\\VideoProcessorTest\\:\\:assertTasksAndProcessedFiles\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: Tests/Functional/Processing/VideoProcessorTest.php
-
-		-
-			message: "#^Method Hn\\\\Video\\\\Tests\\\\Functional\\\\Processing\\\\VideoProcessorTest\\:\\:testActuallyDoProcessFile\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: Tests/Functional/Processing/VideoProcessorTest.php
-
-		-
-			message: "#^Method Hn\\\\Video\\\\Tests\\\\Functional\\\\Processing\\\\VideoProcessorTest\\:\\:testDoNothingIfAlreadyRunning\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: Tests/Functional/Processing/VideoProcessorTest.php
-
-		-
-			message: "#^Method Hn\\\\Video\\\\Tests\\\\Functional\\\\Processing\\\\VideoProcessorTest\\:\\:testDoProcessFile\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: Tests/Functional/Processing/VideoProcessorTest.php
-
-		-
-			message: "#^Method Hn\\\\Video\\\\Tests\\\\Functional\\\\Processing\\\\VideoProcessorTest\\:\\:testNoRedoIfFailed\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: Tests/Functional/Processing/VideoProcessorTest.php
-
-		-
-			message: "#^Method Hn\\\\Video\\\\Tests\\\\Functional\\\\Processing\\\\VideoProcessorTest\\:\\:testNoRedoIfRunning\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: Tests/Functional/Processing/VideoProcessorTest.php
-
-		-
-			message: "#^Method Hn\\\\Video\\\\Tests\\\\Functional\\\\Processing\\\\VideoProcessorTest\\:\\:testProcessFile\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: Tests/Functional/Processing/VideoProcessorTest.php
-
-		-
-			message: "#^Method Hn\\\\Video\\\\Tests\\\\Functional\\\\Processing\\\\VideoProcessorTest\\:\\:testRedoIfFileIsMissing\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: Tests/Functional/Processing/VideoProcessorTest.php
-
-		-
 			message: "#^Call to an undefined method TYPO3\\\\CMS\\\\Core\\\\Resource\\\\Processing\\\\TaskInterface\\:\\:getUid\\(\\)\\.$#"
 			count: 2
-			path: Tests/Functional/Processing/VideoTaskRepositoryTest.php
-
-		-
-			message: "#^Method Hn\\\\Video\\\\Tests\\\\Functional\\\\Processing\\\\VideoTaskRepositoryTest\\:\\:assertTaskCount\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: Tests/Functional/Processing/VideoTaskRepositoryTest.php
-
-		-
-			message: "#^Method Hn\\\\Video\\\\Tests\\\\Functional\\\\Processing\\\\VideoTaskRepositoryTest\\:\\:testPriority\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: Tests/Functional/Processing/VideoTaskRepositoryTest.php
-
-		-
-			message: "#^Method Hn\\\\Video\\\\Tests\\\\Functional\\\\Processing\\\\VideoTaskRepositoryTest\\:\\:testRestoreState\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: Tests/Functional/Processing/VideoTaskRepositoryTest.php
-
-		-
-			message: "#^Method Hn\\\\Video\\\\Tests\\\\Functional\\\\Processing\\\\VideoTaskRepositoryTest\\:\\:testStore\\(\\) has no return type specified\\.$#"
-			count: 1
 			path: Tests/Functional/Processing/VideoTaskRepositoryTest.php
 
 		-
@@ -1092,11 +947,6 @@ parameters:
 
 		-
 			message: "#^Method Hn\\\\Video\\\\Tests\\\\Functional\\\\Rendering\\\\VideoTagRendererTest\\:\\:options\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: Tests/Functional/Rendering/VideoTagRendererTest.php
-
-		-
-			message: "#^Method Hn\\\\Video\\\\Tests\\\\Functional\\\\Rendering\\\\VideoTagRendererTest\\:\\:testVideoTag\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: Tests/Functional/Rendering/VideoTagRendererTest.php
 
@@ -1146,47 +996,12 @@ parameters:
 			path: Tests/Unit/Converter/CloudConvertConverterTest.php
 
 		-
-			message: "#^Method Hn\\\\Video\\\\Tests\\\\Unit\\\\Converter\\\\CloudConvertConverterTest\\:\\:assertDbSelects\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: Tests/Unit/Converter/CloudConvertConverterTest.php
-
-		-
 			message: "#^Method Hn\\\\Video\\\\Tests\\\\Unit\\\\Converter\\\\CloudConvertConverterTest\\:\\:assertDbSelects\\(\\) has parameter \\$selects with no value type specified in iterable type array\\.$#"
 			count: 1
 			path: Tests/Unit/Converter/CloudConvertConverterTest.php
 
 		-
-			message: "#^Method Hn\\\\Video\\\\Tests\\\\Unit\\\\Converter\\\\CloudConvertConverterTest\\:\\:assertRequests\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: Tests/Unit/Converter/CloudConvertConverterTest.php
-
-		-
 			message: "#^Method Hn\\\\Video\\\\Tests\\\\Unit\\\\Converter\\\\CloudConvertConverterTest\\:\\:assertRequests\\(\\) has parameter \\$requests with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: Tests/Unit/Converter/CloudConvertConverterTest.php
-
-		-
-			message: "#^Method Hn\\\\Video\\\\Tests\\\\Unit\\\\Converter\\\\CloudConvertConverterTest\\:\\:testConvert\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: Tests/Unit/Converter/CloudConvertConverterTest.php
-
-		-
-			message: "#^Method Hn\\\\Video\\\\Tests\\\\Unit\\\\Converter\\\\CloudConvertConverterTest\\:\\:testDownload\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: Tests/Unit/Converter/CloudConvertConverterTest.php
-
-		-
-			message: "#^Method Hn\\\\Video\\\\Tests\\\\Unit\\\\Converter\\\\CloudConvertConverterTest\\:\\:testGetInfoFull\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: Tests/Unit/Converter/CloudConvertConverterTest.php
-
-		-
-			message: "#^Method Hn\\\\Video\\\\Tests\\\\Unit\\\\Converter\\\\CloudConvertConverterTest\\:\\:testGetInfoOversize\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: Tests/Unit/Converter/CloudConvertConverterTest.php
-
-		-
-			message: "#^Method Hn\\\\Video\\\\Tests\\\\Unit\\\\Converter\\\\CloudConvertConverterTest\\:\\:testInfoFailure\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: Tests/Unit/Converter/CloudConvertConverterTest.php
 
@@ -1201,47 +1016,7 @@ parameters:
 			path: Tests/Unit/Converter/CloudConvertConverterTest.php
 
 		-
-			message: "#^Method Hn\\\\Video\\\\Tests\\\\Unit\\\\FormatRepositoryTest\\:\\:testBuildEmpty\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: Tests/Unit/FormatRepositoryTest.php
-
-		-
-			message: "#^Method Hn\\\\Video\\\\Tests\\\\Unit\\\\FormatRepositoryTest\\:\\:testBuildUnknown\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: Tests/Unit/FormatRepositoryTest.php
-
-		-
-			message: "#^Method Hn\\\\Video\\\\Tests\\\\Unit\\\\FormatRepositoryTest\\:\\:testBuildVideo\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: Tests/Unit/FormatRepositoryTest.php
-
-		-
-			message: "#^Method Hn\\\\Video\\\\Tests\\\\Unit\\\\FormatRepositoryTest\\:\\:testFindDefinition\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: Tests/Unit/FormatRepositoryTest.php
-
-		-
 			message: "#^Method Hn\\\\Video\\\\Tests\\\\Unit\\\\Preset\\\\AacPresetTest\\:\\:createPreset\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: Tests/Unit/Preset/AacPresetTest.php
-
-		-
-			message: "#^Method Hn\\\\Video\\\\Tests\\\\Unit\\\\Preset\\\\AacPresetTest\\:\\:testBitrate\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: Tests/Unit/Preset/AacPresetTest.php
-
-		-
-			message: "#^Method Hn\\\\Video\\\\Tests\\\\Unit\\\\Preset\\\\AacPresetTest\\:\\:testBitrateWithoutFdk\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: Tests/Unit/Preset/AacPresetTest.php
-
-		-
-			message: "#^Method Hn\\\\Video\\\\Tests\\\\Unit\\\\Preset\\\\AacPresetTest\\:\\:testGetMimeCodecParameter\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: Tests/Unit/Preset/AacPresetTest.php
-
-		-
-			message: "#^Method Hn\\\\Video\\\\Tests\\\\Unit\\\\Preset\\\\AacPresetTest\\:\\:testParameters\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: Tests/Unit/Preset/AacPresetTest.php
 
@@ -1257,11 +1032,6 @@ parameters:
 
 		-
 			message: "#^Method Hn\\\\Video\\\\Tests\\\\Unit\\\\Preset\\\\AbstractAudioPresetTest\\:\\:createPreset\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: Tests/Unit/Preset/AbstractAudioPresetTest.php
-
-		-
-			message: "#^Method Hn\\\\Video\\\\Tests\\\\Unit\\\\Preset\\\\AbstractAudioPresetTest\\:\\:testSampleRate\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: Tests/Unit/Preset/AbstractAudioPresetTest.php
 
@@ -1282,26 +1052,6 @@ parameters:
 
 		-
 			message: "#^Method Hn\\\\Video\\\\Tests\\\\Unit\\\\Preset\\\\AbstractPresetTest\\:\\:createPreset\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: Tests/Unit/Preset/AbstractPresetTest.php
-
-		-
-			message: "#^Method Hn\\\\Video\\\\Tests\\\\Unit\\\\Preset\\\\AbstractPresetTest\\:\\:testQuality\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: Tests/Unit/Preset/AbstractPresetTest.php
-
-		-
-			message: "#^Method Hn\\\\Video\\\\Tests\\\\Unit\\\\Preset\\\\AbstractPresetTest\\:\\:testQualityTooHigh\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: Tests/Unit/Preset/AbstractPresetTest.php
-
-		-
-			message: "#^Method Hn\\\\Video\\\\Tests\\\\Unit\\\\Preset\\\\AbstractPresetTest\\:\\:testQualityTooLow\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: Tests/Unit/Preset/AbstractPresetTest.php
-
-		-
-			message: "#^Method Hn\\\\Video\\\\Tests\\\\Unit\\\\Preset\\\\AbstractPresetTest\\:\\:testRequiresTranscoding\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: Tests/Unit/Preset/AbstractPresetTest.php
 
@@ -1351,16 +1101,6 @@ parameters:
 			path: Tests/Unit/Preset/AbstractVideoPresetTest.php
 
 		-
-			message: "#^Method Hn\\\\Video\\\\Tests\\\\Unit\\\\Preset\\\\AbstractVideoPresetTest\\:\\:testBoostedQuality\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: Tests/Unit/Preset/AbstractVideoPresetTest.php
-
-		-
-			message: "#^Method Hn\\\\Video\\\\Tests\\\\Unit\\\\Preset\\\\AbstractVideoPresetTest\\:\\:testDimensionsAndCropping\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: Tests/Unit/Preset/AbstractVideoPresetTest.php
-
-		-
 			message: "#^Method Hn\\\\Video\\\\Tests\\\\Unit\\\\Preset\\\\AbstractVideoPresetTest\\:\\:testDimensionsAndCropping\\(\\) has parameter \\$expectedCroppedDimensions with no type specified\\.$#"
 			count: 1
 			path: Tests/Unit/Preset/AbstractVideoPresetTest.php
@@ -1381,11 +1121,6 @@ parameters:
 			path: Tests/Unit/Preset/AbstractVideoPresetTest.php
 
 		-
-			message: "#^Method Hn\\\\Video\\\\Tests\\\\Unit\\\\Preset\\\\AbstractVideoPresetTest\\:\\:testFramerate\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: Tests/Unit/Preset/AbstractVideoPresetTest.php
-
-		-
 			message: "#^Method Hn\\\\Video\\\\Tests\\\\Unit\\\\Preset\\\\AbstractVideoPresetTest\\:\\:testFramerate\\(\\) has parameter \\$expectedFramerate with no type specified\\.$#"
 			count: 1
 			path: Tests/Unit/Preset/AbstractVideoPresetTest.php
@@ -1397,46 +1132,6 @@ parameters:
 
 		-
 			message: "#^Method Hn\\\\Video\\\\Tests\\\\Unit\\\\Preset\\\\H264PresetTest\\:\\:createPreset\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: Tests/Unit/Preset/H264PresetTest.php
-
-		-
-			message: "#^Method Hn\\\\Video\\\\Tests\\\\Unit\\\\Preset\\\\H264PresetTest\\:\\:test16by9Dimensions\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: Tests/Unit/Preset/H264PresetTest.php
-
-		-
-			message: "#^Method Hn\\\\Video\\\\Tests\\\\Unit\\\\Preset\\\\H264PresetTest\\:\\:testCrf\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: Tests/Unit/Preset/H264PresetTest.php
-
-		-
-			message: "#^Method Hn\\\\Video\\\\Tests\\\\Unit\\\\Preset\\\\H264PresetTest\\:\\:testDimensions\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: Tests/Unit/Preset/H264PresetTest.php
-
-		-
-			message: "#^Method Hn\\\\Video\\\\Tests\\\\Unit\\\\Preset\\\\H264PresetTest\\:\\:testGetMimeCodecParameter\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: Tests/Unit/Preset/H264PresetTest.php
-
-		-
-			message: "#^Method Hn\\\\Video\\\\Tests\\\\Unit\\\\Preset\\\\H264PresetTest\\:\\:testIntLevel\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: Tests/Unit/Preset/H264PresetTest.php
-
-		-
-			message: "#^Method Hn\\\\Video\\\\Tests\\\\Unit\\\\Preset\\\\H264PresetTest\\:\\:testMaxBitrate\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: Tests/Unit/Preset/H264PresetTest.php
-
-		-
-			message: "#^Method Hn\\\\Video\\\\Tests\\\\Unit\\\\Preset\\\\H264PresetTest\\:\\:testParameters\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: Tests/Unit/Preset/H264PresetTest.php
-
-		-
-			message: "#^Method Hn\\\\Video\\\\Tests\\\\Unit\\\\Preset\\\\H264PresetTest\\:\\:testRequiresTranscoding\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: Tests/Unit/Preset/H264PresetTest.php
 
@@ -1476,26 +1171,6 @@ parameters:
 			path: Tests/Unit/Preset/VP9PresetTest.php
 
 		-
-			message: "#^Method Hn\\\\Video\\\\Tests\\\\Unit\\\\Preset\\\\VP9PresetTest\\:\\:testCrf\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: Tests/Unit/Preset/VP9PresetTest.php
-
-		-
-			message: "#^Method Hn\\\\Video\\\\Tests\\\\Unit\\\\Preset\\\\VP9PresetTest\\:\\:testDimensions\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: Tests/Unit/Preset/VP9PresetTest.php
-
-		-
-			message: "#^Method Hn\\\\Video\\\\Tests\\\\Unit\\\\Preset\\\\VP9PresetTest\\:\\:testParameters\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: Tests/Unit/Preset/VP9PresetTest.php
-
-		-
-			message: "#^Method Hn\\\\Video\\\\Tests\\\\Unit\\\\Processing\\\\VideoProcessingEidTest\\:\\:testKeys\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: Tests/Unit/Processing/VideoProcessingEidTest.php
-
-		-
 			message: "#^Parameter \\#1 \\$encoded_string of function parse_str expects string, string\\|false\\|null given\\.$#"
 			count: 1
 			path: Tests/Unit/Processing/VideoProcessingEidTest.php
@@ -1506,22 +1181,7 @@ parameters:
 			path: Tests/Unit/Processing/VideoProcessingEidTest.php
 
 		-
-			message: "#^Method Hn\\\\Video\\\\Tests\\\\Unit\\\\Processing\\\\VideoProcessingTaskTest\\:\\:testOutOfBounds\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: Tests/Unit/Processing/VideoProcessingTaskTest.php
-
-		-
-			message: "#^Method Hn\\\\Video\\\\Tests\\\\Unit\\\\Processing\\\\VideoProcessingTaskTest\\:\\:testProgress\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: Tests/Unit/Processing/VideoProcessingTaskTest.php
-
-		-
 			message: "#^Method Hn\\\\Video\\\\Tests\\\\Unit\\\\Rendering\\\\VideoTagRendererTest\\:\\:attributeSets\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: Tests/Unit/Rendering/VideoTagRendererTest.php
-
-		-
-			message: "#^Method Hn\\\\Video\\\\Tests\\\\Unit\\\\Rendering\\\\VideoTagRendererTest\\:\\:testSimpleRendering\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: Tests/Unit/Rendering/VideoTagRendererTest.php
 

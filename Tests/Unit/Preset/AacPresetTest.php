@@ -6,7 +6,9 @@ use Hn\Video\Preset\AacPreset;
 
 class AacPresetTest extends AbstractAudioPresetTest
 {
-    /** @var AacPreset */
+    /**
+     * @var AacPreset
+     */
     protected $preset;
 
     protected function createPreset()
@@ -14,7 +16,7 @@ class AacPresetTest extends AbstractAudioPresetTest
         return new AacPreset();
     }
 
-    public function testParameters()
+    public function testParameters(): void
     {
         $this->assertEquals([
             '-ar',
@@ -30,7 +32,7 @@ class AacPresetTest extends AbstractAudioPresetTest
         ], $this->preset->getParameters([]));
     }
 
-    public function testBitrate()
+    public function testBitrate(): void
     {
         $mapping = [
             '1.0' => 192,
@@ -53,7 +55,7 @@ class AacPresetTest extends AbstractAudioPresetTest
         $this->assertEqualsWithDelta($mapping, $result, 8);
     }
 
-    public function testBitrateWithoutFdk()
+    public function testBitrateWithoutFdk(): void
     {
         $this->preset->setFdkAvailable(false);
 
@@ -78,7 +80,7 @@ class AacPresetTest extends AbstractAudioPresetTest
         $this->assertEqualsWithDelta($mapping, $result, 8);
     }
 
-    public function testGetMimeCodecParameter()
+    public function testGetMimeCodecParameter(): void
     {
         $this->assertEquals('mp4a.40.2', $this->preset->getMimeCodecParameter([]));
         $this->preset->setQuality(0.0);

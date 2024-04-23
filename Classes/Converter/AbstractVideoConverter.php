@@ -19,7 +19,7 @@ abstract class AbstractVideoConverter implements VideoConverterInterface
     {
     }
 
-    protected function finishTask(VideoProcessingTask $task, string $tempFilename, array $streams)
+    protected function finishTask(VideoProcessingTask $task, string $tempFilename, array $streams): void
     {
         // the name has to be set before anything else or else random errors
         $processedFile = $task->getTargetFile();

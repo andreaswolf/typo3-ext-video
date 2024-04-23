@@ -8,7 +8,9 @@ use PHPUnit\Framework\MockObject\MockObject;
 
 class AbstractPresetTest extends UnitTestCase
 {
-    /** @var AbstractCompressiblePreset|MockObject */
+    /**
+     * @var AbstractCompressiblePreset|MockObject
+     */
     protected $preset;
 
     public function __sleep()
@@ -27,7 +29,7 @@ class AbstractPresetTest extends UnitTestCase
         $this->preset = $this->createPreset();
     }
 
-    public function testQuality()
+    public function testQuality(): void
     {
         foreach (range(0.0, 1.0, 0.1) as $quality) {
             $this->preset->setQuality($quality);
@@ -35,19 +37,19 @@ class AbstractPresetTest extends UnitTestCase
         }
     }
 
-    public function testQualityTooHigh()
+    public function testQualityTooHigh(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->preset->setQuality(1.1);
     }
 
-    public function testQualityTooLow()
+    public function testQualityTooLow(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->preset->setQuality(-0.1);
     }
 
-    public function testRequiresTranscoding()
+    public function testRequiresTranscoding(): void
     {
         $this->assertTrue($this->preset->requiresTranscoding([]));
     }

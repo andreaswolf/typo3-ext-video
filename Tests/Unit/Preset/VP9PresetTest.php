@@ -11,7 +11,7 @@ class VP9PresetTest extends AbstractVideoPresetTest
         return new VP9Preset();
     }
 
-    public function testParameters()
+    public function testParameters(): void
     {
         $this->assertEquals([
             '-pix_fmt',
@@ -47,7 +47,7 @@ class VP9PresetTest extends AbstractVideoPresetTest
         ], $this->preset->getParameters([]));
     }
 
-    public function testCrf()
+    public function testCrf(): void
     {
         $mapping = [
             '0.0' => 63,
@@ -67,7 +67,7 @@ class VP9PresetTest extends AbstractVideoPresetTest
         $this->assertEquals($mapping, $result);
     }
 
-    public function testDimensions()
+    public function testDimensions(): void
     {
         $this->preset->setLevel('3.0');
         for ($x = 1444; $x < 2560; $x += 16) {

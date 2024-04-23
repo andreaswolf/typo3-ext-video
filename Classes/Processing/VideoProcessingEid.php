@@ -31,7 +31,7 @@ class VideoProcessingEid
         return $keys;
     }
 
-    public static function process(ServerRequestInterface $request, ResponseInterface $response)
+    public static function process(ServerRequestInterface $request, ResponseInterface $response): void
     {
         if (!in_array($request->getQueryParams()['key'], self::getKeys())) {
             throw new BadRequestException('The key is not valid');

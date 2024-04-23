@@ -7,7 +7,7 @@ if (!defined('TYPO3_MODE')) {
     die('Access denied.');
 }
 
-call_user_func(function () {
+call_user_func(function (): void {
     $conf = class_exists(\TYPO3\CMS\Core\Configuration\ExtensionConfiguration::class)
         ? \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Core\Configuration\ExtensionConfiguration::class)->get('video')
         : unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['video']);
@@ -181,5 +181,5 @@ tt_content.video.userFunc = Hn\Video\TestContentElement->render
 tt_content.video.configurations.data = flexform:pi_flexform:settings.options
 TypoScript
         );
-    };
+    }
 });

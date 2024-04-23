@@ -17,8 +17,6 @@ class NoopConverter extends AbstractVideoConverter
      * If you use an api or external service to process the file you can ask for a status update here.
      * This method will be called every time the process command is executed until the task is finished or failed.
      *
-     * @param VideoProcessingTask $task
-     *
      * @throws ConversionException
      */
     public function process(VideoProcessingTask $task): void

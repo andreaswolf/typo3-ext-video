@@ -4,8 +4,6 @@ namespace Hn\Video\Preset;
 
 use TYPO3\CMS\Core\Utility\MathUtility;
 
-/**
- */
 abstract class AbstractVideoPreset extends AbstractCompressiblePreset
 {
     /**
@@ -166,7 +164,6 @@ abstract class AbstractVideoPreset extends AbstractCompressiblePreset
     /**
      * Returns the dimensions for the final video.
      *
-     *
      * @return int[]
      */
     public function getDimensions(array $sourceStream): array
@@ -206,8 +203,6 @@ abstract class AbstractVideoPreset extends AbstractCompressiblePreset
      * So if the source video is 720p but you wanted 1080p than the boost will be 1.5 ** 0.25 so ~1.1.
      * If your requested quality was 0.8 than the quality would be quality ~0.9
      * If your requested quality was 0.6 than the quality would be quality ~0.65
-     *
-     * @param array $sourceStream
      */
     public function getBoostedQuality(array $sourceStream): float
     {
@@ -234,8 +229,6 @@ abstract class AbstractVideoPreset extends AbstractCompressiblePreset
      *
      * How this value is interpreted depends on the specific implementation
      * but in general you can think of it as the maximum average bitrate.
-     *
-     * @param array $sourceStream
      */
     abstract public function getTargetBitrate(array $sourceStream): int;
 
@@ -287,8 +280,6 @@ abstract class AbstractVideoPreset extends AbstractCompressiblePreset
 
     /**
      * The parameters specific to this encoder like bitrate.
-     *
-     *
      */
     abstract protected function getEncoderParameters(array $sourceStream): array;
 

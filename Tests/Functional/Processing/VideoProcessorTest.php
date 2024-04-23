@@ -15,7 +15,9 @@ use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 
 class VideoProcessorTest extends FunctionalTestCase
 {
-    /** @var VideoConverterInterface|MockObject */
+    /**
+     * @var VideoConverterInterface|MockObject
+     */
     protected $converter;
 
     protected function setUp(): void
@@ -34,7 +36,7 @@ class VideoProcessorTest extends FunctionalTestCase
         parent::tearDown();
     }
 
-    protected function assertTasksAndProcessedFiles(int $expectedTasks, int $expectedProcessedFiles)
+    protected function assertTasksAndProcessedFiles(int $expectedTasks, int $expectedProcessedFiles): void
     {
         $storedTasks = $this->getDatabaseConnection()->selectCount('uid', 'tx_video_task');
         $this->assertEquals($expectedTasks, $storedTasks, 'tx_video_task');
@@ -42,7 +44,7 @@ class VideoProcessorTest extends FunctionalTestCase
         $this->assertEquals($expectedProcessedFiles, $processedFiles, 'sys_file_processedfile');
     }
 
-    public function testProcessFile()
+    public function testProcessFile(): void
     {
         $this->converter->expects($this->once())->method('start');
         $this->converter->expects($this->never())->method('process');
@@ -54,7 +56,7 @@ class VideoProcessorTest extends FunctionalTestCase
         $this->assertTasksAndProcessedFiles(1, 0);
     }
 
-    public function testDoProcessFile()
+    public function testDoProcessFile(): void
     {
         $this->converter->expects($this->once())->method('start');
         $this->converter->expects($this->once())->method('process');
@@ -73,10 +75,10 @@ class VideoProcessorTest extends FunctionalTestCase
         $this->assertTasksAndProcessedFiles(1, 0);
     }
 
-    public function testActuallyDoProcessFile()
+    public function testActuallyDoProcessFile(): void
     {
         $this->converter->expects($this->once())->method('start');
-        $this->converter->expects($this->once())->method('process')->willReturnCallback(function (VideoProcessingTask $task) {
+        $this->converter->expects($this->once())->method('process')->willReturnCallback(function (VideoProcessingTask $task): void {
             $processedFile = $task->getTargetFile();
             $processedFile->setName($task->getTargetFilename());
             $processedFile->updateProperties([
@@ -105,7 +107,7 @@ class VideoProcessorTest extends FunctionalTestCase
         $this->assertTasksAndProcessedFiles(1, 1);
     }
 
-    public function testDoNothingIfAlreadyRunning()
+    public function testDoNothingIfAlreadyRunning(): void
     {
         $this->converter->expects($this->once())->method('start');
 
@@ -114,7 +116,7 @@ class VideoProcessorTest extends FunctionalTestCase
         $this->assertTasksAndProcessedFiles(1, 0);
     }
 
-    public function testRedoIfFileIsMissing()
+    public function testRedoIfFileIsMissing(): void
     {
         $this->converter->expects($this->once())->method('start');
 
@@ -130,7 +132,7 @@ class VideoProcessorTest extends FunctionalTestCase
         $this->assertTasksAndProcessedFiles(2, 0);
     }
 
-    public function testNoRedoIfFailed()
+    public function testNoRedoIfFailed(): void
     {
         $this->converter->expects($this->never())->method('start');
 
@@ -146,7 +148,7 @@ class VideoProcessorTest extends FunctionalTestCase
         $this->assertTasksAndProcessedFiles(1, 0);
     }
 
-    public function testNoRedoIfRunning()
+    public function testNoRedoIfRunning(): void
     {
         $this->converter->expects($this->never())->method('start');
 

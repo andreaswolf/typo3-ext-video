@@ -25,15 +25,25 @@ use function GuzzleHttp\Promise\queue;
 
 class CloudConvertConverterTest extends UnitTestCase
 {
-    /** @var Connection|MockObject */
+    /**
+     * @var Connection|MockObject
+     */
     protected $db;
-    /** @var File|MockObject */
+    /**
+     * @var File|MockObject
+     */
     protected $file;
-    /** @var ProcessedFile|MockObject */
+    /**
+     * @var ProcessedFile|MockObject
+     */
     protected $processedFile;
-    /** @var Client|MockObject */
+    /**
+     * @var Client|MockObject
+     */
     protected $client;
-    /** @var LockingStrategyInterface|MockObject */
+    /**
+     * @var LockingStrategyInterface|MockObject
+     */
     protected $lock;
 
     protected function setUp(): void
@@ -76,7 +86,7 @@ class CloudConvertConverterTest extends UnitTestCase
         queue()->disableShutdown();
     }
 
-    protected function assertRequests(array ...$requests)
+    protected function assertRequests(array ...$requests): void
     {
         $this->client
             ->expects($this->exactly(count($requests)))
@@ -91,7 +101,7 @@ class CloudConvertConverterTest extends UnitTestCase
             }, $requests));
     }
 
-    protected function assertDbSelects(array ...$selects)
+    protected function assertDbSelects(array ...$selects): void
     {
         $this->db
             ->expects($this->exactly(count($selects)))
@@ -104,7 +114,7 @@ class CloudConvertConverterTest extends UnitTestCase
             ->willReturnOnConsecutiveCalls(...array_map(fn (array $select) => $this->createConfiguredMock(Statement::class, ['fetch' => $select[2]]), $selects));
     }
 
-    public function testInfoFailure()
+    public function testInfoFailure(): void
     {
         $this->expectException(ConversionException::class);
         $task = new VideoProcessingTask($this->processedFile, []);
@@ -138,7 +148,7 @@ class CloudConvertConverterTest extends UnitTestCase
         $this->assertFalse($task->isExecuted());
     }
 
-    public function testGetInfoOversize()
+    public function testGetInfoOversize(): void
     {
         $this->expectException(ConversionException::class);
         $this->file->expects($this->atLeastOnce())->method('getSize')->willReturn(1024 * 1024 * 1024 * 5);
@@ -185,7 +195,7 @@ class CloudConvertConverterTest extends UnitTestCase
         $this->assertFalse($task->isExecuted());
     }
 
-    public function testGetInfoFull()
+    public function testGetInfoFull(): void
     {
         $this->file->expects($this->atLeastOnce())->method('getSize')->willReturn(1024 * 1024 * 200);
         $task = new VideoProcessingTask($this->processedFile, []);
@@ -285,7 +295,7 @@ class CloudConvertConverterTest extends UnitTestCase
         $this->assertFalse($task->isExecuted());
     }
 
-    public function testConvert()
+    public function testConvert(): void
     {
         $formatRepository = $this->createMock(FormatRepository::class);
         $formatRepository->expects($this->once())
@@ -390,7 +400,7 @@ class CloudConvertConverterTest extends UnitTestCase
         $this->assertEquals(CloudConvertConverter::PROGRESS_RANGES['convert']['input'][0], $task->getLastProgress());
     }
 
-    public function testDownload()
+    public function testDownload(): void
     {
         $formatRepository = $this->createMock(FormatRepository::class);
         $formatRepository->expects($this->once())

@@ -76,9 +76,7 @@ class CloudConvertConverter extends AbstractVideoConverter
      */
     private ?UriInterface $baseUrl = null;
 
-    /**
-     * @param string|null $baseUrl
-     */
+    
     public function __construct(string $apiKey)
     {
         parent::__construct();
@@ -445,7 +443,7 @@ class CloudConvertConverter extends AbstractVideoConverter
         return $this->request('get', $processUrl);
     }
 
-    protected function updateProgressInformation(VideoProcessingTask $task, string $mode, array $response)
+    protected function updateProgressInformation(VideoProcessingTask $task, string $mode, array $response): void
     {
         $range = self::PROGRESS_RANGES[$mode][$response['step']] ?? null;
         if (!$range) {
