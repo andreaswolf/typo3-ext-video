@@ -22,7 +22,7 @@ class VideoCommandController extends CommandController
     /**
      * @param float $timeout A timeout (in minutes) after which no further tasks are started.
      */
-    public function processCommand(float $timeout = INF)
+    public function processCommand(float $timeout = INF): void
     {
         $this->output('Search for new tasks... ');
         $storedTasks = $this->repository->findByStatus(VideoProcessingTask::STATUS_NEW);

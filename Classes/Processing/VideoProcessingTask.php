@@ -48,7 +48,6 @@ class VideoProcessingTask extends AbstractTask
      * Checks if the given configuration is sensible for this task, i.e. if all required parameters
      * are given, within the boundaries and don't conflict with each other.
      *
-     *
      * @return bool
      */
     protected function isValidConfiguration(array $configuration)
@@ -88,7 +87,7 @@ class VideoProcessingTask extends AbstractTask
         return self::STATUS_FAILED;
     }
 
-    public function setStatus(string $status)
+    public function setStatus(string $status): void
     {
         switch ($status) {
             case self::STATUS_NEW:
@@ -207,7 +206,7 @@ class VideoProcessingTask extends AbstractTask
     /**
      * @internal this method is meant for deserialization
      */
-    public function setDatabaseRow(array $row)
+    public function setDatabaseRow(array $row): void
     {
         $this->uid = $row['uid'];
         $this->setStatus($row['status']);

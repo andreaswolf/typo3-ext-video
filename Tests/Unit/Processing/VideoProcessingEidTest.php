@@ -29,7 +29,7 @@ class VideoProcessingEidTest extends UnitTestCase
         parent::tearDown();
     }
 
-    public function testKeys()
+    public function testKeys(): void
     {
         $url = VideoProcessingEid::getUrl();
         $query = parse_url($url, PHP_URL_QUERY);

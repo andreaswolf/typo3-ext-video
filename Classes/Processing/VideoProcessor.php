@@ -34,7 +34,6 @@ class VideoProcessor implements ProcessorInterface
     /**
      * Returns TRUE if this processor can process the given task.
      *
-     *
      * @return bool
      */
     public function canProcessTask(TaskInterface $task)
@@ -48,10 +47,8 @@ class VideoProcessor implements ProcessorInterface
      * For some reason the image processing is hardcoded into the core.
      * @see \TYPO3\CMS\Core\Resource\Service\FileProcessingService::processFile
      * @see \Hn\Video\Slot\FileProcessingServiceSlot::preFileProcess
-     *
-     * @param TaskInterface $task
      */
-    public function processTask(TaskInterface $task)
+    public function processTask(TaskInterface $task): void
     {
         if (!$task instanceof VideoProcessingTask) {
             $type = is_object($task) ? get_class($task) : gettype($task);
@@ -94,10 +91,8 @@ class VideoProcessor implements ProcessorInterface
      * This method actually does process the task.
      *
      * It may take long and should therefor not be called in a frontend process.
-     *
-     * @param TaskInterface $task
      */
-    public function doProcessTask(TaskInterface $task)
+    public function doProcessTask(TaskInterface $task): void
     {
         if (!$task instanceof VideoProcessingTask) {
             $type = is_object($task) ? get_class($task) : gettype($task);

@@ -34,7 +34,7 @@ class MetaDataRepositorySlot implements SingletonInterface
         $this->fileRepository = GeneralUtility::makeInstance(FileRepository::class);
     }
 
-    public function recordPostRetrieval(\ArrayObject $data)
+    public function recordPostRetrieval(\ArrayObject $data): void
     {
         if (isset($this->currentlyProcessing[$data['file']])) {
             return;

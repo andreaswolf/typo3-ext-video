@@ -40,9 +40,6 @@ class TypeUtility
      * This utility compares mime types.
      *
      * It respects case-insensitivity and also mime type extensions.
-     *
-     * @param string $mimeType
-     * @param array $list
      */
     public static function inList(string $mimeType, array $list): bool
     {

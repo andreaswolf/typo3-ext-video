@@ -23,15 +23,25 @@ abstract class FunctionalTestCase extends \Nimut\TestingFramework\TestCase\Funct
         'typo3conf/ext/video',
     ];
 
-    /** @var ObjectManager */
+    /**
+     * @var ObjectManager
+     */
     protected $objectManager;
-    /** @var PersistenceManager */
+    /**
+     * @var PersistenceManager
+     */
     protected $persistenceManager;
-    /** @var StorageRepository */
+    /**
+     * @var StorageRepository
+     */
     protected $storageRepository;
-    /** @var ResourceStorage */
+    /**
+     * @var ResourceStorage
+     */
     protected $resourceStorage;
-    /** @var File */
+    /**
+     * @var File
+     */
     protected $file;
 
     protected function setUp(): void

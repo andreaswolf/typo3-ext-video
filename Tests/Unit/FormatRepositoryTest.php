@@ -24,7 +24,7 @@ class FormatRepositoryTest extends UnitTestCase
         parent::tearDown();
     }
 
-    public function testFindDefinition()
+    public function testFindDefinition(): void
     {
         $this->assertNull($this->repository->findFormatDefinition(['format' => 'mp4']));
 
@@ -38,19 +38,19 @@ class FormatRepositoryTest extends UnitTestCase
         $this->assertNull($this->repository->findFormatDefinition(['format' => 'mp4:high']));
     }
 
-    public function testBuildUnknown()
+    public function testBuildUnknown(): void
     {
         $this->expectException(FormatException::class);
         $this->repository->buildParameters(null, null, ['format' => 'mp4']);
     }
 
-    public function testBuildEmpty()
+    public function testBuildEmpty(): void
     {
         $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['video']['formats']['mp4:default'] = [];
         $this->assertEquals(['-vn', '-an', '-sn', '-dn'], $this->repository->buildParameters(null, null, ['format' => 'mp4']));
     }
 
-    public function testBuildVideo()
+    public function testBuildVideo(): void
     {
         $videoPreset = $this->createMock(PresetInterface::class);
         GeneralUtility::addInstance(get_class($videoPreset), $videoPreset);

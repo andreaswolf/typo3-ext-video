@@ -27,8 +27,6 @@ class LocalCommandRunner implements SingletonInterface
      * This runs the given command.
      * You can use the returned iterator to parse the output while the command is running.
      * The Generator return value will be the status code.
-     *
-     *
      */
     public function run(string $command): \Generator
     {

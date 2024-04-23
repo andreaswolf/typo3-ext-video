@@ -19,7 +19,7 @@ class TaskController extends ActionController
         $this->videoTaskRepository = GeneralUtility::makeInstance(VideoTaskRepository::class);
     }
 
-    public function listAction()
+    public function listAction(): void
     {
         $qb = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('tx_video_task');
         $qb->from('tx_video_task', 'task');
@@ -56,7 +56,7 @@ class TaskController extends ActionController
         ]);
     }
 
-    public function deleteAction(int $task)
+    public function deleteAction(int $task): void
     {
         $task = $this->videoTaskRepository->findByUid($task);
         if (!$task) {

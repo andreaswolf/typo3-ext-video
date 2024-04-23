@@ -106,7 +106,7 @@ class VideoTagRendererTest extends UnitTestCase
     /**
      * @dataProvider attributeSets
      */
-    public function testSimpleRendering($options, $expectedAttributes)
+    public function testSimpleRendering($options, $expectedAttributes): void
     {
         $processedFile = $this->createMock(ProcessedFile::class);
         $processedFile->expects($this->atLeastOnce())->method('exists')->willReturn(true);

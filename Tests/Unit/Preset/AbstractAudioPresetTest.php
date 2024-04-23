@@ -7,7 +7,9 @@ use PHPUnit\Framework\MockObject\MockObject;
 
 class AbstractAudioPresetTest extends AbstractPresetTest
 {
-    /** @var AbstractAudioPreset|MockObject */
+    /**
+     * @var AbstractAudioPreset|MockObject
+     */
     protected $preset;
 
     protected function createPreset()
@@ -17,7 +19,7 @@ class AbstractAudioPresetTest extends AbstractPresetTest
         return $mockObject;
     }
 
-    public function testSampleRate()
+    public function testSampleRate(): void
     {
         $this->assertEquals(48000, $this->preset->getSampleRate([]));
 

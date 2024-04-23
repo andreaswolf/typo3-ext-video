@@ -8,7 +8,7 @@ use TYPO3\CMS\Core\Resource\ProcessedFile;
 
 class VideoProcessingTaskTest extends UnitTestCase
 {
-    public function testProgress()
+    public function testProgress(): void
     {
         $task = new VideoProcessingTask($this->createMock(ProcessedFile::class), []);
 
@@ -60,7 +60,7 @@ class VideoProcessingTaskTest extends UnitTestCase
         $this->assertEquals(0, $task->getEstimatedRemainingTime());
     }
 
-    public function testOutOfBounds()
+    public function testOutOfBounds(): void
     {
         $this->expectException(\OutOfRangeException::class);
         $task = new VideoProcessingTask($this->createMock(ProcessedFile::class), []);

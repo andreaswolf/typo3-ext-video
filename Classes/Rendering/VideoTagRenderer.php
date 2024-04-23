@@ -201,7 +201,7 @@ class VideoTagRenderer implements FileRendererInterface
         ];
     }
 
-    private static function dispatch(string $name, array $arguments, array ...$furtherArguments)
+    private static function dispatch(string $name, array $arguments, array ...$furtherArguments): void
     {
         if (!empty($furtherArguments)) {
             $arguments = array_merge($arguments, ...$furtherArguments);

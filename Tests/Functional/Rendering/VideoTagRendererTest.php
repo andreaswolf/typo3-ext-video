@@ -25,7 +25,7 @@ class VideoTagRendererTest extends FunctionalTestCase
     /**
      * @dataProvider options
      */
-    public function testVideoTag($videoTag, $options)
+    public function testVideoTag($videoTag, $options): void
     {
         $view = new StandaloneView();
         $view->setTemplatePathAndFilename(__DIR__ . '/../../Fixtures/Media.html');

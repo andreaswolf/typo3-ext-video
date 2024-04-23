@@ -12,7 +12,6 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  * Implementation of a metadata extractor.
  * Of course, the typo3 implementation is broken which is why this only runs while adding files.
  * Except for images since they are hardcoded everywhere: \TYPO3\CMS\Core\Resource\Index\MetaDataRepository::findByFile
- *
  */
 class VideoMetadataExtractor implements ExtractorInterface
 {
@@ -88,7 +87,6 @@ class VideoMetadataExtractor implements ExtractorInterface
 
     /**
      * Checks if the given file can be processed by this Extractor
-     *
      *
      * @return bool
      */

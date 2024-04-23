@@ -31,7 +31,7 @@ class VideoTaskRepository implements SingletonInterface
         $this->processedFileRepository = GeneralUtility::makeInstance(ProcessedFileRepository::class);
     }
 
-    public function store(VideoProcessingTask $task)
+    public function store(VideoProcessingTask $task): void
     {
         $values = [
             'tstamp' => time(),
@@ -105,7 +105,6 @@ class VideoTaskRepository implements SingletonInterface
 
     /**
      * Finds tasks by a specific status.
-     *
      *
      * @return VideoProcessingTask[]
      */

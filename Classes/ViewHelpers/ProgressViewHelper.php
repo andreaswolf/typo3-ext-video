@@ -18,7 +18,7 @@ class ProgressViewHelper extends AbstractViewHelper
     protected $escapeChildren = false;
     protected $escapeOutput = false;
 
-    public function initializeArguments()
+    public function initializeArguments(): void
     {
         parent::initializeArguments();
         $this->registerArgument('subject', 'mixed', "one or multiple task id's or proccessed files.", true);

@@ -7,7 +7,9 @@ use PHPUnit\Framework\MockObject\MockObject;
 
 class AbstractVideoPresetTest extends AbstractPresetTest
 {
-    /** @var AbstractVideoPreset|MockObject */
+    /**
+     * @var AbstractVideoPreset|MockObject
+     */
     protected $preset;
 
     protected function createPreset()
@@ -46,7 +48,7 @@ class AbstractVideoPresetTest extends AbstractPresetTest
     /**
      * @dataProvider framerates
      */
-    public function testFramerate($expectedFramerate, array $sourceStream)
+    public function testFramerate($expectedFramerate, array $sourceStream): void
     {
         $this->assertEqualsWithDelta($expectedFramerate, $this->preset->getFramerate($sourceStream), 0.001);
     }
@@ -65,7 +67,7 @@ class AbstractVideoPresetTest extends AbstractPresetTest
     /**
      * @dataProvider dimensions
      */
-    public function testDimensionsAndCropping($expectedDimensions, $expectedCroppedDimensions, array $maxDimensions, array $sourceStream)
+    public function testDimensionsAndCropping($expectedDimensions, $expectedCroppedDimensions, array $maxDimensions, array $sourceStream): void
     {
         if (static::class !== self::class) {
             $this->markTestSkipped('Needed to rename the method because of different parameter sets, but the test should not run in child classes');
@@ -80,7 +82,7 @@ class AbstractVideoPresetTest extends AbstractPresetTest
         $this->assertEquals($expectedCroppedDimensions, $this->preset->getDimensions($sourceStream), 'cropped resolution');
     }
 
-    public function testBoostedQuality()
+    public function testBoostedQuality(): void
     {
         $this->preset->setMaxWidth(1280);
         $this->preset->setMaxHeight(720);

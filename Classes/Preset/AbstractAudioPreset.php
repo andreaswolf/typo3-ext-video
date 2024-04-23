@@ -88,8 +88,6 @@ abstract class AbstractAudioPreset extends AbstractCompressiblePreset
 
     /**
      * the target bitrate in kbit/s.
-     *
-     *
      */
     public function getBitrate(array $sourceStream): int
     {
