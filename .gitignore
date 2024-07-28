@@ -1,0 +1,11 @@
+# macOS files
+.DS_Store
+
+# installation files
+/config
+/public
+/var
+/vendor
+
+# this is a libraray, the dependencies must not be locked
+/composer.lock

@@ -1,0 +1,29 @@
+{
+  "name": "hn/video",
+  "description": "Video processing in typo3",
+  "type": "typo3-cms-extension",
+  "license": "GPL-2.0-or-later",
+  "autoload": {
+    "psr-4": {
+      "Hn\\Video\\": "Classes"
+    }
+  },
+  "authors": [
+    {
+      "name": "Marco Pfeiffer",
+      "email": "marco@hauptsache.net"
+    }
+  ],
+  "require": {
+    "typo3/cms-backend": "^12.4",
+    "typo3/cms-core": "^12.4"
+  },
+  "config": {
+    "sort-packages": true
+  },
+  "extra": {
+    "typo3/cms": {
+      "extension-key": "video"
+    }
+  }
+}

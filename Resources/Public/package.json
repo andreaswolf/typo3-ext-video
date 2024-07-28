@@ -1,0 +1,7 @@
+{
+  "name": "hn_video",
+  "dependencies": {
+    "@ffmpeg/core-mt": "^0.12.6",
+    "@ffmpeg/ffmpeg": "^0.12.10"
+  }
+}
