@@ -5,7 +5,7 @@ import {createHlsFiles, createMp4File} from "./video-converter.js";
 // this also loads and initializes it
 export * from "@hn/video/typo3/backend/drag-uploader.js";
 
-const ORIGINAL_FILE = Symbol("original file");
+const ORIGINAL_VIDEO_FILE = Symbol("hn/video extension: original video file");
 
 // monkey patch the processFiles method of the DragUploaderPlugin to replace video files with a fake m3u8 file
 // the upload process can than later be extended to convert the video to a m3u8 file
@@ -29,7 +29,7 @@ $.fn.dragUploader = function () {
                     // const replacementFile = new File([""], replacementFileName, {type: "application/x-mpegURL"});
                     const replacementFileName = file.name.replace(/\.[^.]{2,4}$|$/, ".mp4");
                     const replacementFile = new File([""], replacementFileName, {type: "video/mp4"});
-                    replacementFile[ORIGINAL_FILE] = file[ORIGINAL_FILE] ?? file;
+                    replacementFile[ORIGINAL_VIDEO_FILE] = file[ORIGINAL_VIDEO_FILE] ?? file;
                     return replacementFile;
                 })
             return origProcessFiles.call(this, modifiedFiles);
@@ -48,11 +48,11 @@ XMLHttpRequest.prototype.send = function (data) {
     }
 
     const file = data.get('upload_1');
-    if (!(file instanceof File) || !(ORIGINAL_FILE in file)) {
+    if (!(file instanceof File) || !(ORIGINAL_VIDEO_FILE in file)) {
         return origSend.call(this, data);
     }
 
-    const conversion = createMp4File(file[ORIGINAL_FILE], (progress) => {
+    const conversion = createMp4File(file[ORIGINAL_VIDEO_FILE], (progress) => {
         const event = new Event("progress");
         event.loaded = Math.floor(progress * 1000);
         event.total = 1000;
