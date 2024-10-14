@@ -8,7 +8,7 @@ use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
 /**
- * To enable multi threaded wasm executing, access to SharedArrayBuffer is required.
+ * To enable multithreaded wasm executing, access to SharedArrayBuffer is required.
  * Because of Spectre and Meltdown, SharedArrayBuffer were disabled in 2018.
  * They are now available again but with additional security requirements.
  * This middleware adds the required headers to enable SharedArrayBuffer.

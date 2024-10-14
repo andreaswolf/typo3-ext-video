@@ -9,3 +9,7 @@
 
 # this is a libraray, the dependencies must not be locked
 /composer.lock
+
+# node module files that we don't use
+Resources/Public/node_modules/@ffmpeg/core-mt/dist/umd
+Resources/Public/node_modules/@ffmpeg/ffmpeg/dist/umd

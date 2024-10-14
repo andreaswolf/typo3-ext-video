@@ -7,6 +7,10 @@ export * from "@hn/video/typo3/backend/drag-uploader.js";
 
 const ORIGINAL_VIDEO_FILE = Symbol("hn/video extension: original video file");
 
+if (!window.crossOriginIsolated) {
+    alert("Video conversion might be unavailable because of missing crossOriginIsolation.\nSee: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/SharedArrayBuffer#security_requirements");
+}
+
 // monkey patch the processFiles method of the DragUploaderPlugin to replace video files with a fake m3u8 file
 // the upload process can than later be extended to convert the video to a m3u8 file
 const origDragUploader = $.fn.dragUploader;
