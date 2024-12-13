@@ -65,13 +65,33 @@ XMLHttpRequest.prototype.send = function (data) {
 
     conversion
         .then(async (mp4File) => {
+            if (mp4File.size < 100) {
+                throw new Error("Conversion Error")
+            }
             // finally start the actual upload of the m3u8 file
             data.set('upload_1', mp4File);
             origSend.call(this, data);
         })
         .catch((error) => {
             console.error(error);
-            // TODO throw error event
+
+            Object.defineProperty(this, 'readyState', { value: XMLHttpRequest.DONE });
+            Object.defineProperty(this, 'status', { value: 500 });
+            Object.defineProperty(this, 'responseText', {
+                value: JSON.stringify({
+                    messages: [
+                        {
+                            title: 'Conversion Failed',
+                            message: String(error),
+                            severity: 2, // error
+                        },
+                    ]
+                })
+            });
+
+            const event = new Event("readystatechange");
+            this.upload.dispatchEvent(event);
+            this.onreadystatechange?.(event);
         });
 };
 

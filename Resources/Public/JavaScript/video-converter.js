@@ -45,6 +45,10 @@ export async function createMp4File (videoFile, onProgress) {
     const resultFileName = videoFile.name.replace(/\.[^.]+$|$/, '.mp4');
     const result = new File([await ffmpeg.readFile('output.mp4')], resultFileName, {type: 'video/mp4'});
     ffmpeg.terminate();
+    if (result.size < 100) {
+        throw new Error("Conversion failed for unknown reasons. See Browser Console for more details.")
+    }
+
     return result;
 }
 
