@@ -1,7 +1,7 @@
 <?php
 $EM_CONF[$_EXTKEY] = [
     'title' => 'Video',
-    'description' => 'Video processing in typo3',
+    'description' => 'TYPO3 extension that compresses videos during upload to 720p H.264 MP4 using ffmpeg.wasm for optimal compatibility, storage, and performance.',
     'category' => 'plugin',
     'author' => 'Marco Pfeiffer',
     'author_email' => 'marco@hauptsache.net',
