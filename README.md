@@ -6,6 +6,8 @@
   - It save storage space on your server by not uploading the original files
   - It potentially helps users upload videos that have a slow internet connection
 
+![recording.clip.gif](recording.clip.gif)
+
 ## installation
 
 You usually just need to install and activate this extension.
@@ -22,10 +24,14 @@ Here is the explanation why this is required:
 https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/SharedArrayBuffer#security_requirements  
 In short: It will prevent a 3rd party site from embedding resources from your backend. It is a security requirement to use some timing critical browser api's.
 
+## known issues
+
+- Empty folders in the Filelist have an upload button that avoids the drag-uploader in TYPO3 13.
+
 ## future plans
 
 - allow for quality configuration
-  - the default is a pretty good compromise between quality, compatibility and file size, but you might have different requirements
+  - the 720p default is a pretty good compromise between quality, compatibility and file size, but you might have different requirements
 - create posters and thumbnails for video files
   - this would allow to populate the poster property of the `<video>` tag as a placeholder before playing the video
   - it could give a better overview within the fileadmin, where videos currently have no thumbnail/preview

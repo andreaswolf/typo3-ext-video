@@ -1,4 +1,4 @@
-import $ from "jquery";
+import DragUploader from "@hn/video/typo3/backend/drag-uploader.js";
 import {createHlsFiles, createMp4File} from "./video-converter.js";
 
 // export the original module
@@ -13,33 +13,30 @@ if (!window.crossOriginIsolated) {
 
 // monkey patch the processFiles method of the DragUploaderPlugin to replace video files with a fake m3u8 file
 // the upload process can than later be extended to convert the video to a m3u8 file
-const origDragUploader = $.fn.dragUploader;
-$.fn.dragUploader = function () {
-    const result = origDragUploader.apply(this, arguments);
-    this.each(function () {
-        // https://github.com/TYPO3/typo3/blob/fab5b85d9a980a4f33c72f8a584b90141908f0d5/Build/Sources/TypeScript/backend/drag-uploader.ts#L338
-        const uploaderPlugin = $(this).data("DragUploaderPlugin");
-        const origProcessFiles = uploaderPlugin.processFiles;
-        uploaderPlugin.processFiles = function (files) {
-            const modifiedFiles = Array.from(files)
-                .map((file) => {
-                    if (!file.type.startsWith("video/")) {
-                        return file;
-                    }
+function patchProcessFiles(dragUploaderInstanceOrPrototype) {
+    const origProcessFiles = dragUploaderInstanceOrPrototype.processFiles;
+    dragUploaderInstanceOrPrototype.processFiles = function (files) {
+        const modifiedFiles = Array.from(files)
+            .map((file) => {
+                if (!file.type.startsWith("video/")) {
+                    return file;
+                }
 
-                    // if a video is uploaded, replace it with a fake m3u8 file
-                    // this file will be generated during the upload process
-                    // const replacementFileName = file.name.replace(/\.[^.]{2,4}$|$/, ".m3u8");
-                    // const replacementFile = new File([""], replacementFileName, {type: "application/x-mpegURL"});
-                    const replacementFileName = file.name.replace(/\.[^.]{2,4}$|$/, ".mp4");
-                    const replacementFile = new File([""], replacementFileName, {type: "video/mp4"});
-                    replacementFile[ORIGINAL_VIDEO_FILE] = file[ORIGINAL_VIDEO_FILE] ?? file;
-                    return replacementFile;
-                })
-            return origProcessFiles.call(this, modifiedFiles);
-        };
-    });
-    return result;
+                // if a video is uploaded, replace it with a fake m3u8 file
+                // this file will be generated during the upload process
+                // const replacementFileName = file.name.replace(/\.[^.]{2,4}$|$/, ".m3u8");
+                // const replacementFile = new File([""], replacementFileName, {type: "application/x-mpegURL"});
+                const replacementFileName = file.name.replace(/\.[^.]{2,4}$|$/, ".mp4");
+                const replacementFile = new File([""], replacementFileName, {type: "video/mp4"});
+                replacementFile[ORIGINAL_VIDEO_FILE] = file[ORIGINAL_VIDEO_FILE] ?? file;
+                return replacementFile;
+            })
+        return origProcessFiles.call(this, modifiedFiles);
+    };
+}
+// typo3 13 exposed class
+if (typeof DragUploader === "function") {
+    patchProcessFiles(DragUploader.prototype);
 }
 
 // monkey patch the XMLHttpRequest send method to intercept the upload process
