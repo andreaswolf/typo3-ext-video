@@ -48,7 +48,7 @@ async function createFfmpegInstance(onProgress, onLog) {
         workerURL: import.meta.resolve(`@ffmpeg/core-mt/ffmpeg-core.worker.js`),
     });
     ffmpeg.on("log", ({ message }) => onLog(message));
-    ffmpeg.on("progress", ({progress}) => onProgress(progress));
+    ffmpeg.on("progress", ({ progress }) => onProgress(progress));
     return ffmpeg;
 }
 /**
@@ -75,10 +75,10 @@ export async function createMp4File(videoFile, preset, onProgress) {
 
     await ffmpeg.exec(params);
     const resultFileName = videoFile.name.replace(/\.[^.]+$|$/, '.mp4');
-    const result = new File([await ffmpeg.readFile('output.mp4')], resultFileName, {type: 'video/mp4'});
+    const result = new File([await ffmpeg.readFile('output.mp4')], resultFileName, { type: 'video/mp4' });
     ffmpeg.terminate();
     if (result.size < 100) {
-        throw new Error("Conversion failed for unknown reasons. See Browser Console for more details.")
+        throw new Error("Conversion failed for unknown reasons. See Browser Console for more details.");
     }
 
     return result;
@@ -90,7 +90,7 @@ export async function createMp4File(videoFile, preset, onProgress) {
  * @param emitFile {(file: File) => void} A callback that gets the fragment files as parameter
  * @returns {Promise<File>} The final m3u8 playlist file
  */
-export async function createHlsFiles (videoFile, onProgress, emitFile) {
+export async function createHlsFiles(videoFile, onProgress, emitFile) {
     const ffmpeg = await createFfmpegInstance(onProgress, (message) => {
         const match = message.match(/Opening '([^']+)' for writing/);
         if (match && match[1] !== 'output.m3u8') {
@@ -113,7 +113,7 @@ export async function createHlsFiles (videoFile, onProgress, emitFile) {
 
     // mount the file using WORKERFS. That way, we don't need to load the file into memory
     await ffmpeg.createDir('input');
-    await ffmpeg.mount('WORKERFS', { blobs: [{ name: 'input', data: videoFile }] }, '/input');
+    await ffmpeg.mount(FFFSType.WORKERFS, { blobs: [{ name: 'input', data: videoFile }] }, '/input');
     params.push('-i', `input/input`);
 
     params.push('-filter_complex', [
@@ -153,7 +153,7 @@ export async function createHlsFiles (videoFile, onProgress, emitFile) {
 
     // output the final playlist file separately
     const m3u8FileName = videoFile.name.replace(/\.[^.]+$|$/, '.m3u8');
-    const result = new File([await ffmpeg.readFile('output.m3u8')], m3u8FileName, {type: 'application/x-mpegURL'});
+    const result = new File([await ffmpeg.readFile('output.m3u8')], m3u8FileName, { type: 'application/x-mpegURL' });
     ffmpeg.terminate();
     return result;
 }

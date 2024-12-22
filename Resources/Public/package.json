@@ -3,5 +3,12 @@
   "dependencies": {
     "@ffmpeg/core-mt": "^0.12.6",
     "@ffmpeg/ffmpeg": "^0.12.10"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.2"
+  },
+  "scripts": {
+    "build": "tsc",
+    "build:watch": "tsc --watch"
   }
 }
