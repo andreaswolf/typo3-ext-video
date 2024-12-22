@@ -1,11 +1,44 @@
 import { FFmpeg } from '@ffmpeg/ffmpeg';
 
-/**
- * @param videoFile {File} The original video file
- * @param onProgress {(progress: number) => void} A callback that gets the progress event as parameter
- * @returns {Promise<File>} The final mp4 file
- */
-export async function createMp4File (videoFile, onProgress) {
+export const Mp4Presets = {
+    'x264-360p': { apply: (params) => {
+            params.push('-vf', 'scale=w=640:h=360:force_original_aspect_ratio=decrease:force_divisible_by=2');
+            params.push('-c:v', 'libx264'); // codec
+            params.push('-crf:v', '21', '-maxrate:v', '2M', '-bufsize:v', '4M'); // quality
+            params.push('-level:v', '2.2', '-pix_fmt:v', 'yuv420p'); // compatibility
+            // NOTE: There is no easy way to limit fps without potentially introducing stutter or messing with intent, so I don't
+            params.push('-c:a', 'aac'); // codec
+            params.push('-b:a', '128k'); // quality
+            // NOTE: I don't mess with sample rate or even channel count and hope ffmpeg uses sensible defaults
+            params.push('-f', 'mp4');
+            params.push('-movflags', '+faststart'); // important: move metadata to the beginning of the video
+        } },
+    'x264-720p': { apply: (params) => {
+            params.push('-vf', 'scale=w=1280:h=720:force_original_aspect_ratio=decrease:force_divisible_by=2');
+            params.push('-c:v', 'libx264'); // codec
+            params.push('-crf:v', '21', '-maxrate:v', '6M', '-bufsize:v', '12M'); // quality
+            params.push('-level:v', '3.2', '-pix_fmt:v', 'yuv420p'); // compatibility
+            // NOTE: There is no easy way to limit fps without potentially introducing stutter or messing with intent, so I don't
+            params.push('-c:a', 'aac'); // codec
+            params.push('-b:a', '128k'); // quality
+            // NOTE: I don't mess with sample rate or even channel count and hope ffmpeg uses sensible defaults
+            params.push('-f', 'mp4');
+            params.push('-movflags', '+faststart'); // important: move metadata to the beginning of the video
+        } },
+    'x264-1080p': { apply: (params) => {
+            params.push('-vf', 'scale=w=1920:h=1080:force_original_aspect_ratio=decrease:force_divisible_by=2');
+            params.push('-c:v', 'libx264'); // codec
+            params.push('-crf:v', '21', '-maxrate:v', '12M', '-bufsize:v', '24M'); // quality
+            params.push('-level:v', '4.2', '-pix_fmt:v', 'yuv420p'); // compatibility
+            // NOTE: There is no easy way to limit fps without potentially introducing stutter or messing with intent, so I don't
+            params.push('-c:a', 'aac'); // codec
+            params.push('-b:a', '128k'); // quality
+            // NOTE: I don't mess with sample rate or even channel count and hope ffmpeg uses sensible defaults
+            params.push('-f', 'mp4');
+            params.push('-movflags', '+faststart'); // important: move metadata to the beginning of the video
+        } }
+};
+async function createFfmpegInstance(onProgress, onLog) {
     const ffmpeg = new FFmpeg();
     await ffmpeg.load({
         // coreURL: import.meta.resolve(`@ffmpeg/core/ffmpeg-core.js`),
@@ -14,8 +47,17 @@ export async function createMp4File (videoFile, onProgress) {
         wasmURL: import.meta.resolve(`@ffmpeg/core-mt/ffmpeg-core.wasm`),
         workerURL: import.meta.resolve(`@ffmpeg/core-mt/ffmpeg-core.worker.js`),
     });
-    ffmpeg.on("log", ({message}) => console.log(message));
+    ffmpeg.on("log", ({ message }) => onLog(message));
     ffmpeg.on("progress", ({progress}) => onProgress(progress));
+    return ffmpeg;
+}
+/**
+ * @param videoFile {File} The original video file
+ * @param onProgress {(progress: number) => void} A callback that gets the progress event as parameter
+ * @returns {Promise<File>} The final mp4 file
+ */
+export async function createMp4File(videoFile, preset, onProgress) {
+    const ffmpeg = await createFfmpegInstance(onProgress, (message) => console.log(message));
     const params = [];
 
     // reduce multi threading for filters ~ it appears to be broken in some cases
@@ -27,18 +69,8 @@ export async function createMp4File (videoFile, onProgress) {
     await ffmpeg.mount('WORKERFS', { blobs: [{ name: 'input', data: videoFile }] }, '/input');
     params.push('-i', `input/input`);
 
-    params.push('-vf', 'scale=w=1280:h=720:force_original_aspect_ratio=decrease:force_divisible_by=2');
-    params.push('-c:v', 'libx264'); // codec
-    params.push('-crf:v', '21', '-maxrate:v', '6M', '-bufsize:v', '12M'); // quality
-    params.push('-level:v', '3.2', '-pix_fmt:v', 'yuv420p'); // compatibility
-    // NOTE: There is no easy way to limit fps without potentially introducing stutter or messing with intent, so I don't
+    preset.apply(params);
 
-    params.push('-c:a', 'aac'); // codec
-    params.push('-b:a', '128k'); // quality
-    // NOTE: I don't mess with sample rate or even channel count and hope ffmpeg uses sensible defaults
-
-    params.push('-f', 'mp4');
-    params.push('-movflags', '+faststart'); // important: move metadata to the beginning of the video
     params.push('output.mp4');
 
     await ffmpeg.exec(params);
@@ -59,15 +91,17 @@ export async function createMp4File (videoFile, onProgress) {
  * @returns {Promise<File>} The final m3u8 playlist file
  */
 export async function createHlsFiles (videoFile, onProgress, emitFile) {
-    const ffmpeg = new FFmpeg();
-    ffmpeg.on("log", ({message}) => console.log(message));
-    ffmpeg.on("progress", ({progress}) => onProgress(progress));
-    await ffmpeg.load({
-        // coreURL: import.meta.resolve(`@ffmpeg/core/ffmpeg-core.js`),
-        // wasmURL: import.meta.resolve(`@ffmpeg/core/ffmpeg-core.wasm`),
-        coreURL: import.meta.resolve(`@ffmpeg/core-mt/ffmpeg-core.js`),
-        wasmURL: import.meta.resolve(`@ffmpeg/core-mt/ffmpeg-core.wasm`),
-        workerURL: import.meta.resolve(`@ffmpeg/core-mt/ffmpeg-core.worker.js`),
+    const ffmpeg = await createFfmpegInstance(onProgress, (message) => {
+        const match = message.match(/Opening '([^']+)' for writing/);
+        if (match && match[1] !== 'output.m3u8') {
+            console.log('try to read', match[1]);
+            ffmpeg.readFile(match[1])
+                .then(data => {
+                emitFile(new File([data], match[1]));
+                console.log("successfully read file", match[1]);
+            })
+                .catch(console.error);
+        }
     });
 
     const params = [];
@@ -114,20 +148,6 @@ export async function createHlsFiles (videoFile, onProgress, emitFile) {
     params.push('-hls_segment_filename', `%v_%03d.ts`);
     params.push('-master_pl_name', 'output.m3u8');
     params.push('%v.m3u8');
-
-    ffmpeg.on("log", ({message}) => {
-        const match = message.match(/Opening '([^']+)' for writing/);
-        if (match && match[1] !== 'output.m3u8') {
-            console.log('try to read', match[1]);
-            ffmpeg.readFile(match[1])
-                .then(data => {
-                    emitFile(new File([data], match[1]));
-                    console.log("successfully read file", match[1]);
-                })
-                .catch(console.error);
-
-        }
-    });
 
     await ffmpeg.exec(params);
 

@@ -1,5 +1,6 @@
 import $ from "jquery";
 import {createHlsFiles, createMp4File} from "./video-converter.js";
+import {Mp4Presets} from "./video-converter";
 
 // export the original module
 // this also loads and initializes it
@@ -60,7 +61,7 @@ XMLHttpRequest.prototype.send = function (data) {
         return origSend.call(this, data);
     }
 
-    const conversion = createMp4File(file[ORIGINAL_VIDEO_FILE], (progress) => {
+    const conversion = createMp4File(file[ORIGINAL_VIDEO_FILE], Mp4Presets['x264-720p'], (progress) => {
         const event = new Event("progress");
         event.loaded = Math.floor(progress * 1000);
         event.total = 1000;
