@@ -1,5 +1,5 @@
-import DragUploader from "@hn/video/typo3/backend/drag-uploader.js";
-export * from "@hn/video/typo3/backend/drag-uploader.js";
+import DragUploader from "./drag-uploader.js";
+export * from "./drag-uploader.js";
 export default DragUploader
 
 import { FFmpegVideoScaler } from './drag-uploader-integration.js'
